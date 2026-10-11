@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Unbounded } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
-import { SiteHeader } from "@/shared/components/layout/site-header";
+import { openGraphBase } from "@/shared/lib/metadata";
+import { themeInitScript } from "@/shared/lib/theme";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const unbounded = Unbounded({
+  variable: "--font-unbounded",
   subsets: ["latin"],
+  weight: "800",
 });
 
 export const metadata: Metadata = {
@@ -25,26 +27,35 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   applicationName: siteConfig.name,
   openGraph: {
-    type: "website",
-    siteName: siteConfig.name,
+    ...openGraphBase,
     title: siteConfig.name,
     description: siteConfig.description,
-    url: siteConfig.url,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: siteConfig.themeColor,
+  themeColor: [
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: siteConfig.themeColors.dark,
+    },
+    {
+      media: "(prefers-color-scheme: light)",
+      color: siteConfig.themeColors.light,
+    },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // The theme script sets data-theme on <html> before React hydrates.
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${unbounded.variable}`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
-        <SiteHeader />
+      <body className="grid min-h-svh grid-rows-[auto_1fr_auto] bg-background font-sans text-foreground antialiased">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {children}
       </body>
     </html>

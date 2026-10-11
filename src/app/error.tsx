@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 
-import { StatusScreen } from "@/shared/components/status-screen";
+import { GhostMark } from "@/shared/components/brand/status-marks";
+import { StatusPage } from "@/shared/components/status-page";
 import { Button } from "@/shared/components/ui/button";
 
 type ErrorPageProps = {
@@ -16,11 +17,12 @@ export default function ErrorPage({ error, retry }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <StatusScreen
-      title="Something went wrong"
+    <StatusPage
+      kicker="Error"
+      title="Something went wrong."
       description="An unexpected error occurred. Please try again."
-    >
-      <Button onClick={retry}>Try again</Button>
-    </StatusScreen>
+      mark={<GhostMark />}
+      action={<Button onClick={retry}>Try again</Button>}
+    />
   );
 }

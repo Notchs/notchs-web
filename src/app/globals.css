@@ -1,29 +1,160 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-ink: #0f0f14;
-  --color-paper: #f5f3ec;
-  --color-volt: #d2ff3c;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Light tokens apply when the system prefers light, unless the user chose
+   dark, and whenever the user chose light with the theme toggle. */
+@custom-variant light {
+  @media (prefers-color-scheme: light) {
+    &:not([data-theme="dark"]) {
+      @slot;
+    }
+  }
+  &[data-theme="light"] {
+    @slot;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+:root {
+  --ink: #0f0f14;
+  --paper: #f5f3ec;
+  --volt: #d2ff3c;
+
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --muted: #8a8a94;
+  --line: rgb(245 243 236 / 0.12);
+  --unnotched: #ff5b35;
+  --block: #24242c;
+  --btn: var(--volt);
+  --btn-fg: var(--ink);
+  --btn-hover: #ddff6b;
+
+  --gutter: 20px;
+  color-scheme: dark;
+
+  @variant light {
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --muted: #5c5c66;
+    --line: rgb(15 15 20 / 0.14);
+    --unnotched: #c2381a;
+    --block: #e3dfd2;
+    --btn: var(--ink);
+    --btn-fg: var(--volt);
+    --btn-hover: #24242c;
+    color-scheme: light;
+  }
+
+  @variant md {
+    --gutter: 40px;
+  }
+
+  @variant xl {
+    --gutter: 64px;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-volt: var(--volt);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-unnotched: var(--unnotched);
+  --color-block: var(--block);
+  --color-btn: var(--btn);
+  --color-btn-fg: var(--btn-fg);
+  --color-btn-hover: var(--btn-hover);
+
+  --font-sans:
+    var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-unbounded), system-ui, sans-serif;
+}
+
+@theme {
+  /* Where the hero switches from stacked to two columns. */
+  --breakpoint-split: 56.25rem;
+
+  --ease-notch: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --animate-fade-in: fade-in 0.7s var(--ease-notch) both;
+  --animate-cut: cut 0.55s var(--ease-notch) both;
+  --animate-draw: draw 0.35s var(--ease-notch) both;
+  --animate-slide: slide 0.6s var(--ease-notch) 0.35s both;
+  --animate-blink: blink 2.4s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes cut {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes slide {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0.25;
+    }
+  }
+}
+
+/* Page side padding: 20px, 40px from md, 64px from xl. */
+@utility px-gutter {
+  padding-inline: var(--gutter);
+}
+
+/* Bottom-right corner cut used on buttons. */
+@utility clip-notch {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 14px),
+    calc(100% - 8px) 100%,
+    0 100%
+  );
+}
+
+@layer base {
+  body {
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  ::selection {
+    background: var(--volt);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation: none !important;
+    }
+  }
 }

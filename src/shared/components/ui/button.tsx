@@ -1,40 +1,50 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
+import Link from "next/link";
 
 import { cn } from "@/shared/lib/cn";
 
-const baseStyles =
-  "inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground disabled:pointer-events-none disabled:opacity-50";
+const buttonStyles =
+  "group clip-notch bg-btn text-btn-fg hover:bg-btn-hover inline-flex min-h-14 cursor-pointer items-center gap-2.5 rounded-[10px] px-7 leading-none font-semibold transition-[background-color,scale] duration-150 focus-visible:outline-none active:scale-[.98]";
 
-const variantStyles = {
-  primary: "bg-foreground text-background hover:bg-foreground/85",
-  outline: "border border-foreground/15 hover:bg-foreground/5",
-} as const;
-
-export type ButtonVariant = keyof typeof variantStyles;
-
-/** Button class names, exported so links can share the exact same look. */
-export function buttonStyles(
-  variant: ButtonVariant = "primary",
-  className?: string,
-) {
-  return cn(baseStyles, variantStyles[variant], className);
-}
-
-type ButtonProps = ComponentProps<"button"> & {
-  variant?: ButtonVariant;
+type FrameProps = {
+  className?: string;
+  children: ReactNode;
 };
 
+/** Draws the focus ring, which the clipped corner of the button would cut off. */
+function ButtonFrame({ className, children }: FrameProps) {
+  return (
+    <span
+      className={cn(
+        "inline-block rounded-[10px] has-focus-visible:outline-2 has-focus-visible:outline-offset-4 has-focus-visible:outline-foreground",
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function Button({
-  variant,
   className,
   type = "button",
   ...props
-}: ButtonProps) {
+}: ComponentProps<"button">) {
   return (
-    <button
-      type={type}
-      className={buttonStyles(variant, className)}
-      {...props}
-    />
+    <ButtonFrame className={className}>
+      <button type={type} className={buttonStyles} {...props} />
+    </ButtonFrame>
+  );
+}
+
+/** A link with the same look as `Button`. */
+export function ButtonLink({
+  className,
+  ...props
+}: ComponentProps<typeof Link>) {
+  return (
+    <ButtonFrame className={className}>
+      <Link className={buttonStyles} {...props} />
+    </ButtonFrame>
   );
 }

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
-import { routes } from "@/config/routes";
-import { StatusScreen } from "@/shared/components/status-screen";
-import { buttonStyles } from "@/shared/components/ui/button";
+import { GhostMark } from "@/shared/components/brand/status-marks";
+import { StatusPage } from "@/shared/components/status-page";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -11,13 +9,11 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <StatusScreen
-      title="Page not found"
-      description="The page you are looking for does not exist or has been moved."
-    >
-      <Link href={routes.home} className={buttonStyles()}>
-        Back to home
-      </Link>
-    </StatusScreen>
+    <StatusPage
+      kicker="Error 404"
+      title="Unnotched."
+      description="This page doesn’t exist. Nothing to prove here."
+      mark={<GhostMark />}
+    />
   );
 }
