@@ -23,6 +23,8 @@ export const navLinks = [
 ] as const;
 
 export const accessLabel = "Get your access";
+/** Header label on phones, where the full one crowds the logo. */
+export const accessLabelShort = "Get access";
 
 export type VenueKind =
   | "cafe"
@@ -488,6 +490,6 @@ const description = heroContent.description;
 export const landingMetadata: Metadata = {
   title: { absolute: title },
   description,
-  alternates: { canonical: routes.landing },
-  openGraph: { ...openGraphBase, url: routes.landing, title, description },
+  alternates: { canonical: routes.home },
+  openGraph: { ...openGraphBase, url: routes.home, title, description },
 };

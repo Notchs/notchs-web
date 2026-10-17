@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { cn } from "@/shared/lib/cn";
 
 import { momentsContent } from "../content";
+import { useStripScroll } from "../lib/use-strip-scroll";
 import { SectionHeading } from "./section-heading";
 import { VerifiedIcon } from "./verified-icon";
 
@@ -15,40 +16,47 @@ const { stories } = momentsContent;
 /**
  * Story-style viewer with photos of people out in the city. Bars fill over
  * 4 seconds, then the next story shows. Tap right for next, left for back;
- * press and hold to pause.
+ * press and hold to pause. Below lg the story list is a swipeable strip right
+ * above the viewer, and the viewer is sized to the screen, so both fit at once.
  */
 export function Moments() {
+  const listRef = useRef<HTMLOListElement>(null);
   const [active, setActive] = useState(0);
   const [held, setHeld] = useState(false);
   const story = stories[active];
+  useStripScroll(listRef, active);
 
   const go = (step: number) =>
     setActive((current) => (current + step + stories.length) % stories.length);
 
   return (
-    <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-center lg:gap-20">
-      <div>
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-center lg:gap-20">
+      {/* min-w-0 lets the story strip scroll instead of widening the page. */}
+      <div className="min-w-0">
         <SectionHeading
           kicker={momentsContent.kicker}
           title={momentsContent.title}
           description={momentsContent.description}
           className="reveal"
         />
-        <ol className="mt-10 grid gap-2 sm:grid-cols-2">
+        <ol
+          ref={listRef}
+          className="mt-8 flex snap-x gap-2 overflow-x-auto pb-1 lg:mt-10 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0"
+        >
           {stories.map((item, index) => (
-            <li key={item.caption}>
+            <li key={item.caption} className="flex-none snap-start">
               <button
                 type="button"
                 aria-pressed={index === active}
                 onClick={() => setActive(index)}
                 className={cn(
-                  "flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-2xl border p-2 pr-4 text-left transition-[background-color,border-color] duration-200",
+                  "flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-2xl border p-1.5 pr-4 text-left transition-[background-color,border-color] duration-200 lg:min-h-16 lg:p-2 lg:pr-4",
                   index === active
                     ? "border-foreground bg-card"
                     : "border-line hover:border-foreground/40",
                 )}
               >
-                <span className="relative size-12 flex-none overflow-hidden rounded-xl bg-block">
+                <span className="relative size-10 flex-none overflow-hidden rounded-xl bg-block lg:size-12">
                   <Image
                     src={item.image.src}
                     alt=""
@@ -57,7 +65,7 @@ export function Moments() {
                     className="object-cover"
                   />
                 </span>
-                <span className="leading-snug font-semibold">
+                <span className="leading-snug font-semibold whitespace-nowrap lg:whitespace-normal">
                   {item.caption}
                 </span>
               </button>
@@ -68,7 +76,7 @@ export function Moments() {
 
       <div className="mx-auto w-full max-w-[22rem] reveal">
         <div
-          className="relative aspect-[9/16] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper select-none"
+          className="relative h-[clamp(24rem,calc(100svh-13rem),36rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper select-none lg:aspect-9/16 lg:h-auto"
           onPointerDown={() => setHeld(true)}
           onPointerUp={() => setHeld(false)}
           onPointerLeave={() => setHeld(false)}

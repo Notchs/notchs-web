@@ -8,7 +8,7 @@ const baseStyles =
 
 const sizeStyles = {
   default: "min-h-14 px-7",
-  sm: "min-h-12 px-5 text-[.9375rem]",
+  sm: "min-h-9 px-3 text-[.8125rem] sm:min-h-12 sm:px-5 sm:text-[.9375rem]",
 } as const;
 
 type ButtonSize = keyof typeof sizeStyles;

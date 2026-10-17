@@ -14,12 +14,13 @@ const SLIDE_MS = 2000;
  * Where each card sits, by its place in the fan. 0 is the main card in front,
  * -1 and 1 lean out behind it on the left and right, and -2 is the card that
  * just left (it slides further left and fades). New cards come in on the right.
+ * Below lg the fan is tighter so the tilted side cards stay inside the gutter.
  */
 const fanStyles: Record<number, string> = {
-  [-2]: "z-0 -translate-x-[55%] scale-[.78] -rotate-12 opacity-0 pointer-events-none",
-  [-1]: "z-10 -translate-x-[30%] scale-[.86] -rotate-6",
+  [-2]: "z-0 -translate-x-[45%] lg:-translate-x-[55%] scale-[.78] -rotate-12 opacity-0 pointer-events-none",
+  [-1]: "z-10 -translate-x-[22%] lg:-translate-x-[30%] scale-[.86] -rotate-6",
   0: "z-30",
-  1: "z-10 translate-x-[30%] scale-[.86] rotate-6",
+  1: "z-10 translate-x-[22%] lg:translate-x-[30%] scale-[.86] rotate-6",
 };
 
 /** One venue card: photo, place label and the sample proof. */
@@ -57,8 +58,8 @@ function DeckCard({
       </span>
       <div className="absolute inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-[19rem]">
         <div className="rounded-2xl border border-white/10 bg-ink p-4 pt-6 text-paper notch notch-lg">
-          <div className="flex items-center justify-between gap-3">
-            <p className="flex items-center gap-2 font-display text-xl font-extrabold tracking-[-.02em] text-volt">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <p className="flex items-center gap-2 font-display text-lg font-extrabold tracking-[-.02em] text-volt sm:text-xl">
               <VerifiedIcon className="size-5" />
               {sampleProof.title}
             </p>
@@ -112,7 +113,7 @@ export function HeroShowcase() {
           <div
             key={slideIndex}
             className={cn(
-              "absolute inset-x-[15%] inset-y-0 origin-[50%_85%] transition-[translate,scale,rotate,opacity] duration-700 ease-notch motion-reduce:transition-none",
+              "absolute inset-x-[17%] inset-y-0 origin-[50%_85%] transition-[translate,scale,rotate,opacity] duration-700 ease-notch motion-reduce:transition-none lg:inset-x-[15%]",
               "starting:translate-x-[55%] starting:scale-[.78] starting:rotate-12 starting:opacity-0",
               fanStyles[offset],
             )}

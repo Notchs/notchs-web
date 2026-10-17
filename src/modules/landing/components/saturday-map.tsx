@@ -12,6 +12,7 @@ import {
   saturdayStops,
   venueByKind,
 } from "../content";
+import { useStripScroll } from "../lib/use-strip-scroll";
 import { useLanding } from "./landing-provider";
 
 /** Size of the stitched map image, in pixels. */
@@ -27,11 +28,13 @@ const TOUR_MS = 3500;
 export function SaturdayMap() {
   const { openAccess } = useLanding();
   const rootRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
   const [manual, setManual] = useState(false);
   const stop = saturdayStops[active];
   const venue = venueByKind(stop.kind);
+  useStripScroll(listRef, active);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -71,7 +74,10 @@ export function SaturdayMap() {
       ref={rootRef}
       className="grid gap-4 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-6"
     >
-      <ol className="flex snap-x gap-2 overflow-x-auto pb-1 lg:grid lg:gap-2 lg:overflow-visible lg:pb-0">
+      <ol
+        ref={listRef}
+        className="flex snap-x gap-2 overflow-x-auto pb-1 lg:grid lg:gap-2 lg:overflow-visible lg:pb-0"
+      >
         {saturdayStops.map((item, index) => {
           const place = venueByKind(item.kind);
           const current = index === active;
