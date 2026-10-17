@@ -78,3 +78,61 @@ export function MailIcon(props: IconProps) {
     </OutlineIcon>
   );
 }
+
+export function ArrowRightIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2.25} strokeLinecap="round" {...props}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </OutlineIcon>
+  );
+}
+
+export function PlusIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </OutlineIcon>
+  );
+}
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M4 8h16M4 16h16" />
+    </OutlineIcon>
+  );
+}
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </OutlineIcon>
+  );
+}
+
+export function SendIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M4 12l16-8-6 16-3-7z" />
+    </OutlineIcon>
+  );
+}
+
+export function ReplayIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" />
+    </OutlineIcon>
+  );
+}
+
+export function MoreIcon(props: IconProps) {
+  return (
+    <OutlineIcon stroke="none" fill="currentColor" {...props}>
+      <circle cx="12" cy="5.5" r="1.75" />
+      <circle cx="12" cy="12" r="1.75" />
+      <circle cx="12" cy="18.5" r="1.75" />
+    </OutlineIcon>
+  );
+}

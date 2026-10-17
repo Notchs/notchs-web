@@ -51,3 +51,6 @@ __tests__/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local design references (mockups, PDFs); never shipped
+/All pages designs/
