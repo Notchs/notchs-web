@@ -21,6 +21,7 @@ export function ForVenues() {
           alt={venuesContent.image.alt}
           fill
           sizes="(min-width: 1024px) 600px, 100vw"
+          placeholder="blur"
           className="object-cover"
         />
         {/* Keeps the text readable where the photo is the background. */}

@@ -36,6 +36,7 @@ export function PlaceCards() {
                 alt={venue.image.alt}
                 fill
                 sizes="(min-width: 1024px) 280px, 50vw"
+                placeholder="blur"
                 className="object-cover transition-transform duration-700 ease-notch group-hover:scale-105 motion-reduce:transition-none"
               />
             </span>

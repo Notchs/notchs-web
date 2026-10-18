@@ -209,6 +209,7 @@ export function NotchDemo() {
                 alt=""
                 fill
                 sizes="300px"
+                placeholder="blur"
                 className="object-cover opacity-45"
               />
               <div className="absolute inset-0 grid place-items-center">
