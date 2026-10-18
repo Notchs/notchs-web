@@ -61,6 +61,9 @@ export function LandingHeader() {
           <div className="hidden sm:block">
             <ThemeToggle />
           </div>
+          <a href="/login" className={linkStyles}>
+            Login
+          </a>
           <AccessButton size="sm" />
           <button
             type="button"
