@@ -1,7 +1,7 @@
-import { ComingSoonPage, comingSoonMetadata } from "@/modules/coming-soon";
+import { LandingPage, landingMetadata } from "@/modules/landing";
 
-export const metadata = comingSoonMetadata;
+export const metadata = landingMetadata;
 
 export default function HomePage() {
-  return <ComingSoonPage />;
+  return <LandingPage />;
 }
