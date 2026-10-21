@@ -26,13 +26,15 @@ import {
   venueByKind,
 } from "../content";
 import { useStripScroll } from "../lib/use-strip-scroll";
+import ahmedabadMap from "../assets/ahmedabad-map.webp";
 import { useLanding } from "./landing-provider";
 import { MapLens, type DropTarget, type Lens } from "./map-lens";
 
 /** Size of the stitched map image, in pixels. */
 const MAP_W = 1280;
 const MAP_H = 1024;
-const MAP_SRC = "/images/landing/ahmedabad-map.webp";
+/** The map file's URL, which the WebGL lenses load as their texture. */
+const MAP_SRC = ahmedabadMap.src;
 const TOUR_MS = 3500;
 /** How long the map takes to fly to a stop (the layer's transition). */
 const FLY_MS = 1500;
@@ -177,11 +179,12 @@ export function SaturdayMap() {
         >
           <Image
             ref={mapRef}
-            src={MAP_SRC}
+            src={ahmedabadMap}
             alt={saturdayContent.mapAlt}
             width={MAP_W}
             height={MAP_H}
             sizes={`${MAP_W}px`}
+            placeholder="blur"
             className="block size-full select-none"
             draggable={false}
           />
@@ -250,6 +253,7 @@ export function SaturdayMap() {
                 alt=""
                 fill
                 sizes="272px"
+                placeholder="blur"
                 className="object-cover"
               />
               <GlassGroup

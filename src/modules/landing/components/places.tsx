@@ -43,6 +43,7 @@ function PlaceCard({
         alt={venue.image.alt}
         fill
         sizes="(min-width: 1024px) 320px, 50vw"
+        placeholder="blur"
         className="object-cover transition-transform duration-700 ease-notch group-hover:scale-105 motion-reduce:transition-none"
       />
       <GlassGroup

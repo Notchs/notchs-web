@@ -100,7 +100,7 @@ export function Moments() {
         >
           {stories.map((item, index) => (
             <Image
-              key={item.image.src}
+              key={item.caption}
               ref={(node) => {
                 if (index === active) photoRef.current = node;
               }}
@@ -109,6 +109,7 @@ export function Moments() {
               aria-hidden={index !== active}
               fill
               sizes="352px"
+              placeholder="blur"
               className={cn(
                 "object-cover transition-opacity duration-500 ease-notch motion-reduce:transition-none",
                 index === active ? "opacity-100" : "opacity-0",

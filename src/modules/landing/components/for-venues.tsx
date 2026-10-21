@@ -39,6 +39,7 @@ export function ForVenues() {
           alt={venuesContent.image.alt}
           fill
           sizes="(min-width: 1024px) 600px, 100vw"
+          placeholder="blur"
           className="object-cover"
         />
         {/* Heavy Ink glass over the photo keeps the text readable. */}
