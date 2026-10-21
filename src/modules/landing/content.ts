@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import type { StaticImageData } from "next/image";
 
 import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { openGraphBase } from "@/shared/lib/metadata";
+
+import { photoFiles, type PhotoFile } from "./photos";
 
 /** In-page sections the header links to. */
 export const sectionIds = {
@@ -36,7 +39,7 @@ export type VenueKind =
   | "gym"
   | "court";
 
-type Photo = { src: string; alt: string };
+type Photo = { src: StaticImageData; alt: string };
 
 type Venue = {
   kind: VenueKind;
@@ -47,14 +50,14 @@ type Venue = {
   image: Photo;
 };
 
-const photo = (file: string, alt: string): Photo => ({
-  src: `/images/landing/${file}`,
+const photo = (file: PhotoFile, alt: string): Photo => ({
+  src: photoFiles[file],
   alt,
 });
 
 /*
- * Photos are CC0 (public domain), with no brand signs or logos, resized for
- * the web. From Wikimedia Commons: turf.jpg, turf-futsal.jpg, pickleball.jpg,
+ * Photos (assets/photos) are CC0 (public domain), with no brand signs or logos,
+ * resized for the web. From Wikimedia Commons: turf.jpg, turf-futsal.jpg, pickleball.jpg,
  * pickleball-courts.jpg. All others: wordpress.org/photos.
  */
 export const venues: readonly Venue[] = [
@@ -145,7 +148,7 @@ type HeroSlide = { kind: VenueKind; image: Photo };
 export const venueByKind = (kind: VenueKind) =>
   venues.find((venue) => venue.kind === kind) ?? venues[0];
 
-const slide = (kind: VenueKind, file: string, alt: string): HeroSlide => ({
+const slide = (kind: VenueKind, file: PhotoFile, alt: string): HeroSlide => ({
   kind,
   image: photo(file, alt),
 });
@@ -437,10 +440,10 @@ export const venuesContent = {
     "A monthly Notch Card for your venue",
   ],
   cta: "Bring Notchs to your venue",
-  image: {
-    src: "/images/landing/cafe-lights.jpg",
-    alt: "Woven bamboo pendant lights glowing over a café",
-  },
+  image: photo(
+    "cafe-lights.jpg",
+    "Woven bamboo pendant lights glowing over a café",
+  ),
 } as const;
 
 export const faqContent = {
