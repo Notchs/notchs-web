@@ -32,7 +32,9 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
 function fanStyle(offset: number) {
   const distance = Math.abs(offset);
   const scale =
-    distance <= 1 ? 1 - 0.14 * distance : 0.86 - 0.08 * Math.min(distance - 1, 1);
+    distance <= 1
+      ? 1 - 0.14 * distance
+      : 0.86 - 0.08 * Math.min(distance - 1, 1);
 
   return {
     translate: `calc(${offset} * var(--fan-step)) 0`,
@@ -65,7 +67,8 @@ function DeckCard({
         aria-hidden={!front}
         fill
         draggable={false}
-        sizes="(min-width: 1024px) 640px, 100vw"
+        sizes="(min-width: 1024px) 440px, 70vw"
+        placeholder="blur"
         preload={slideIndex === 0}
         className="object-cover"
       />

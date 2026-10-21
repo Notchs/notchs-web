@@ -13,6 +13,7 @@ import {
   venueByKind,
 } from "../content";
 import { useStripScroll } from "../lib/use-strip-scroll";
+import ahmedabadMap from "../assets/ahmedabad-map.webp";
 import { useLanding } from "./landing-provider";
 
 /** Size of the stitched map image, in pixels. */
@@ -117,11 +118,12 @@ export function SaturdayMap() {
           style={layerStyle}
         >
           <Image
-            src="/images/landing/ahmedabad-map.webp"
+            src={ahmedabadMap}
             alt={saturdayContent.mapAlt}
             width={MAP_W}
             height={MAP_H}
             sizes={`${MAP_W}px`}
+            placeholder="blur"
             className="block size-full select-none"
             draggable={false}
           />
@@ -168,6 +170,7 @@ export function SaturdayMap() {
                 alt=""
                 fill
                 sizes="272px"
+                placeholder="blur"
                 className="object-cover"
               />
               <span className="absolute top-2.5 left-2.5 rounded-full bg-ink/75 px-2.5 py-1 font-mono text-xs text-paper">
