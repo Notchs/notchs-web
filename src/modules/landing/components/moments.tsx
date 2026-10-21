@@ -4,7 +4,13 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
+import {
+  GlassLensTrack,
+  LENS_ITEM,
+} from "@/shared/components/glass/glass-lens-track";
 import { cn } from "@/shared/lib/cn";
+import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { momentsContent } from "../content";
 import { useStripScroll } from "../lib/use-strip-scroll";
@@ -20,7 +26,9 @@ const { stories } = momentsContent;
  * above the viewer, and the viewer is sized to the screen, so both fit at once.
  */
 export function Moments() {
-  const listRef = useRef<HTMLOListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  // The photo on screen: the glass chips over the story bend it.
+  const photoRef = useRef<HTMLImageElement | null>(null);
   const [active, setActive] = useState(0);
   const [held, setHeld] = useState(false);
   const story = stories[active];
@@ -39,44 +47,53 @@ export function Moments() {
           description={momentsContent.description}
           className="reveal"
         />
-        <ol
-          ref={listRef}
-          className="mt-8 flex snap-x gap-2 overflow-x-auto pb-1 lg:mt-10 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0"
-        >
-          {stories.map((item, index) => (
-            <li key={item.caption} className="flex-none snap-start">
-              <button
-                type="button"
-                aria-pressed={index === active}
-                onClick={() => setActive(index)}
-                className={cn(
-                  "flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-2xl border p-1.5 pr-4 text-left transition-[background-color,border-color] duration-200 lg:min-h-16 lg:p-2 lg:pr-4",
-                  index === active
-                    ? "border-foreground bg-card"
-                    : "border-line hover:border-foreground/40",
-                )}
+        {/* Pieces of one glass; the lens sits on the story playing. */}
+        <GlassGroup self={false} merge={14}>
+          <GlassLensTrack
+            ref={listRef}
+            role="list"
+            restingIndex={active}
+            lensRadius={12}
+            inset={4}
+            className="mt-5 flex snap-x gap-2 overflow-x-auto py-3 lg:mt-7 lg:grid lg:grid-cols-2 lg:overflow-visible lg:py-3"
+          >
+            {stories.map((item, index) => (
+              <GlassShape
+                key={item.caption}
+                role="listitem"
+                radius={16}
+                className="flex-none snap-start"
               >
-                <span className="relative size-10 flex-none overflow-hidden rounded-xl bg-block lg:size-12">
-                  <Image
-                    src={item.image.src}
-                    alt=""
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </span>
-                <span className="leading-snug font-semibold whitespace-nowrap lg:whitespace-normal">
-                  {item.caption}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
+                <button
+                  type="button"
+                  aria-pressed={index === active}
+                  onClick={() => setActive(index)}
+                  className="relative flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-2xl p-1.5 pr-4 text-left lg:min-h-16 lg:p-2 lg:pr-4"
+                  {...LENS_ITEM}
+                >
+                  <span className="relative size-10 flex-none overflow-hidden rounded-xl bg-block lg:size-12">
+                    <Image
+                      src={item.image.src}
+                      alt=""
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="leading-snug font-semibold whitespace-nowrap lg:whitespace-normal">
+                    {item.caption}
+                  </span>
+                </button>
+              </GlassShape>
+            ))}
+          </GlassLensTrack>
+        </GlassGroup>
       </div>
 
       <div className="mx-auto w-full max-w-[22rem] reveal">
         <div
-          className="relative h-[clamp(24rem,calc(100svh-13rem),36rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper select-none lg:aspect-9/16 lg:h-auto"
+          {...INK_GROUND}
+          className="relative h-[clamp(24rem,calc(100svh-13rem),36rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper shadow-[0_24px_60px_-24px_rgb(15_15_20/.45)] select-none lg:aspect-9/16 lg:h-auto"
           onPointerDown={() => setHeld(true)}
           onPointerUp={() => setHeld(false)}
           onPointerLeave={() => setHeld(false)}
@@ -84,6 +101,9 @@ export function Moments() {
           {stories.map((item, index) => (
             <Image
               key={item.image.src}
+              ref={(node) => {
+                if (index === active) photoRef.current = node;
+              }}
               src={item.image.src}
               alt={index === active ? item.image.alt : ""}
               aria-hidden={index !== active}
@@ -118,9 +138,17 @@ export function Moments() {
           </div>
 
           <div className="absolute top-7 left-3 flex items-center gap-2 text-sm font-semibold">
-            <span className="grid size-8 place-items-center rounded-full bg-ink text-volt">
+            <GlassGroup
+              image={photoRef}
+              radius={999}
+              tintVar="--ink"
+              tintAmount={0.8}
+              margin={10}
+              animateKey={active}
+              className="grid size-8 place-items-center rounded-full text-volt"
+            >
               <NotchGlyph className="size-4" />
-            </span>
+            </GlassGroup>
             notchs
           </div>
 
@@ -128,13 +156,29 @@ export function Moments() {
             key={active}
             className="absolute inset-x-4 bottom-5 grid animate-rise justify-items-start gap-3"
           >
-            <span className="inline-flex items-center gap-2 rounded-xl bg-ink px-3 py-2 font-mono text-sm">
+            {/* Ink glass over the photo, bending it. */}
+            <GlassGroup
+              image={photoRef}
+              radius={12}
+              tintVar="--ink"
+              tintAmount={0.82}
+              margin={12}
+              className="inline-flex items-center gap-2 rounded-xl px-3 py-2 font-mono text-sm"
+            >
               <VerifiedIcon className="size-4 text-volt" />
               {story.sticker}
-            </span>
-            <p className="rounded-xl bg-ink/60 px-3 py-2 font-display text-xl leading-tight font-extrabold tracking-[-.02em]">
-              {story.caption}
-            </p>
+            </GlassGroup>
+            <GlassGroup
+              image={photoRef}
+              radius={12}
+              tintVar="--ink"
+              tintAmount={0.5}
+              frost={0.95}
+              margin={12}
+              className="rounded-xl px-3 py-2 font-display text-xl leading-tight font-extrabold tracking-[-.02em]"
+            >
+              <p>{story.caption}</p>
+            </GlassGroup>
           </div>
 
           <button

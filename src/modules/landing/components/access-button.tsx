@@ -2,6 +2,7 @@
 
 import { ArrowRightIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui/button";
+import { prewarmPageSnapshot } from "@/shared/lib/glass/page-snapshot";
 
 import { accessLabel, accessLabelShort } from "../content";
 import { useLanding } from "./landing-provider";
@@ -11,7 +12,10 @@ type AccessButtonProps = {
   className?: string;
 };
 
-/** Opens the access dialog with the animated QR. */
+/**
+ * Opens the access dialog with the animated QR. Hover or focus starts the
+ * page snapshot its glass refracts, so it is usually ready by the click.
+ */
 export function AccessButton({ size, className }: AccessButtonProps) {
   const { openAccess } = useLanding();
 
@@ -20,7 +24,9 @@ export function AccessButton({ size, className }: AccessButtonProps) {
       size={size}
       className={className}
       aria-haspopup="dialog"
-      onClick={openAccess}
+      onClick={(event) => openAccess(event.currentTarget)}
+      onPointerEnter={prewarmPageSnapshot}
+      onFocus={prewarmPageSnapshot}
     >
       {size === "sm" ? (
         <>

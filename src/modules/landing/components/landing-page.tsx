@@ -28,13 +28,13 @@ type SectionProps = {
   children: ReactNode;
 };
 
-/** Page-width section; `scroll-mt` keeps headings clear of the sticky header. */
+/** Page-width section; `scroll-mt` keeps headings clear of the floating header. */
 function Section({ id, className, children }: SectionProps) {
   return (
     <section
       id={id}
       className={cn(
-        "mx-auto max-w-[1440px] scroll-mt-20 px-gutter py-16 sm:py-24",
+        "mx-auto max-w-[1440px] scroll-mt-24 px-gutter py-16 sm:py-24",
         className,
       )}
     >
