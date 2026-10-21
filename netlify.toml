@@ -1,0 +1,16 @@
+# Netlify settings kept with the code. Build settings stay in the Netlify UI.
+
+# The live site's address, used for canonical links, Open Graph tags, robots.txt
+# and the sitemap. Production deploys only, and it overrides the value set in the
+# Netlify UI. Deploy previews keep the UI value.
+[context.production.environment]
+  NEXT_PUBLIC_APP_URL = "https://www.notchs.com"
+
+# Send visitors and search engines from the default Netlify address to the real
+# domain, so Google sees one site instead of two copies. Deploy previews have
+# their own addresses and are not redirected.
+[[redirects]]
+  from = "https://notchs-web.netlify.app/*"
+  to = "https://www.notchs.com/:splat"
+  status = 301
+  force = true
