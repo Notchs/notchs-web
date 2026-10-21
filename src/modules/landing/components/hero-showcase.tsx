@@ -7,7 +7,7 @@ import Image from "next/image";
 import { cn } from "@/shared/lib/cn";
 
 import { heroContent, heroSlides, sampleProof, venueByKind } from "../content";
-import { VerifiedIcon } from "./verified-icon";
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
 
 const SLIDE_MS = 2000;
 

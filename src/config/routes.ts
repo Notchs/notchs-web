@@ -4,4 +4,6 @@ export const routes = {
   forbidden: "/403",
   login: "/login",
   loginVerify: "/login/verify",
+  venueLogin: "/venue/login",
+  venueSetPassword: "/venue/set-password",
 } as const;
