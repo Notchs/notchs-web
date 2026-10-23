@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 
 export const venueLoginMetadata: Metadata = {
   title: "Venue log in",
+  robots: { index: false, follow: false },
   description:
     "Log in to your venue on Notchs, or sign up your venue for the Ahmedabad pilot.",
 };
 
 export const setPasswordMetadata: Metadata = {
   title: "Set your password",
-  robots: { index: false },
+  robots: { index: false, follow: false },
 };
 
 export const showcaseContent = {

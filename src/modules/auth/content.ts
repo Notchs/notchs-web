@@ -14,10 +14,11 @@ export const LOGIN_MESSAGE = "LOGIN";
 
 export const loginMetadata: Metadata = {
   title: "Log in",
+  robots: { index: false, follow: false },
   description: "Log in to Notchs with WhatsApp. No email, no password.",
 };
 
 export const verifyMetadata: Metadata = {
   title: "Logging you in",
-  robots: { index: false },
+  robots: { index: false, follow: false },
 };
