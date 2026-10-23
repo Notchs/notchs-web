@@ -6,4 +6,7 @@ export const routes = {
   loginVerify: "/login/verify",
   venueLogin: "/venue/login",
   venueSetPassword: "/venue/set-password",
+  /** Team builds only; a 404 on the live site. */
+  teamLogin: "/team-login",
+  teamLoginSession: "/team-login/session",
 } as const;
