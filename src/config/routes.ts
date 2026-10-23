@@ -5,4 +5,6 @@ export const routes = {
   /** Team builds only; a 404 on the live site. */
   teamLogin: "/team-login",
   teamLoginSession: "/team-login/session",
+  /** Team builds only: the All pages hub. */
+  teamHub: "/team",
 } as const;
