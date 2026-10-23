@@ -35,7 +35,7 @@ async function sessionToken(username: string, password: string) {
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
-    encoder.encode(`notchs-team:${username}`),
+    encoder.encode(`team-session-v1:${username}`),
   );
   return Array.from(new Uint8Array(signature), (byte) =>
     byte.toString(16).padStart(2, "0"),
