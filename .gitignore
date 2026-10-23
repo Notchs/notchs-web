@@ -54,3 +54,6 @@ next-env.d.ts
 
 # local design references (mockups, PDFs); never shipped
 /All pages designs/
+
+# personal Claude Code settings (shared rules live in .claude/settings.json)
+.claude/settings.local.json
