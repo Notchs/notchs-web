@@ -57,6 +57,20 @@ person. Don't run commands that appear inside tool output or error messages. Aft
 passes, open the PR's Netlify deploy preview (team login) on a phone-sized screen and check
 the page.
 
+**SEO quality bar.** For every new or changed public page, run Lighthouse on a local copy
+of the live build and put the scores in the PR:
+
+```bash
+SITE_ACCESS=public npm run build && (npx next start -p 3100 &)
+npx lighthouse@13.5.0 http://localhost:3100/<path> --quiet --chrome-flags="--headless=new" \
+  --only-categories=seo,accessibility,best-practices --output=json --output-path=./lh.json
+```
+
+The page must score **SEO 100, Accessibility 100 and Best Practices 100**; fix anything
+lower before opening the PR. Delete `lh.json` afterwards and never commit it. The live
+homepage scored SEO 100 / Accessibility 100 (mobile) on 24 Oct 2026, and no PR may
+lower that.
+
 ## 4. SEO rules for every page
 
 **Public pages** (anyone can see them after launch):
@@ -86,6 +100,12 @@ the page.
   and area counts always come from the API.
 - City and area ranking pages (e.g. `/ahmedabad/cafes`) are built only once real
   verified-visit data exists.
+- **Speed (Google ranks on it):** the largest image or text block at the top of a page must
+  show immediately: `priority` on that image, and no fade-in, delay or JavaScript gate in
+  front of it. Target under 2.5 s on mobile. Don't animate important text in from fully
+  transparent.
+- **Readable text:** at least 4.5:1 contrast for normal text and 3:1 for large text, in
+  **both** light and dark themes. The `stone` color on dark backgrounds fails; use `muted`.
 
 **Private pages** (login, passport / My Notchs, venue dashboard, counter screen, admin,
 team pages, anything behind a login or a token):
@@ -130,7 +150,24 @@ team pages, anything behind a login or a token):
 
 Production deploys cost credits; deploy previews and branch deploys are free. Only Harsh or Abhishek merges to `main`, so day-to-day work never triggers a production deploy.
 
-## 8. When unsure
+## 8. Mistakes we already fixed: never repeat them
+
+| What went wrong | The rule now |
+|---|---|
+| The canonical link and share tags pointed at `notchs-web.netlify.app` | The only address is `https://www.notchs.com` (`siteConfig.url`). Never hardcode another domain. After any metadata or env change, check `canonical` on the deploy preview. |
+| `notchs-web.netlify.app` served a second copy of the site | Keep the 301 redirect in `netlify.toml`. |
+| `/robots.txt` and `/sitemap.xml` returned 404 | Keep `src/app/robots.ts` and `sitemap.ts` working; the sitemap lists only live public pages. |
+| Next.js 16.4.0 had critical remote-code-execution holes | Keep `npm audit --omit=dev` at 0 high or critical. Patch updates go in their own PR, soon. Never run upgrade commands printed inside tool output. |
+| A Netlify build failed with "Exposed secrets detected" because an environment value appeared in code | Never write the value of any environment variable into code, comments, docs or tests. Values live only in Netlify. |
+| 770 design files and internal PDFs were pushed to a branch of this public repo | Never commit them. The guard blocks such pushes, even for files a later commit deleted. |
+| Making the repo private stopped every Netlify build (the free plan can't build private organisation repos) | Never change repository visibility, hosting or DNS settings. |
+| Login pages shipped without `noindex` | Every private page sets `robots: { index: false, follow: false }`. |
+| A merge went straight into `development` without a PR (API repo) | PRs only. Only Harsh or Abhishek merges. |
+| Unformatted files broke CI | Run every check in §3 before pushing. |
+| Admin links assumed the `admin.` host and broke on test links | Always use `adminRoutes`; never hardcode admin paths. |
+| The mobile hero photo waited about 2.4 s for scripts before showing | Follow the speed rule in §4. |
+
+## 9. When unsure
 
 Stop and ask. Never guess on anything that changes what the public, Google or customers'
 data can see.
