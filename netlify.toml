@@ -1,5 +1,11 @@
 # Netlify settings kept with the code. Build settings stay in the Netlify UI.
 
+# Netlify's secret scanner stops a build when a secret variable's value shows up
+# in the code. The team login's username is not a secret (the password is, and
+# is still scanned), and a plain word can match ordinary text in the build.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "TEAM_USERNAME"
+
 # The live site's address, used for canonical links, Open Graph tags, robots.txt
 # and the sitemap. Production deploys only, and it overrides the value set in the
 # Netlify UI. Deploy previews keep the UI value.
