@@ -38,6 +38,8 @@ yarn-error.log*
 # (use `git add -f <path>` for the ones that must be pushed)
 *.md
 !/README.md
+!/CLAUDE.md
+!/.github/*.md
 *.test.*
 *.spec.*
 __tests__/
