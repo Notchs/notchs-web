@@ -2,4 +2,7 @@
 export const routes = {
   home: "/",
   forbidden: "/403",
+  /** Team builds only; a 404 on the live site. */
+  teamLogin: "/team-login",
+  teamLoginSession: "/team-login/session",
 } as const;
