@@ -17,6 +17,6 @@
 - [ ] Team lock untouched (`guardTeamAccess` first in `src/proxy.ts`; `next.config.ts`, `netlify.toml`, robots and sitemap unchanged), or the change is explained below
 - [ ] Checked on this PR's Netlify deploy preview (team login) on a phone-sized screen
 
-## Notes for Harsh
+## Notes for Harsh and Abhishek
 
 <!-- Anything that needs a decision, and the deploy preview link. -->
