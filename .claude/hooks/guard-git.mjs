@@ -6,6 +6,8 @@
  * - committing, merging, rebasing, cherry-picking or reverting while on main/development
  * - pushing to main/development, whether named or implied by the current branch
  * - force pushes, --all/--mirror pushes, and deleting main/development
+ * - pushes whose new commits contain design references, PDFs or .env files (this repo is
+ *   public, so anything pushed is public)
  * - merging pull requests and changing the repository (gh pr merge, gh repo edit/delete/...)
  *
  * Exit 0 lets the command run; exit 2 blocks it and shows stderr to Claude.
@@ -47,6 +49,33 @@ function currentBranch(dir) {
   }
 }
 
+/** Files that must never reach GitHub. `.env.example` is fine. */
+const NEVER_PUSH = /^All pages designs\/|\.pdf$|(^|\/)\.env($|\.(?!example$))/;
+
+/** Files touched by commits in `refs` that no remote branch has yet. */
+function outgoingFiles(dir, refs) {
+  try {
+    return execFileSync(
+      "git",
+      [
+        "-C",
+        dir,
+        "log",
+        "--name-only",
+        "--format=",
+        ...refs,
+        "--not",
+        "--remotes",
+      ],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+    )
+      .split("\n")
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 /** "refs/heads/main" -> "main"; "HEAD" -> the current branch. */
 function branchName(ref, current) {
   const name = ref.replace(/^refs\/heads\//, "");
@@ -85,6 +114,24 @@ function checkGit(words, cwd) {
     const deleting = flags.some((f) => f === "-d" || f === "--delete");
 
     const refspecs = positional.slice(1); // the first one is the remote
+
+    // What would be uploaded: HEAD, or the source side of each refspec.
+    const sources = deleting
+      ? []
+      : refspecs.length === 0
+        ? ["HEAD"]
+        : refspecs
+            .map((spec) => spec.replace(/^\+/, "").split(":")[0])
+            .filter(Boolean);
+    const unsafe = [
+      ...new Set(outgoingFiles(dir, sources).filter((f) => NEVER_PUSH.test(f))),
+    ];
+    if (unsafe.length > 0) {
+      block(
+        `these files would be uploaded to the public repo: ${unsafe.slice(0, 5).join(", ")}${unsafe.length > 5 ? ` and ${unsafe.length - 5} more` : ""}. Remove them from your branch's history first (ask Harsh)`,
+      );
+    }
+
     if (refspecs.length === 0) {
       if (PROTECTED.has(branch)) block(`pushing while on ${branch}`);
       return;

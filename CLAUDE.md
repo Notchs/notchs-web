@@ -35,8 +35,13 @@ owner) first. Parts of it are enforced by `.claude/settings.json` and
 - Before opening a PR, merge the latest `origin/development` into your branch and resolve
   any conflicts. Then push your branch and open a PR **into `development`**, filling in
   the PR template.
-- Never commit design references, PDFs, exports or screenshots. `All pages designs/` stays
-  on your machine (it is gitignored). Never commit `.env` files.
+- `main` and `development` are protected on GitHub: changes arrive only through PRs, and
+  only Harsh can merge them.
+- **This repository is public: anything pushed can be read by anyone.** Never commit
+  design references, PDFs, exports or screenshots. `All pages designs/` stays on your
+  machine (it is gitignored). Never commit `.env` files. The guard blocks any push whose
+  new commits contain such files, even if a later commit deleted them, because they would
+  still be in the history.
 
 ## 3. Checks before every PR (all must pass; CI runs them too)
 
