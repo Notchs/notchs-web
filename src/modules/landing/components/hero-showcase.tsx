@@ -68,7 +68,13 @@ function paintCard(element: HTMLElement, offset: number) {
 }
 
 /** One venue card: photo, place label and the sample proof. */
-function DeckCard({ slideIndex, front }: { slideIndex: number; front: boolean }) {
+function DeckCard({
+  slideIndex,
+  front,
+}: {
+  slideIndex: number;
+  front: boolean;
+}) {
   const slide = heroSlides[slideIndex];
   const venue = venueByKind(slide.kind);
 
