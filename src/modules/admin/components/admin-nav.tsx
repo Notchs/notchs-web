@@ -12,15 +12,26 @@ import { SectionIcon } from "./section-icon";
 
 const subscribeNever = () => () => {};
 
-/** Accepts both /venues (browser URL) and /admin/venues (rewritten path). */
-function sectionFor(pathname: string): AdminSectionKey | null {
+/** "/admin/venues" -> "/venues"; other paths unchanged. */
+function withoutAppPath(path: string) {
   const { appPath } = adminConfig;
-  const path = pathname.startsWith(appPath)
-    ? pathname.slice(appPath.length) || "/"
-    : pathname;
-  const match = adminSections.find(({ href }) =>
-    href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`),
-  );
+  return path === appPath || path.startsWith(`${appPath}/`)
+    ? path.slice(appPath.length) || "/"
+    : path;
+}
+
+/**
+ * Accepts both /venues (admin host) and /admin/venues (rewritten path, and
+ * the links on team builds, where the panel lives under /admin).
+ */
+function sectionFor(pathname: string): AdminSectionKey | null {
+  const path = withoutAppPath(pathname);
+  const match = adminSections.find(({ href }) => {
+    const section = withoutAppPath(href);
+    return section === "/"
+      ? path === "/"
+      : path === section || path.startsWith(`${section}/`);
+  });
   return match?.key ?? null;
 }
 

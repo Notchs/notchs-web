@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { adminConfig, isAdminHost } from "@/config/admin";
+import { env } from "@/config/env";
+import { guardTeamAccess } from "@/shared/lib/team-access";
 
 const { appPath } = adminConfig;
 
@@ -18,12 +20,22 @@ function requestHost(request: NextRequest) {
 }
 
 /**
- * Splits the site by host:
- * - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
- * - admin.notchs.com/admin/... redirects to the same page without "/admin".
- * - notchs.com/admin/... is a 404, so the panel is only on its own host.
+ * Runs before every page.
+ *
+ * 1. Team lock first: on test links, anyone without the team login is sent to
+ *    /team-login (see src/shared/lib/team-access.ts). Keep this first.
+ * 2. Team builds have no admin host, so the panel is simply served at /admin.
+ * 3. On the live site, splits the site by host:
+ *    - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
+ *    - admin.notchs.com/admin/... redirects to the same page without "/admin".
+ *    - notchs.com/admin/... is a 404, so the panel is only on its own host.
  */
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  const locked = await guardTeamAccess(request);
+  if (locked) return locked;
+
+  if (env.siteAccess === "team") return NextResponse.next();
+
   const { pathname } = request.nextUrl;
   const url = request.nextUrl.clone();
   const host = requestHost(request);
