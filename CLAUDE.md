@@ -1,13 +1,12 @@
 # Notchs Web: rules for every change
 
 Claude Code loads this file in every session, for every teammate. Follow it for every task.
-If a request conflicts with these rules, stop and ask the person to check with Harsh (owner) or Abhishek (CTO) first. Parts of it are enforced by `.claude/settings.json` and
+If a request conflicts with these rules, stop and ask the person to confirm with the team first. Parts of it are enforced by `.claude/settings.json` and
 `.claude/hooks/guard-git.mjs`. Never edit, bypass or disable those to get a task done.
 
 ## 1. Secret launch: what is public and what is not
 
-- **`main` is the live site, www.notchs.com.** It must stay exactly as it is until Harsh
-  launches. Nobody changes `main` except Harsh or Abhishek, by merging `development` on launch day.
+- **`main` is the live site, www.notchs.com.** It must stay exactly as it is until the team decides to launch. `main` changes only on launch day (or for a live fix the team agreed), through a reviewed PR.
 - **`development` is the team preview**: https://development--notchs-web.netlify.app, behind
   the team login. Every new page lands there first.
 - Every Netlify build except production is a **team build** (`SITE_ACCESS` in
@@ -17,7 +16,7 @@ If a request conflicts with these rules, stop and ask the person to check with H
     `proxy.ts` may exist; add new proxy logic after that call.
   - Don't change `siteAccess()` in `next.config.ts`, `env.siteAccess`,
     `src/shared/lib/team-access.ts`, `src/config/server-env.ts`, `netlify.toml`,
-    `src/app/robots.ts` or `src/app/sitemap.ts` unless Harsh or Abhishek asked for that exact change.
+    `src/app/robots.ts` or `src/app/sitemap.ts` unless the team agreed to that exact change.
 - Never link unreleased pages from public pages (homepage, header, footer). Never add them
   to the sitemap.
 
@@ -28,14 +27,13 @@ If a request conflicts with these rules, stop and ask the person to check with H
   (bug fixes: `fix/<name>`).
 - **Never** commit on, push to, or merge into `main` or `development`. **Never** force-push.
   **Never** merge pull requests, and never change repository settings or visibility.
-  Harsh or Abhishek reviews and merges.
+  A teammate other than the author reviews each PR before it is merged.
 - Commit messages: `<branch-name>: <what changed>`, e.g.
   `feature/passport-module: add the My Notchs page`.
 - Before opening a PR, merge the latest `origin/development` into your branch and resolve
   any conflicts. Then push your branch and open a PR **into `development`**, filling in
   the PR template.
-- `main` and `development` are protected on GitHub: changes arrive only through PRs, and
-  only Harsh and Abhishek can merge them.
+- `main` and `development` are protected on GitHub: changes arrive only through PRs whose checks pass, and force-pushes or deleting them are blocked.
 - **This repository is public: anything pushed can be read by anyone.** Never commit
   design references, PDFs, exports or screenshots. `All pages designs/` stays on your
   machine (it is gitignored). Never commit `.env` files. The guard blocks any push whose
@@ -93,8 +91,7 @@ lower that.
   anything that loads late.
 - URLs are lowercase, hyphenated and stable (`/ahmedabad/cafes`). Add every path to
   `src/config/routes.ts`. Never change a live URL without a redirect.
-- A page goes into `src/app/sitemap.ts` **only** once it is live for everyone. Harsh
-  decides that at launch.
+- A page goes into `src/app/sitemap.ts` **only** once it is live for everyone. The team decides that at launch.
 - **Real data only.** Never show invented counts, ranks, queue numbers, reviews or
   ratings as if they were real. Sample content must be labelled "Example". Queue numbers
   and area counts always come from the API.
@@ -119,7 +116,7 @@ team pages, anything behind a login or a token):
 
 - Secrets (API keys, passwords, tokens) never go in code, in `NEXT_PUBLIC_*` variables or
   in client components. Server-only secrets are read only in `src/config/server-env.ts`
-  (it imports `server-only`); public values only in `src/config/env.ts`. Harsh or Abhishek sets new secrets in Netlify, marked "Contains secret values".
+  (it imports `server-only`); public values only in `src/config/env.ts`. A maintainer sets new secrets in Netlify, marked "Contains secret values".
 - Never read, print or commit `.env` files. Put variable names (never values) in
   `.env.example`.
 - Never pass data from users, URLs or the API to `dangerouslySetInnerHTML`.
@@ -130,7 +127,7 @@ team pages, anything behind a login or a token):
 - Customer privacy (DPDP): profiles are private by default. Never show a customer's phone
   number to venues or to other customers; venues see totals only. Collect only what a
   screen needs. Consent checkboxes start unticked and use the exact approved wording.
-- No new third-party scripts, trackers, analytics, embeds or font hosts without Harsh's or Abhishek's approval.
+- No new third-party scripts, trackers, analytics, embeds or font hosts without the team's agreement.
 - Dependencies: add one only when it is really needed, pin the exact version (as in
   `package.json`), and keep `npm audit --omit=dev` at 0 high or critical.
 
@@ -148,7 +145,7 @@ team pages, anything behind a login or a token):
 
 ## 7. Netlify (free plan: 300 credits a month)
 
-Production deploys cost credits; deploy previews and branch deploys are free. Only Harsh or Abhishek merges to `main`, so day-to-day work never triggers a production deploy.
+Production deploys cost credits; deploy previews and branch deploys are free. `main` changes only on launch day or for an agreed live fix, so day-to-day work never triggers a production deploy.
 
 ## 8. Mistakes we already fixed: never repeat them
 
@@ -162,7 +159,7 @@ Production deploys cost credits; deploy previews and branch deploys are free. On
 | 770 design files and internal PDFs were pushed to a branch of this public repo | Never commit them. The guard blocks such pushes, even for files a later commit deleted. |
 | Making the repo private stopped every Netlify build (the free plan can't build private organisation repos) | Never change repository visibility, hosting or DNS settings. |
 | Login pages shipped without `noindex` | Every private page sets `robots: { index: false, follow: false }`. |
-| A merge went straight into `development` without a PR (API repo) | PRs only. Only Harsh or Abhishek merges. |
+| A merge went straight into `development` without a PR (API repo) | PRs only, reviewed by a teammate other than the author. |
 | Unformatted files broke CI | Run every check in §3 before pushing. |
 | Admin links assumed the `admin.` host and broke on test links | Always use `adminRoutes`; never hardcode admin paths. |
 | The mobile hero photo waited about 2.4 s for scripts before showing | Follow the speed rule in §4. |

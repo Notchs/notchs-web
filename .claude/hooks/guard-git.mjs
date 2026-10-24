@@ -25,7 +25,7 @@ const COMMITTING = new Set([
 ]);
 const ALLOWED_FLAGS = new Set(["--abort", "--continue", "--quit", "--skip"]);
 const HOW =
-  "Work on your own branch (feature/<name>-module or fix/<name>) and open a PR into development; Harsh or Abhishek reviews and merges.";
+  "Work on your own branch (feature/<name>-module or fix/<name>) and open a PR into development; a teammate other than the author reviews it before merging.";
 
 function block(reason) {
   process.stderr.write(
@@ -128,7 +128,7 @@ function checkGit(words, cwd) {
     ];
     if (unsafe.length > 0) {
       block(
-        `these files would be uploaded to the public repo: ${unsafe.slice(0, 5).join(", ")}${unsafe.length > 5 ? ` and ${unsafe.length - 5} more` : ""}. Remove them from your branch's history first (ask Harsh or Abhishek)`,
+        `these files would be uploaded to the public repo: ${unsafe.slice(0, 5).join(", ")}${unsafe.length > 5 ? ` and ${unsafe.length - 5} more` : ""}. Remove them from your branch's history first (ask the team)`,
       );
     }
 
