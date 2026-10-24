@@ -107,6 +107,8 @@ class GlassEngine {
   private pageLoading: Promise<void> | null = null;
   private readonly pageListeners = new Set<() => void>();
   readonly scale = Math.min(window.devicePixelRatio || 1, 3);
+  /** The browser took the GPU context away; the CSS glass takes over. */
+  private lost = false;
 
   constructor() {
     this.gl = this.canvas.getContext("webgl", {
@@ -115,10 +117,17 @@ class GlassEngine {
       antialias: false,
     });
     this.program = this.gl ? createGlassProgram(this.gl) : null;
+    // Not restored on purpose: the textures and program would all need
+    // rebuilding, and the CSS glass already looks right.
+    this.canvas.addEventListener("webglcontextlost", () => {
+      this.lost = true;
+      this.page = null;
+      window.dispatchEvent(new Event(GLASS_LOST_EVENT));
+    });
   }
 
   get ready() {
-    return !!this.program;
+    return !!this.program && !this.lost;
   }
 
   /** Calls `listener` whenever a new page snapshot arrives. */
@@ -166,7 +175,6 @@ class GlassEngine {
         sharp: uploadTexture(gl, snapshot.page, 0),
         soft: uploadTexture(gl, snapshot.frost, 1),
       };
-      (window as unknown as { __GLASSDEBUG: unknown }).__GLASSDEBUG = snapshot;
       this.pageListeners.forEach((listener) => listener());
     });
   }
@@ -198,7 +206,7 @@ class GlassEngine {
   render(spec: GlassSpec, target: HTMLCanvasElement) {
     const gl = this.gl;
     const u = this.program;
-    if (!gl || !u) return false;
+    if (!gl || !u || !this.ready) return false;
 
     const pxW = Math.max(1, Math.ceil(spec.width * this.scale));
     const pxH = Math.max(1, Math.ceil(spec.height * this.scale));
@@ -295,17 +303,45 @@ class GlassEngine {
   }
 }
 
+/** Sent on `window` when the GPU context is lost; glass redraws as CSS. */
+export const GLASS_LOST_EVENT = "notchs:glass-lost";
+
+/**
+ * Devices below this get the CSS glass: WebGL glass costs battery and frame
+ * time they don't have. Conservative, so most phones keep the real glass.
+ */
+const SLOW_DEVICE = { maxMemoryGb: 2, maxCores: 2 };
+
+type DeviceHints = Navigator & {
+  deviceMemory?: number;
+  connection?: { saveData?: boolean };
+};
+
+/** Data saver on, or very little memory or very few cores. */
+function isSlowDevice() {
+  const { deviceMemory, hardwareConcurrency, connection } =
+    navigator as DeviceHints;
+  return (
+    connection?.saveData === true ||
+    (deviceMemory !== undefined && deviceMemory <= SLOW_DEVICE.maxMemoryGb) ||
+    (hardwareConcurrency > 0 && hardwareConcurrency <= SLOW_DEVICE.maxCores)
+  );
+}
+
 let engine: GlassEngine | null | undefined;
 
 /**
- * The shared glass engine, or null where WebGL is missing or the viewer
- * asked for reduced transparency (CSS glass is used instead).
+ * The shared glass engine, or null (CSS glass is used instead) where WebGL
+ * or its shader is missing, the viewer asked for reduced transparency, the
+ * device is slow, or the GPU context was lost.
  */
 export function getGlassEngine() {
-  if (engine !== undefined) return engine;
+  if (engine) return engine.ready ? engine : null;
+  if (engine === null) return engine;
   if (
     typeof window === "undefined" ||
-    window.matchMedia("(prefers-reduced-transparency: reduce)").matches
+    window.matchMedia("(prefers-reduced-transparency: reduce)").matches ||
+    isSlowDevice()
   ) {
     engine = null;
     return engine;

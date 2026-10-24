@@ -329,9 +329,10 @@
   --glass-saturate: var(--glass-saturate-clear);
 }
 
-/* A <GlassGroup> shows CSS glass until its WebGL glass has drawn, and keeps
-   it where WebGL is unavailable. */
-[data-glass-self]:not([data-glass-ready]) {
+/* A <GlassGroup> and each <GlassShape> in it show CSS glass until the WebGL
+   glass has drawn, and keep it where WebGL is unavailable or was lost. */
+[data-glass-self]:not([data-glass-ready]),
+[data-glass-shape]:not([data-glass-ready]) {
   @apply glass;
 }
 

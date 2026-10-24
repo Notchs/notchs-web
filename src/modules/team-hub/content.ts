@@ -35,7 +35,11 @@ export const hubSections: readonly HubSection[] = [
   {
     title: "Public website",
     screens: [
-      { name: "Homepage", href: "/", note: "Mobile and desktop" },
+      {
+        name: "Homepage",
+        href: "/",
+        note: "Mobile and desktop; glass header marks the section you're on",
+      },
       { name: "Waitlist form", note: "Name, WhatsApp, city, area, consent" },
       { name: "Shared Notch Card page", code: "A12" },
       {

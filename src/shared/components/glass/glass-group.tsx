@@ -21,6 +21,7 @@ import {
 } from "@/shared/lib/glass/css-color";
 import {
   getGlassEngine,
+  GLASS_LOST_EVENT,
   type GlassBackdrop,
   type GlassShapeSpec,
 } from "@/shared/lib/glass/engine/glass-engine";
@@ -162,7 +163,13 @@ function drawGroup(runtime: GroupRuntime): boolean {
     shadow,
     margin,
   } = runtime.options;
-  if (!engine || !element || !canvas || !state.visible) return false;
+  if (!element || !canvas) return false;
+  // No engine any more (the GPU context was lost): back to the CSS glass.
+  if (!engine) {
+    clearGlass(element, canvas, shapes);
+    return false;
+  }
+  if (!state.visible) return false;
 
   // Screen box, and the factor from screen px to the element's own layout
   // px (it may be scaled, e.g. a card in the hero deck); the canvas lives
@@ -235,8 +242,7 @@ function drawGroup(runtime: GroupRuntime): boolean {
 
   // Nothing to draw (e.g. `self` turned off): clear, and show the fallback.
   if (!pieces.length) {
-    canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
-    delete element.dataset.glassReady;
+    clearGlass(element, canvas, shapes);
     return false;
   }
 
@@ -294,9 +300,23 @@ function drawGroup(runtime: GroupRuntime): boolean {
     canvas.style.width = `${layoutW + margin * 2}px`;
     canvas.style.height = `${layoutH + margin * 2}px`;
     element.dataset.glassReady = "";
+    shapes.forEach((entry) => (entry.element.dataset.glassReady = ""));
+  } else {
+    clearGlass(element, canvas, shapes);
   }
 
   return now < state.animateUntil || state.press !== state.pressTarget;
+}
+
+/** Wipes the WebGL glass so the group's and pieces' fallback look shows. */
+function clearGlass(
+  element: HTMLElement,
+  canvas: HTMLCanvasElement,
+  shapes: Map<string, ShapeEntry>,
+) {
+  canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+  delete element.dataset.glassReady;
+  shapes.forEach((entry) => delete entry.element.dataset.glassReady);
 }
 
 /**
@@ -442,6 +462,7 @@ export function GlassGroup({
     window.addEventListener(THEME_CHANGE_EVENT, onTheme);
     scheme.addEventListener("change", onTheme);
     window.addEventListener("resize", redraw);
+    window.addEventListener(GLASS_LOST_EVENT, redraw);
     // A strip inside the group scrolled: its pieces moved.
     element.addEventListener("scroll", redraw, {
       capture: true,
@@ -466,6 +487,7 @@ export function GlassGroup({
       window.removeEventListener(THEME_CHANGE_EVENT, onTheme);
       scheme.removeEventListener("change", onTheme);
       window.removeEventListener("resize", redraw);
+      window.removeEventListener(GLASS_LOST_EVENT, redraw);
       element.removeEventListener("scroll", redraw, { capture: true });
       window.removeEventListener("scroll", redraw);
       offPage?.();
@@ -569,6 +591,7 @@ export function GlassShape({
   liquid = false,
   motionKey,
   ref,
+  style,
   ...props
 }: GlassShapeProps) {
   const group = use(GlassGroupContext);
@@ -595,7 +618,16 @@ export function GlassShape({
     [ref],
   );
 
-  return <div ref={setRef} {...props} />;
+  // A piece of the slab shows CSS glass until (or unless) the WebGL glass
+  // draws, like a group's own box. Lenses are only a hover cue: none.
+  return (
+    <div
+      ref={setRef}
+      data-glass-shape={lens ? undefined : ""}
+      style={{ borderRadius: radius, ...style }}
+      {...props}
+    />
+  );
 }
 
 /** Lets custom controls inside a group trigger glass animation. */
