@@ -122,7 +122,8 @@ export function SaturdayMap() {
             alt={saturdayContent.mapAlt}
             width={MAP_W}
             height={MAP_H}
-            sizes={`${MAP_W}px`}
+            // Phones show the map at about 768 CSS px; the full layer only on wider screens.
+            sizes={`(max-width: 767px) 768px, ${MAP_W}px`}
             placeholder="blur"
             className="block size-full select-none"
             draggable={false}

@@ -24,7 +24,7 @@ const structuredData = {
       "@id": `${siteConfig.url}/#website`,
       name: siteConfig.name,
       url: siteConfig.url,
-      inLanguage: "en",
+      inLanguage: "en-IN",
       publisher: { "@id": organizationId },
     },
   ],
