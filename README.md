@@ -60,3 +60,12 @@ These boundaries are enforced by ESLint.
 - `development` — integration branch, created from `main`
 - `feature/<module>-module` — feature work, created from `development`
 - `fix/<name>` — fixes, created from `development`
+
+## Test links and the team login
+
+Only the live site (Netlify production) is public. Every other Netlify build, meaning deploy previews and branch deploys, asks for the team login on every page and tells search engines not to index anything.
+
+- The choice is made at build time in `next.config.ts` (`SITE_ACCESS`), so the live site can't be locked by mistake at runtime, and a test link can't be opened by mistake.
+- Set `TEAM_USERNAME` and `TEAM_PASSWORD` in Netlify for the **Deploy Previews** and **Branch deploys** contexts only. Until they are set, test links stay locked.
+- Locally the site is public. Run with `SITE_ACCESS=team` plus the two variables to try the login.
+- `src/proxy.ts` runs `guardTeamAccess` first. Keep it first when adding more proxy logic.

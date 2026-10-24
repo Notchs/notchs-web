@@ -8,6 +8,7 @@ import {
   type RefObject,
 } from "react";
 
+import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
@@ -129,6 +130,9 @@ export function LandingHeader() {
               <span className="max-sm:hidden" {...LENS_ITEM}>
                 <ThemeToggle />
               </span>
+              <a href={routes.login} className={linkStyles} {...LENS_ITEM}>
+                Login
+              </a>
               <button
                 type="button"
                 aria-expanded={menuOpen}

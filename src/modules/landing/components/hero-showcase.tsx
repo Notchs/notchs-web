@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { KeyboardEvent, PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import Image from "next/image";
 
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
 import { GlassGroup } from "@/shared/components/glass/glass-group";
-import { cn } from "@/shared/lib/cn";
 import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { heroContent, heroSlides, sampleProof, venueByKind } from "../content";
-import { VerifiedIcon } from "./verified-icon";
 
 const SLIDE_MS = 2000;
-/** How long a card takes to swing into place (its transition). */
-const SWING_MS = 800;
+
+/** How long a card takes to glide into its spot. */
+const SETTLE_MS = 700;
 
 /** How far, as a share of the deck's width, a drag goes to move one card. */
 const DRAG_UNIT = 0.45;
@@ -24,6 +24,12 @@ const DRAG_THRESHOLD = 6;
 /** Release speed, in px/ms, that flicks to the next card on a short drag. */
 const FLICK_SPEED = 0.4;
 
+/**
+ * Cards kept mounted on each side of the front one. The outer ones sit faded
+ * out past the edge, so their photos have loaded before they slide in.
+ */
+const REACH = 3;
+
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
 /**
@@ -33,7 +39,7 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
  * spots. The sideways step comes from --fan-step, tighter below lg so the
  * tilted side cards stay inside the gutter.
  */
-function fanStyle(offset: number) {
+function fan(offset: number) {
   const distance = Math.abs(offset);
   const scale =
     distance <= 1
@@ -44,24 +50,36 @@ function fanStyle(offset: number) {
     translate: `calc(${offset} * var(--fan-step)) 0`,
     scale: `${scale}`,
     rotate: `${Math.max(-2, Math.min(2, offset)) * 6}deg`,
-    opacity: Math.max(0, Math.min(1, 2 - distance)),
-    zIndex: Math.max(0, 30 - Math.round(distance * 10)),
+    opacity: `${Math.max(0, Math.min(1, 2 - distance))}`,
+    zIndex: `${Math.max(0, 30 - Math.round(distance * 10))}`,
+    pointerEvents: distance > 1.5 ? "none" : "",
+    // How much the dimming layer covers the photo, so the front card stands out.
+    dim: `${0.35 * Math.min(1, distance)}`,
   };
+}
+
+const fanStyle = (offset: number) => {
+  const { dim, ...style } = fan(offset);
+  return { ...style, "--dim": dim } as CSSProperties;
+};
+
+/** Writes a card's spot straight to the DOM, skipping a React render. */
+function paintCard(element: HTMLElement, offset: number) {
+  const { dim, ...style } = fan(offset);
+  Object.assign(element.style, style);
+  element.style.setProperty("--dim", dim);
 }
 
 /** One venue card: photo, place label and the sample proof. */
 function DeckCard({
   slideIndex,
-  offset,
-  dragging,
+  front,
 }: {
   slideIndex: number;
-  offset: number;
-  dragging: boolean;
+  front: boolean;
 }) {
   const slide = heroSlides[slideIndex];
   const venue = venueByKind(slide.kind);
-  const front = Math.round(offset) === 0;
   const photoRef = useRef<HTMLImageElement>(null);
 
   return (
@@ -78,18 +96,12 @@ function DeckCard({
         preload={slideIndex === 0}
         className="object-cover"
       />
-      {/* Dims the cards behind so the main one stands out. */}
       <span
         aria-hidden="true"
-        style={{ opacity: 0.35 * Math.min(1, Math.abs(offset)) }}
-        className={cn(
-          "absolute inset-0 z-10 bg-ink",
-          !dragging &&
-            "transition-opacity duration-700 ease-notch motion-reduce:transition-none",
-        )}
+        className="absolute inset-0 z-10 bg-ink opacity-(--dim) transition-opacity duration-(--deck-speed) ease-notch motion-reduce:transition-none"
       />
       {/* On the front card the label and the proof are Ink glass bending
-          the photo, following the card as it swings in; the cards behind,
+          the photo, following the card as it glides in; the cards behind,
           which are tilted, keep solid Ink. */}
       <GlassGroup
         self={front}
@@ -100,7 +112,7 @@ function DeckCard({
         margin={12}
         fallback="own"
         animateKey={front}
-        animateFor={SWING_MS}
+        animateFor={SETTLE_MS}
         className="absolute top-4 left-4 rounded-full px-3 py-1.5 text-sm font-semibold text-paper not-data-glass-ready:bg-ink/70"
       >
         {venue.label}
@@ -117,7 +129,7 @@ function DeckCard({
           margin={14}
           fallback="own"
           animateKey={front}
-          animateFor={SWING_MS}
+          animateFor={SETTLE_MS}
           className="rounded-2xl p-4 pt-6 text-paper notch notch-lg not-data-glass-ready:bg-ink"
         >
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
@@ -141,6 +153,7 @@ function DeckCard({
 type Drag = {
   pointerId: number;
   startX: number;
+  startView: number;
   lastX: number;
   lastTime: number;
   velocity: number;
@@ -154,36 +167,53 @@ type Drag = {
  * moves left. People can also drag or swipe the deck, tap a side card, or use
  * the arrow keys; the cards follow the pointer and settle on the nearest spot.
  * Pauses on hover and while dragging; reduced motion turns off the autoplay.
+ *
+ * While dragging, card positions are written to the DOM once per frame rather
+ * than through React state, so the photos track the pointer without lag.
  */
 export function HeroShowcase() {
-  // Unbounded, so a card keeps its element as the deck wraps around.
-  const [position, setPosition] = useState(0);
-  // How many cards the current drag has moved the deck, as a fraction.
-  const [shift, setShift] = useState(0);
+  // The front card's place, unbounded so a card keeps its element as the deck
+  // wraps around. Only changes when the front card does.
+  const [center, setCenter] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const deckRef = useRef<HTMLDivElement>(null);
+  const cards = useRef(new Map<number, HTMLDivElement>());
+  // Where the deck is right now, as a fractional place.
+  const view = useRef(0);
+  const frame = useRef(0);
   const drag = useRef<Drag | null>(null);
   const suppressClick = useRef(false);
   const count = heroSlides.length;
 
+  const paint = () => {
+    frame.current = 0;
+    for (const [place, element] of cards.current) {
+      paintCard(element, place - view.current);
+    }
+  };
+
+  const setSpeed = (ms: number) =>
+    deckRef.current?.style.setProperty("--deck-speed", `${ms}ms`);
+
+  const goTo = (place: number) => {
+    setSpeed(SETTLE_MS);
+    view.current = place;
+    paint();
+    setCenter(place);
+  };
+
+  // Cards that just mounted take their spot before the browser draws them.
+  useLayoutEffect(paint);
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
   useEffect(() => {
     if (hovered || dragging) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setTimeout(
-      () => setPosition((current) => current + 1),
-      SLIDE_MS,
-    );
+    const timer = setTimeout(() => goTo(center + 1), SLIDE_MS);
     return () => clearTimeout(timer);
-  }, [position, hovered, dragging]);
-
-  const settle = (velocity: number) => {
-    const flick =
-      Math.abs(velocity) > FLICK_SPEED ? -Math.sign(velocity) * 0.5 : 0;
-    const steps = Math.round(shift + flick);
-    setPosition((current) => current + steps);
-    setShift(0);
-    setDragging(false);
-  };
+  });
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -191,6 +221,7 @@ export function HeroShowcase() {
     drag.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
+      startView: view.current,
       lastX: event.clientX,
       lastTime: event.timeStamp,
       velocity: 0,
@@ -209,6 +240,7 @@ export function HeroShowcase() {
       // Captured only once it is a drag, so a plain tap still reaches a card.
       current.moved = true;
       event.currentTarget.setPointerCapture(event.pointerId);
+      setSpeed(0);
       setDragging(true);
     }
 
@@ -219,7 +251,12 @@ export function HeroShowcase() {
     }
     current.lastX = event.clientX;
     current.lastTime = event.timeStamp;
-    setShift(-dx / current.unit);
+
+    view.current = current.startView - dx / current.unit;
+    if (!frame.current) frame.current = requestAnimationFrame(paint);
+    // Re-renders only when the front card changes, to mount the next one.
+    const nearest = Math.round(view.current);
+    if (nearest !== center) setCenter(nearest);
   };
 
   const onPointerEnd = (event: PointerEvent<HTMLDivElement>) => {
@@ -228,34 +265,39 @@ export function HeroShowcase() {
     drag.current = null;
     if (!current.moved) return;
     suppressClick.current = true;
+    cancelAnimationFrame(frame.current);
+    frame.current = 0;
     // A pointer that sat still before letting go should not flick.
     const idle = event.timeStamp - current.lastTime > 80;
-    settle(idle ? 0 : current.velocity);
+    const velocity = idle ? 0 : current.velocity;
+    const flick =
+      Math.abs(velocity) > FLICK_SPEED ? -Math.sign(velocity) * 0.5 : 0;
+    goTo(Math.round(view.current + flick));
+    setDragging(false);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "ArrowLeft") setPosition((current) => current - 1);
-    else if (event.key === "ArrowRight") setPosition((current) => current + 1);
+    if (event.key === "ArrowLeft") goTo(center - 1);
+    else if (event.key === "ArrowRight") goTo(center + 1);
     else return;
     event.preventDefault();
   };
 
   // Keyed by slide, so each card keeps its element and glides between spots.
-  const view = position + shift;
-  const center = Math.round(view);
-  const deck = [-2, -1, 0, 1, 2].map((step) => {
-    const place = center + step;
-    return { place, offset: place - view, slideIndex: mod(place, count) };
+  const deck = Array.from({ length: REACH * 2 + 1 }, (_, i) => {
+    const place = center + i - REACH;
+    return { place, slideIndex: mod(place, count) };
   });
 
   return (
     <div
+      ref={deckRef}
       {...INK_GROUND}
       role="region"
       aria-roledescription="carousel"
       aria-label="Places you can get Notched"
       tabIndex={0}
-      className="relative aspect-[4/3.6] animate-fade-in cursor-grab touch-pan-y rounded-3xl select-none [animation-delay:250ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/5.2]"
+      className="relative aspect-[4/3.6] animate-fade-in cursor-grab touch-pan-y rounded-3xl select-none [--deck-speed:700ms] [animation-delay:250ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/5.2]"
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onPointerDown={onPointerDown}
@@ -265,26 +307,24 @@ export function HeroShowcase() {
       onKeyDown={onKeyDown}
     >
       <div className="relative size-full [--fan-step:22.5%] lg:[--fan-step:29%]">
-        {deck.map(({ place, offset, slideIndex }) => (
+        {deck.map(({ place, slideIndex }) => (
           <div
             key={slideIndex}
-            style={fanStyle(offset)}
-            className={cn(
-              "absolute inset-x-[17%] inset-y-0 origin-[50%_85%] lg:inset-x-[15%]",
-              !dragging &&
-                "transition-[translate,scale,rotate,opacity] duration-700 ease-notch motion-reduce:transition-none",
-              Math.abs(offset) > 1.5 && "pointer-events-none",
-            )}
+            ref={(element) => {
+              if (!element) return;
+              cards.current.set(place, element);
+              return () => {
+                cards.current.delete(place);
+              };
+            }}
+            style={fanStyle(place - center)}
+            className="absolute inset-x-[17%] inset-y-0 origin-[50%_85%] transition-[translate,scale,rotate,opacity] duration-(--deck-speed) ease-notch will-change-[translate,scale,rotate,opacity] motion-reduce:transition-none lg:inset-x-[15%]"
             onClick={() => {
               if (suppressClick.current) return;
-              if (place !== center) setPosition(place);
+              if (place !== center) goTo(place);
             }}
           >
-            <DeckCard
-              slideIndex={slideIndex}
-              offset={offset}
-              dragging={dragging}
-            />
+            <DeckCard slideIndex={slideIndex} front={place === center} />
           </div>
         ))}
       </div>

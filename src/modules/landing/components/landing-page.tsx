@@ -21,6 +21,7 @@ import { NotchDemo } from "./notch-demo";
 import { PlaceCards } from "./places";
 import { SaturdayMap } from "./saturday-map";
 import { SectionHeading } from "./section-heading";
+import { StructuredData } from "./structured-data";
 
 type SectionProps = {
   id?: string;
@@ -46,6 +47,7 @@ function Section({ id, className, children }: SectionProps) {
 export function LandingPage() {
   return (
     <LandingProvider>
+      <StructuredData />
       <LandingHeader />
       <main data-smooth-scroll className={jetbrainsMono.variable}>
         <Hero />

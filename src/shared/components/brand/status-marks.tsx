@@ -39,3 +39,14 @@ export function LockedMark() {
     </svg>
   );
 }
+
+/** The full "N", cut cleanly: something checked out. */
+export function NotchedMark() {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className="w-full">
+      <g transform="translate(4 4)">
+        <path className="animate-fade-in fill-block" d={NOTCH_PATH} />
+      </g>
+    </svg>
+  );
+}

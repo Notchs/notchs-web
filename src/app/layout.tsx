@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Unbounded } from "next/font/google";
 
+import { env } from "@/config/env";
 import { siteConfig } from "@/config/site";
+import { TeamBar } from "@/modules/team-hub";
 import { glassInitScript } from "@/shared/lib/glass/refraction";
 import { openGraphBase } from "@/shared/lib/metadata";
 import { themeInitScript } from "@/shared/lib/theme";
@@ -52,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // These scripts set data-theme and data-glass-refraction on <html>
     // before React hydrates.
     <html
-      lang="en"
+      lang="en-IN"
       className={`${inter.variable} ${unbounded.variable}`}
       suppressHydrationWarning
     >
@@ -60,6 +62,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script dangerouslySetInnerHTML={{ __html: glassInitScript }} />
         {children}
+        {/* Team builds only: a corner link to the All pages hub. */}
+        {env.siteAccess === "team" && <TeamBar />}
       </body>
     </html>
   );
