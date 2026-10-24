@@ -71,6 +71,10 @@ lower that.
 
 ## 4. SEO rules for every page
 
+Page-by-page titles, descriptions, structured data and index thresholds live in
+`SEO_PLAN.md`. Follow it for any page you build or change. If it ever conflicts with this
+file, this file wins.
+
 **Public pages** (anyone can see them after launch):
 
 - Export `metadata` (or `generateMetadata`) with a unique `title` of at most 60 characters
