@@ -52,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // The theme script sets data-theme on <html> before React hydrates.
     <html
-      lang="en"
+      lang="en-IN"
       className={`${inter.variable} ${unbounded.variable}`}
       suppressHydrationWarning
     >

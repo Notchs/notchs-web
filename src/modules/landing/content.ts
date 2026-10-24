@@ -487,8 +487,10 @@ export const accessDialogContent = {
   notify: "Tell me when it's live",
 } as const;
 
-const title = `${siteConfig.name} · Every real visit counts`;
-const description = heroContent.description;
+const title = `${siteConfig.name} · Ahmedabad's real-life leaderboard`;
+/** Search-result text (120–155 characters); the visible hero copy stays as it is. */
+const description =
+  "Scan the QR at the counter, send one WhatsApp message, get Notched. Ahmedabad's real-life leaderboard, ranked by the places you actually go.";
 
 export const landingMetadata: Metadata = {
   title: { absolute: title },
