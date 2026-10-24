@@ -39,6 +39,7 @@ yarn-error.log*
 *.md
 !/README.md
 !/CLAUDE.md
+!/SEO_PLAN.md
 !/.github/*.md
 *.test.*
 *.spec.*
