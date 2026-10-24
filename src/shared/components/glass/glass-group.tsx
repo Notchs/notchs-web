@@ -25,6 +25,7 @@ import {
   type GlassBackdrop,
   type GlassShapeSpec,
 } from "@/shared/lib/glass/engine/glass-engine";
+import { canSnapshotPage } from "@/shared/lib/glass/page-snapshot";
 import { THEME_CHANGE_EVENT } from "@/shared/lib/theme";
 
 /** A piece of glass inside a group, measured from its element. */
@@ -425,6 +426,9 @@ export function GlassGroup({
     const engine = getGlassEngine();
     const element = groupRef.current;
     if (!engine || !element) return;
+    // Glass over the page needs a page snapshot, which phones and tablets
+    // never take: there it stays CSS glass. Glass over a photo still draws.
+    if (backdrop === "page" && !image && !canSnapshotPage()) return;
     const state = live.current;
     drawer.current = () => {
       const moving = drawGroup({

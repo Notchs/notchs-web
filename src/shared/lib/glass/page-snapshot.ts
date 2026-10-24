@@ -20,10 +20,23 @@ export const SNAPSHOT_IGNORE_ATTRIBUTE = "data-snapshot-ignore";
 /** Longest side of the picture: inside the texture limit of most GPUs. */
 const MAX_SIDE = 8192;
 const MAX_SCALE = 1;
-/** A snapshot younger than this is reused instead of taking another. */
-const FRESH_MS = 4000;
 /** The frost copy is this many times smaller than the page. */
 const FROST_DOWNSCALE = 14;
+/** A capture waits until the page has not scrolled for this long. */
+const SCROLL_IDLE_MS = 250;
+
+/**
+ * Whether this device may snapshot the page. Capturing clones every element
+ * and its styles on the main thread: about 2–4 s on a desktop, and a freeze
+ * of many seconds on a phone. So phones and tablets (touch first) never take
+ * one; there, glass over the page is CSS glass, a live blur of what's behind.
+ */
+export function canSnapshotPage() {
+  return (
+    typeof window !== "undefined" &&
+    !window.matchMedia("(pointer: coarse)").matches
+  );
+}
 
 let cached: PageSnapshot | null = null;
 let pending: Promise<PageSnapshot | null> | null = null;
@@ -81,7 +94,27 @@ function frostCopy(page: HTMLCanvasElement) {
   return frost;
 }
 
+/**
+ * Resolves once the page has stopped scrolling. A capture blocks the main
+ * thread, so it never starts mid-scroll, where it would freeze the page.
+ */
+function scrollIdle() {
+  return new Promise<void>((resolve) => {
+    let timer = setTimeout(done, SCROLL_IDLE_MS);
+    function onScroll() {
+      clearTimeout(timer);
+      timer = setTimeout(done, SCROLL_IDLE_MS);
+    }
+    function done() {
+      window.removeEventListener("scroll", onScroll);
+      resolve();
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+  });
+}
+
 async function capture(): Promise<PageSnapshot | null> {
+  await scrollIdle();
   const root = document.body;
   const width = document.documentElement.clientWidth;
   const height = root.scrollHeight;
@@ -115,10 +148,14 @@ async function capture(): Promise<PageSnapshot | null> {
 }
 
 /**
- * The current page snapshot: reused while fresh and the same size, shared
- * with any capture already running, otherwise taken now.
+ * The page snapshot: taken once per page view and reused while the page is
+ * the same width, shared with any capture already running. Capturing clones
+ * the whole page's styles (seconds on a phone), so it is only retaken when
+ * it would look wrong: a new width, or `invalidatePageSnapshot()` (theme).
+ * The glass bends a softened copy, so small changes since don't show.
  */
 export function getPageSnapshot(): Promise<PageSnapshot | null> {
+  if (!canSnapshotPage()) return Promise.resolve(null);
   if (cached && hasFreshPageSnapshot()) return Promise.resolve(cached);
   pending ??= capture().then((snapshot) => {
     cached = snapshot;
@@ -135,11 +172,7 @@ export function invalidatePageSnapshot() {
 
 /** True when a snapshot can be used right away, without waiting. */
 export function hasFreshPageSnapshot() {
-  return (
-    !!cached &&
-    cached.width === document.documentElement.clientWidth &&
-    performance.now() - cached.takenAt < FRESH_MS
-  );
+  return !!cached && cached.width === document.documentElement.clientWidth;
 }
 
 /** Starts a snapshot early (e.g. on hover) so the glass is ready on open. */

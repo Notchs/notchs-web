@@ -165,7 +165,9 @@ class GlassEngine {
     if (!gl || this.pageLoading) return;
     this.pageLoading = getPageSnapshot().then((snapshot) => {
       this.pageLoading = null;
-      if (!snapshot) return;
+      // Nothing new (another group asked for the same picture): the page
+      // texture is large, so don't upload it again.
+      if (!snapshot || this.page?.snapshot === snapshot || this.lost) return;
       if (this.page) {
         gl.deleteTexture(this.page.sharp);
         gl.deleteTexture(this.page.soft);

@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 
 import { cn } from "@/shared/lib/cn";
-import { getPageSnapshot } from "@/shared/lib/glass/page-snapshot";
+import { getGlassEngine } from "@/shared/lib/glass/engine/glass-engine";
+import {
+  canSnapshotPage,
+  getPageSnapshot,
+} from "@/shared/lib/glass/page-snapshot";
 import { createSlabProgram } from "@/shared/lib/glass/slab-shader";
 import { uploadTexture } from "@/shared/lib/glass/webgl";
 
@@ -95,10 +99,10 @@ export function GlassSlabCanvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (
-      !canvas ||
-      window.matchMedia("(prefers-reduced-transparency: reduce)").matches
-    ) {
+    // Same rules as the rest of the glass: no WebGL slab with reduced
+    // transparency, on a slow device, after a lost context, or where the page
+    // is never snapshotted (phones and tablets).
+    if (!canvas || !getGlassEngine() || !canSnapshotPage()) {
       onMode("off");
       return;
     }
