@@ -278,6 +278,10 @@ export const placesContent = {
   title: "Where you'll Notch.",
   description:
     "The spots you already go to. Each visit you prove adds to your Notch count.",
+  pause: "Pause",
+  play: "Play",
+  /** Read by screen readers with the button above. */
+  motionLabel: "moving places",
 } as const;
 
 export const collectContent = {

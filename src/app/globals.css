@@ -103,6 +103,14 @@
   --animate-stamp: stamp 0.5s var(--ease-notch) both;
   /* Story progress bar; the story moves on when it ends. */
   --animate-story: slide 4s linear both;
+  /* Places row: two copies of the cards slide left by one copy, then loop. */
+  --animate-marquee: marquee var(--marquee-duration, 48s) linear infinite;
+
+  @keyframes marquee {
+    to {
+      translate: -50% 0;
+    }
+  }
 
   @keyframes scan {
     from {

@@ -4,9 +4,15 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 
 import { GlassGroup } from "@/shared/components/glass/glass-group";
-import { ArrowRightIcon } from "@/shared/components/icons";
+import { ArrowRightIcon, PauseIcon, PlayIcon } from "@/shared/components/icons";
+import { cn } from "@/shared/lib/cn";
 
-import { howItWorksContent, sectionIds, venues } from "../content";
+import {
+  howItWorksContent,
+  placesContent,
+  sectionIds,
+  venues,
+} from "../content";
 import { useLanding } from "./landing-provider";
 
 type Venue = (typeof venues)[number];
@@ -72,9 +78,17 @@ function PlaceCard({
   );
 }
 
-/** Photo cards; picking one replays the WhatsApp demo at that place. */
+/**
+ * Photo cards in a row that moves slowly from right to left, without end:
+ * two copies of the cards slide left by one copy, then start again. It
+ * pauses on hover, while a card has keyboard focus, and with the Pause
+ * button (moving content needs a way to stop it). With reduced motion it
+ * stands still as a row you can swipe. Picking a card replays the WhatsApp
+ * demo at that place.
+ */
 export function PlaceCards() {
   const { selectVenue } = useLanding();
+  const [paused, setPaused] = useState(false);
 
   const tryAt = (kind: Venue["kind"]) => {
     selectVenue(kind);
@@ -82,16 +96,56 @@ export function PlaceCards() {
   };
 
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {venues.map((venue, index) => (
-        <li
-          key={venue.kind}
-          className="reveal"
-          style={{ animationRangeStart: `entry ${(index % 4) * 8}%` }}
+    <div className="reveal">
+      {/* Edges fade out, so cards slide in and out softly. Inline-size
+          containment: the long moving row must not widen the page. */}
+      <div className="group/marquee overflow-hidden mask-x-from-94% mask-x-to-100% contain-inline-size motion-reduce:snap-x motion-reduce:overflow-x-auto motion-reduce:mask-none">
+        <div
+          className={cn(
+            "flex w-max animate-marquee group-focus-within/marquee:[animation-play-state:paused] group-hover/marquee:[animation-play-state:paused]",
+            paused && "[animation-play-state:paused]",
+          )}
         >
-          <PlaceCard venue={venue} onPick={tryAt} />
-        </li>
-      ))}
-    </ul>
+          {/* The second copy only makes the loop seamless: hidden from
+              screen readers and keyboards, and gone with reduced motion. */}
+          {[false, true].map((copy) => (
+            <ul
+              key={String(copy)}
+              aria-hidden={copy || undefined}
+              inert={copy}
+              className={cn(
+                "flex gap-3 pr-3 sm:gap-4 sm:pr-4",
+                copy && "motion-reduce:hidden",
+              )}
+            >
+              {venues.map((venue) => (
+                <li
+                  key={venue.kind}
+                  className="w-[13.5rem] flex-none snap-start sm:w-64 lg:w-72"
+                >
+                  <PlaceCard venue={venue} onPick={tryAt} />
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-end motion-reduce:hidden">
+        <button
+          type="button"
+          onClick={() => setPaused((now) => !now)}
+          className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-line px-4 text-sm font-semibold transition-colors duration-150 hover:border-foreground/40"
+        >
+          {paused ? (
+            <PlayIcon className="size-4" />
+          ) : (
+            <PauseIcon className="size-4" />
+          )}
+          {paused ? placesContent.play : placesContent.pause}
+          <span className="sr-only">{placesContent.motionLabel}</span>
+        </button>
+      </div>
+    </div>
   );
 }

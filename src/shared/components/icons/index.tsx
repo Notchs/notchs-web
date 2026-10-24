@@ -154,6 +154,22 @@ export function SendIcon(props: IconProps) {
   );
 }
 
+export function PauseIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2.25} strokeLinecap="round" {...props}>
+      <path d="M9 6v12M15 6v12" />
+    </OutlineIcon>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} {...props}>
+      <path d="M8 5.5v13l10.5-6.5z" />
+    </OutlineIcon>
+  );
+}
+
 export function ReplayIcon(props: IconProps) {
   return (
     <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
