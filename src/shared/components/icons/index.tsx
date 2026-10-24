@@ -162,6 +162,44 @@ export function ReplayIcon(props: IconProps) {
   );
 }
 
+export function DashboardIcon(props: IconProps) {
+  return (
+    <OutlineIcon {...props}>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </OutlineIcon>
+  );
+}
+
+export function VenueIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0M5.5 12v8h13v-8M10 20v-4.5h4V20" />
+    </OutlineIcon>
+  );
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <circle cx="9" cy="8.5" r="3.5" />
+      <path d="M3 19.5c.6-3.2 3-5 6-5s5.4 1.8 6 5M15.5 5.2a3.5 3.5 0 0 1 0 6.6M17.5 14.8c1.9.6 3.1 2.2 3.5 4.7" />
+    </OutlineIcon>
+  );
+}
+
+export function SettingsIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+      <circle cx="15" cy="7" r="2" />
+      <circle cx="9" cy="17" r="2" />
+    </OutlineIcon>
+  );
+}
+
 export function MoreIcon(props: IconProps) {
   return (
     <OutlineIcon stroke="none" fill="currentColor" {...props}>
