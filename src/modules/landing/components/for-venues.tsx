@@ -1,11 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import { siteConfig } from "@/config/site";
+import { routes } from "@/config/routes";
 import { ArrowRightIcon } from "@/shared/components/icons";
 
 import { venuesContent } from "../content";
 import { SectionHeading } from "./section-heading";
-import { VerifiedIcon } from "./verified-icon";
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
 
 /**
  * Ink panel for venue owners, with a photo beside the pitch. On phones the
@@ -48,13 +49,13 @@ export function ForVenues() {
             </li>
           ))}
         </ul>
-        <a
-          href={`mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent("Notchs for my venue")}`}
+        <Link
+          href={routes.venueLogin}
           className="group mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-graphite px-6 py-3 text-center font-semibold transition-colors duration-150 hover:bg-white/14 sm:mt-10 sm:w-auto"
         >
           {venuesContent.cta}
           <ArrowRightIcon className="size-4.5 transition-transform duration-150 group-hover:translate-x-0.5" />
-        </a>
+        </Link>
       </div>
     </div>
   );

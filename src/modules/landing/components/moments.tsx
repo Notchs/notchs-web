@@ -9,7 +9,7 @@ import { cn } from "@/shared/lib/cn";
 import { momentsContent } from "../content";
 import { useStripScroll } from "../lib/use-strip-scroll";
 import { SectionHeading } from "./section-heading";
-import { VerifiedIcon } from "./verified-icon";
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
 
 const { stories } = momentsContent;
 

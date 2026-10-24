@@ -79,6 +79,41 @@ export function MailIcon(props: IconProps) {
   );
 }
 
+export function EyeIcon(props: IconProps) {
+  return (
+    <OutlineIcon {...props}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </OutlineIcon>
+  );
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M9.9 5.75A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5a9.3 9.3 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M3.5 3.5l17 17" />
+    </OutlineIcon>
+  );
+}
+
+export function MapPinIcon(props: IconProps) {
+  return (
+    <OutlineIcon {...props}>
+      <path d="M12 21s-6.75-5.6-6.75-11.25a6.75 6.75 0 0 1 13.5 0C18.75 15.4 12 21 12 21Z" />
+      <circle cx="12" cy="9.75" r="2.5" />
+    </OutlineIcon>
+  );
+}
+
+export function GiftIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <rect x="3.5" y="8" width="17" height="4" rx="1" />
+      <path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.25 8.5 8 12 8ZM12 8s1.5-4.5 4-3.75S15.5 8 12 8Z" />
+    </OutlineIcon>
+  );
+}
+
 export function ArrowRightIcon(props: IconProps) {
   return (
     <OutlineIcon strokeWidth={2.25} strokeLinecap="round" {...props}>

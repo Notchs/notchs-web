@@ -13,7 +13,7 @@ import {
   venues,
   type VenueKind,
 } from "../content";
-import { VerifiedIcon } from "./verified-icon";
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
 
 type Counts = Record<VenueKind, number>;
 

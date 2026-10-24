@@ -11,8 +11,10 @@ type StatusPageProps = {
   /** Small label above the title, e.g. "Error 404". */
   kicker: string;
   title: string;
-  description: string;
+  description?: string;
   mark: ReactNode;
+  /** Overrides the artwork's size, e.g. for a QR that must stay scannable. */
+  markClassName?: string;
   /** Replaces the default "back home" action. */
   action?: ReactNode;
 };
@@ -32,6 +34,7 @@ export function StatusPage({
   title,
   description,
   mark,
+  markClassName,
   action = <BackHomeLink />,
 }: StatusPageProps) {
   return (
@@ -41,6 +44,7 @@ export function StatusPage({
         title={title}
         description={description}
         mark={mark}
+        markClassName={markClassName}
       >
         <div className="mt-10 animate-fade-in [animation-delay:450ms]">
           {action}

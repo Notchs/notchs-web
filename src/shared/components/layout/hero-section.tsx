@@ -6,7 +6,7 @@ type HeroSectionProps = {
   /** Small uppercase label above the title. */
   kicker: string;
   title: ReactNode;
-  description: string;
+  description?: string;
   descriptionClassName?: string;
   /** Content below the description, such as a call to action. */
   children?: ReactNode;
