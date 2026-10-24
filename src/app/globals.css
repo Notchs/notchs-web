@@ -28,6 +28,7 @@
      its own lens filter instead. */
   --glass-blur: 24px;
   --glass-blur-clear: 14px;
+  --glass-blur-liquid: 10px;
 
   --gutter: 20px;
 
@@ -235,6 +236,17 @@
   --glass-shine: rgb(255 255 255 / 0.55);
   --glass-shadow:
     0 0 0 1px rgb(15 15 20 / 0.06), 0 10px 30px rgb(15 15 20 / 0.12);
+
+  /* iPhone-style controls (glass-liquid). The wash keeps Ink text at 4.5:1
+     even over pure black; the rim stays clear. */
+  --glass-wash: rgb(255 255 255 / 0.55);
+  --glass-wash-rim: rgb(255 255 255 / 0.12);
+  --glass-wash-strong: rgb(255 255 255 / 0.78);
+  --glass-rim-top: rgb(255 255 255 / 0.95);
+  --glass-rim-bottom: rgb(255 255 255 / 0.4);
+  --glass-rim-edge: rgb(15 15 20 / 0.07);
+  --glass-shadow-liquid:
+    0 1px 3px rgb(15 15 20 / 0.08), 0 10px 28px rgb(15 15 20 / 0.12);
 }
 
 @utility tone-ink {
@@ -258,6 +270,16 @@
   --glass-highlight: rgb(245 243 236 / 0.16);
   --glass-shine: rgb(255 255 255 / 0.08);
   --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+
+  /* iPhone-style controls (glass-liquid). The wash keeps Paper text at
+     4.5:1 even over pure white; the rim stays clear. */
+  --glass-wash: rgb(23 23 29 / 0.66);
+  --glass-wash-rim: rgb(23 23 29 / 0.2);
+  --glass-wash-strong: rgb(23 23 29 / 0.82);
+  --glass-rim-top: rgb(255 255 255 / 0.22);
+  --glass-rim-bottom: rgb(255 255 255 / 0.07);
+  --glass-rim-edge: rgb(245 243 236 / 0.1);
+  --glass-shadow-liquid: 0 10px 30px rgb(0 0 0 / 0.45);
 
   /* Ink panels on Ink: a whisper of an edge instead of a shadow. */
   --surface-shadow-ink: 0 0 0 1px rgb(245 243 236 / 0.08);
@@ -320,6 +342,54 @@
     background-image: none;
     backdrop-filter: none;
   }
+}
+
+/* ---- iPhone-style Liquid Glass for floating controls ---------------------
+   Used with <LiquidGlass bare>: in Chromium its lens filter replaces the
+   backdrop-filter below, bending the content at the clear rim and frosting
+   only behind the text. Elsewhere: a light frost. Light catches the top rim,
+   a fainter line the bottom, as on iPhone. Solid with reduced transparency. */
+@utility glass-liquid {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--glass-wash-rim);
+  box-shadow:
+    inset 0 1px 0 var(--glass-rim-top),
+    inset 0 -1px 0 var(--glass-rim-bottom),
+    inset 0 0 0 1px var(--glass-rim-edge),
+    var(--glass-shadow-liquid);
+
+  /* The readable wash sits behind the text only, with soft edges, so the
+     rim stays clear and its bend shows. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--glass-wash);
+    filter: blur(4px);
+    pointer-events: none;
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(var(--glass-blur-liquid)) saturate(180%);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--glass-solid);
+    backdrop-filter: none;
+
+    &::before {
+      content: none;
+    }
+  }
+}
+
+/* More frost behind long text, e.g. menus and sheets. */
+@utility glass-liquid-strong {
+  --glass-wash: var(--glass-wash-strong);
+  --glass-blur-liquid: 20px;
 }
 
 /* Clear glass, used with `glass` for chips over maps only. */

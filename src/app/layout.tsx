@@ -55,10 +55,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // before React hydrates.
     <html
       lang="en-IN"
-      className={`${inter.variable} ${unbounded.variable}`}
+      // Nothing (e.g. a glass shadow at the edge) may widen the page on phones.
+      className={`${inter.variable} ${unbounded.variable} overflow-x-clip`}
       suppressHydrationWarning
     >
-      <body className="grid min-h-svh grid-rows-[auto_1fr_auto] bg-background font-sans text-foreground antialiased">
+      <body className="grid min-h-svh grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr_auto] overflow-x-clip bg-background font-sans text-foreground antialiased">
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script dangerouslySetInnerHTML={{ __html: glassInitScript }} />
         {children}

@@ -11,11 +11,7 @@ import {
 import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
-import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
-import {
-  GlassLensTrack,
-  LENS_ITEM,
-} from "@/shared/components/glass/glass-lens-track";
+import { LiquidGlass } from "@/shared/components/glass/liquid-glass";
 import { CloseIcon, MenuIcon } from "@/shared/components/icons";
 import { ThemeToggle } from "@/shared/components/layout/theme-toggle";
 import { cn } from "@/shared/lib/cn";
@@ -26,11 +22,31 @@ import { navLinks } from "../content";
 import { useActiveSection } from "../lib/use-active-section";
 import { AccessButton } from "./access-button";
 
+/**
+ * Primary text colour on the glass, like iPhone controls: clear glass can
+ * sit over anything, and the muted colour would not stay readable.
+ */
 const linkStyles =
-  "relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[.9375rem] font-medium text-muted transition-colors duration-150 hover:text-foreground focus-visible:text-foreground";
+  "relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[.9375rem] font-medium text-foreground transition-colors duration-150 hover:bg-glass-tint";
 
 /** Height and corner radius of the bar's glass capsules, px. */
 const CAPSULE_RADIUS = 32;
+const MENU_RADIUS = 20;
+
+/**
+ * The capsules' lens: a clear rim that bends what's behind it, and a light
+ * frost behind the text.
+ */
+const capsuleGlass = {
+  radius: CAPSULE_RADIUS,
+  bezel: 22,
+  depth: 26,
+  rimBlur: 1,
+  coreBlur: 7,
+  bare: true,
+} as const;
+
+const capsuleStyles = "glass-liquid flex h-16 items-center rounded-[32px]";
 
 const sectionIds = navLinks.map((link) => link.href.slice(1));
 
@@ -64,7 +80,6 @@ function SectionLink({
         active &&
           "text-background hover:text-background focus-visible:text-background",
       )}
-      {...LENS_ITEM}
     >
       <span
         aria-hidden="true"
@@ -108,12 +123,14 @@ function useDismiss(
 }
 
 /**
- * The top bar as Liquid Glass: three capsules (brand, links, actions) that
- * float over the page and bend it as it scrolls beneath. Pieces that come
- * close melt together; a glass lens follows the pointer or keyboard focus
- * along the links and actions, stretching a neck as it moves. Over Ink
- * panels the glass turns dark so it stays readable. On phones and tablets
- * the links open in a glass panel that grows out of the Menu button.
+ * The top bar as iPhone-style Liquid Glass: three clear capsules (brand,
+ * links, actions) that float over the page. In Chromium the content behind
+ * bends live at each capsule's rounded rim, with a light frost behind the
+ * text and light catching the edge; Safari and Firefox get the same clear
+ * glass without the bend. No page snapshot, so it's always up to date and
+ * costs almost nothing. Over Ink panels the glass turns dark so it stays
+ * readable. On phones and tablets the links open in a glass panel that grows
+ * out of the Menu button.
  */
 export function LandingHeader() {
   const headerRef = useRef<HTMLElement>(null);
@@ -127,25 +144,17 @@ export function LandingHeader() {
   return (
     <header
       ref={headerRef}
+      // Live glass, so other glass must not bend a picture of it.
+      {...{ [SNAPSHOT_IGNORE_ATTRIBUTE]: "" }}
       className={cn("sticky top-0 z-40 px-gutter pt-3", onInk && "tone-ink")}
     >
       <div className="relative mx-auto max-w-[calc(1440px_-_2_*_var(--gutter))]">
-        <GlassGroup
-          self={false}
-          floating
-          merge={22}
-          tintAmount={0.62}
-          frost={0.85}
-          className="flex h-16 items-center justify-between gap-2"
-        >
-          <GlassShape
-            radius={CAPSULE_RADIUS}
-            className="flex h-16 items-center pr-5 pl-5"
-          >
+        <div className="flex h-16 items-center justify-between gap-2">
+          <LiquidGlass {...capsuleGlass} className={capsuleStyles}>
             <a
               href="#top"
               aria-label={`${siteConfig.name} home`}
-              className="inline-flex min-h-11 items-center gap-2.5"
+              className="inline-flex min-h-11 items-center gap-2.5 px-5"
               onClick={closeMenu}
             >
               <NotchGlyph className="size-6" />
@@ -153,73 +162,63 @@ export function LandingHeader() {
                 {siteConfig.name}
               </span>
             </a>
-          </GlassShape>
+          </LiquidGlass>
 
-          <GlassShape
-            radius={CAPSULE_RADIUS}
-            className="hidden h-16 items-center px-2 lg:flex"
+          <LiquidGlass
+            {...capsuleGlass}
+            className={cn(capsuleStyles, "hidden px-2 lg:flex")}
           >
             <nav aria-label="Main">
-              <GlassLensTrack lensRadius={20} inset={2}>
-                <ul className="flex items-center gap-0.5">
-                  {navLinks.map((link) => (
-                    <li key={link.href}>
-                      <SectionLink
-                        href={link.href}
-                        label={link.label}
-                        active={link.href.slice(1) === activeSection}
-                        className={linkStyles}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </GlassLensTrack>
+              <ul className="flex items-center gap-0.5">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <SectionLink
+                      href={link.href}
+                      label={link.label}
+                      active={link.href.slice(1) === activeSection}
+                      className={linkStyles}
+                    />
+                  </li>
+                ))}
+              </ul>
             </nav>
-          </GlassShape>
+          </LiquidGlass>
 
-          <GlassShape
-            radius={CAPSULE_RADIUS}
-            className="flex h-16 items-center gap-1 pr-3 pl-2 sm:gap-2"
+          <LiquidGlass
+            {...capsuleGlass}
+            className={cn(capsuleStyles, "gap-1 pr-3 pl-2 sm:gap-2")}
           >
-            <GlassLensTrack
-              lensRadius={22}
-              inset={1}
-              className="flex items-center gap-1"
+            <span className="max-sm:hidden">
+              <ThemeToggle />
+            </span>
+            {/* Phones: in the menu instead, so the bar fits the screen. */}
+            <a href={routes.login} className={cn(linkStyles, "max-sm:hidden")}>
+              Login
+            </a>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls="landing-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+              className="relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 text-[.9375rem] font-medium transition-colors duration-150 hover:bg-glass-tint lg:hidden"
             >
-              <span className="max-sm:hidden" {...LENS_ITEM}>
-                <ThemeToggle />
-              </span>
-              <a href={routes.login} className={linkStyles} {...LENS_ITEM}>
-                Login
-              </a>
-              <button
-                ref={menuButtonRef}
-                type="button"
-                aria-expanded={menuOpen}
-                aria-controls="landing-menu"
-                onClick={() => setMenuOpen((open) => !open)}
-                className="relative order-last inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 text-[.9375rem] font-medium lg:hidden"
-                {...LENS_ITEM}
-              >
-                {menuOpen ? (
-                  <CloseIcon className="size-5" />
-                ) : (
-                  <MenuIcon className="size-5" />
-                )}
-                <span className="sr-only sm:not-sr-only">Menu</span>
-              </button>
-            </GlassLensTrack>
+              {menuOpen ? (
+                <CloseIcon className="size-5" />
+              ) : (
+                <MenuIcon className="size-5" />
+              )}
+              <span className="sr-only sm:not-sr-only">Menu</span>
+            </button>
             <AccessButton size="sm" />
-          </GlassShape>
-        </GlassGroup>
+          </LiquidGlass>
+        </div>
 
         {/* Phone and tablet menu: grows out of the Menu button (200ms, both
-            ways; none with reduced motion). An overlay, so the page snapshot
-            the glass bends leaves it out. */}
+            ways; none with reduced motion). */}
         <div
           id="landing-menu"
           inert={!menuOpen}
-          {...{ [SNAPSHOT_IGNORE_ATTRIBUTE]: "" }}
           className={cn(
             "absolute inset-x-0 top-full mt-2 origin-top-right transition-[opacity,scale,translate] duration-200 ease-notch motion-reduce:transition-none sm:left-auto sm:w-72 lg:hidden",
             menuOpen
@@ -227,36 +226,46 @@ export function LandingHeader() {
               : "pointer-events-none -translate-y-2 scale-[.85] opacity-0",
           )}
         >
-          {/* Heavier frost than the bar: the items must read over anything. */}
-          <GlassGroup
-            floating
-            radius={20}
-            tintAmount={0.9}
-            frost={1}
-            className="rounded-[20px] p-1.5"
+          {/* More frost behind the items than the bar: they must read over
+              anything. The rim stays clear and bends. */}
+          <LiquidGlass
+            radius={MENU_RADIUS}
+            bezel={18}
+            depth={30}
+            rimBlur={2}
+            coreBlur={18}
+            bare
+            className="glass-liquid rounded-[20px] p-1.5 glass-liquid-strong"
           >
             <nav aria-label="Menu">
-              <GlassLensTrack lensRadius={14} inset={1}>
-                <ul className="grid gap-0.5">
-                  {navLinks.map((link) => (
-                    <li key={link.href}>
-                      <SectionLink
-                        href={link.href}
-                        label={link.label}
-                        active={link.href.slice(1) === activeSection}
-                        onClick={closeMenu}
-                        className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium transition-colors"
-                      />
-                    </li>
-                  ))}
-                  <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">
-                    <span className="text-base text-muted">Theme</span>
-                    <ThemeToggle />
+              <ul className="grid gap-0.5">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <SectionLink
+                      href={link.href}
+                      label={link.label}
+                      active={link.href.slice(1) === activeSection}
+                      onClick={closeMenu}
+                      className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium transition-colors hover:bg-glass-tint"
+                    />
                   </li>
-                </ul>
-              </GlassLensTrack>
+                ))}
+                <li className="sm:hidden">
+                  <a
+                    href={routes.login}
+                    onClick={closeMenu}
+                    className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium transition-colors hover:bg-glass-tint"
+                  >
+                    Login
+                  </a>
+                </li>
+                <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">
+                  <span className="text-base">Theme</span>
+                  <ThemeToggle />
+                </li>
+              </ul>
             </nav>
-          </GlassGroup>
+          </LiquidGlass>
         </div>
       </div>
     </header>
