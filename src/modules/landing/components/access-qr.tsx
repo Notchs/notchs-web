@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { cn } from "@/shared/lib/cn";
+import { THEME_CHANGE_EVENT } from "@/shared/lib/theme";
 
 import { QR_MODULES, buildQrPattern } from "../lib/qr-pattern";
 
@@ -11,12 +12,14 @@ import { QR_MODULES, buildQrPattern } from "../lib/qr-pattern";
 const MODULE_PX = 4;
 const QR_PX = QR_MODULES * MODULE_PX;
 const REVEAL_MS = 1800;
+/** Modules left empty around the centre, so the logo sits in a clear gap. */
+const LOGO_MODULES = 12;
 
 function easeInOut(t: number) {
   return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 }
 
-/** Fisher-Yates shuffle, so light modules appear in a random order. */
+/** Fisher-Yates shuffle, so modules appear in a random order. */
 function shuffle(items: number[]) {
   for (let i = items.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -26,9 +29,12 @@ function shuffle(items: number[]) {
 }
 
 /**
- * Starts as a solid Ink square; light modules turn Paper one by one in random
- * order until the code takes shape. Then the logo drops in and a scan line
- * sweeps up and down. Reduced motion shows the finished code at once.
+ * Starts empty; the code's modules appear one by one in random order, drawn
+ * straight onto the glass in the theme's text colour (dark on light, or
+ * light on dark, which phone cameras read too), with a clear gap in the
+ * middle for the logo. Then the logo drops in and a scan line sweeps up and
+ * down. Switching theme repaints it
+ * at once; reduced motion shows the finished code straight away.
  */
 export function AccessQr() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,19 +52,36 @@ export function AccessQr() {
     canvas.height = QR_PX * scale;
     ctx.scale(scale, scale);
 
-    const root = getComputedStyle(document.documentElement);
-    const ink = root.getPropertyValue("--ink").trim();
-    const paper = root.getPropertyValue("--paper").trim();
-
-    const light: number[] = [];
-    pattern.forEach((dark, i) => {
-      if (!dark) light.push(i);
+    const gapStart = (QR_MODULES - LOGO_MODULES) / 2;
+    const inLogoGap = (i: number) => {
+      const x = i % QR_MODULES;
+      const y = Math.floor(i / QR_MODULES);
+      return (
+        x >= gapStart &&
+        x < gapStart + LOGO_MODULES &&
+        y >= gapStart &&
+        y < gapStart + LOGO_MODULES
+      );
+    };
+    const dark: number[] = [];
+    pattern.forEach((isDark, i) => {
+      if (isDark && !inLogoGap(i)) dark.push(i);
     });
-    shuffle(light);
+    shuffle(dark);
 
-    ctx.fillStyle = ink;
-    ctx.fillRect(0, 0, QR_PX, QR_PX);
-    ctx.fillStyle = paper;
+    const paint = (count: number) => {
+      ctx.clearRect(0, 0, QR_PX, QR_PX);
+      ctx.fillStyle = getComputedStyle(canvas).color;
+      for (let i = 0; i < count; i++) {
+        const cell = dark[i];
+        ctx.fillRect(
+          (cell % QR_MODULES) * MODULE_PX,
+          Math.floor(cell / QR_MODULES) * MODULE_PX,
+          MODULE_PX,
+          MODULE_PX,
+        );
+      }
+    };
 
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -70,45 +93,46 @@ export function AccessQr() {
     let frame = requestAnimationFrame(function tick(now) {
       start ??= now;
       const progress = duration ? Math.min(1, (now - start) / duration) : 1;
-      const target = Math.round(easeInOut(progress) * light.length);
-      for (; painted < target; painted++) {
-        const cell = light[painted];
-        ctx.fillRect(
-          (cell % QR_MODULES) * MODULE_PX,
-          Math.floor(cell / QR_MODULES) * MODULE_PX,
-          MODULE_PX,
-          MODULE_PX,
-        );
-      }
+      painted = Math.round(easeInOut(progress) * dark.length);
+      paint(painted);
       if (progress < 1) frame = requestAnimationFrame(tick);
       else setReady(true);
     });
 
-    return () => cancelAnimationFrame(frame);
+    // A theme change swaps the colours; repaint what is shown so far.
+    const repaint = () => requestAnimationFrame(() => paint(painted));
+    const scheme = window.matchMedia("(prefers-color-scheme: light)");
+    window.addEventListener(THEME_CHANGE_EVENT, repaint);
+    scheme.addEventListener("change", repaint);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener(THEME_CHANGE_EVENT, repaint);
+      scheme.removeEventListener("change", repaint);
+    };
   }, [pattern]);
 
   return (
-    <div className="rounded-2xl bg-paper p-5">
+    <div className="p-5">
       <div className="relative" style={{ width: QR_PX, height: QR_PX }}>
         <canvas
           ref={canvasRef}
           role="img"
           aria-label="Sample Notchs QR code with the Notchs logo in the centre"
-          className="block size-full [image-rendering:pixelated]"
+          className="block size-full text-foreground [image-rendering:pixelated]"
         />
         <span
           aria-hidden="true"
           className={cn(
-            "absolute top-1/2 left-1/2 grid size-10 -translate-1/2 place-items-center rounded-lg bg-ink text-paper transition-[opacity,scale] duration-500 ease-notch",
+            "absolute top-1/2 left-1/2 grid size-10 -translate-1/2 place-items-center text-foreground transition-[opacity,scale] duration-500 ease-notch",
             ready ? "scale-100 opacity-100" : "scale-50 opacity-0",
           )}
         >
-          <NotchGlyph className="size-6" />
+          <NotchGlyph className="size-7" />
         </span>
         {ready && (
           <span
             aria-hidden="true"
-            className="absolute -inset-x-3 h-1 animate-scan rounded-full border-y border-ink bg-volt motion-reduce:hidden"
+            className="absolute -inset-x-3 h-1 animate-scan rounded-full border-y border-foreground/40 bg-volt motion-reduce:hidden"
           />
         )}
       </div>

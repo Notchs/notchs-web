@@ -4,8 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
 import { PlusIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/cn";
+import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import {
   builderBadges,
@@ -46,33 +48,39 @@ function Stepper({
   onChange: (next: number) => void;
 }) {
   const buttonStyles =
-    "grid size-12 flex-none cursor-pointer place-items-center rounded-xl border border-line text-lg font-semibold transition-colors duration-150 hover:border-foreground disabled:cursor-not-allowed disabled:opacity-40";
+    "relative grid size-12 flex-none cursor-pointer place-items-center rounded-xl text-lg font-semibold disabled:cursor-not-allowed";
+  // Each step is a small glass key that presses in.
+  const keyStyles = "rounded-xl has-disabled:opacity-40";
   return (
     <div className="flex items-center gap-1.5">
-      <button
-        type="button"
-        aria-label={`${builderContent.remove}: ${label}`}
-        disabled={count === 0}
-        onClick={() => onChange(count - 1)}
-        className={buttonStyles}
-      >
-        −
-      </button>
+      <GlassGroup radius={12} pressable margin={10} className={keyStyles}>
+        <button
+          type="button"
+          aria-label={`${builderContent.remove}: ${label}`}
+          disabled={count === 0}
+          onClick={() => onChange(count - 1)}
+          className={buttonStyles}
+        >
+          −
+        </button>
+      </GlassGroup>
       <span
         aria-live="polite"
         className="w-7 text-center font-display text-lg font-extrabold tabular-nums"
       >
         {count}
       </span>
-      <button
-        type="button"
-        aria-label={`${builderContent.add}: ${label}`}
-        disabled={count === MAX_PER_PLACE}
-        onClick={() => onChange(count + 1)}
-        className={buttonStyles}
-      >
-        <PlusIcon className="size-5" />
-      </button>
+      <GlassGroup radius={12} pressable margin={10} className={keyStyles}>
+        <button
+          type="button"
+          aria-label={`${builderContent.add}: ${label}`}
+          disabled={count === MAX_PER_PLACE}
+          onClick={() => onChange(count + 1)}
+          className={buttonStyles}
+        >
+          <PlusIcon className="size-5" />
+        </button>
+      </GlassGroup>
     </div>
   );
 }
@@ -100,34 +108,42 @@ export function NotchCardBuilder() {
         <p className="mt-3 max-w-[40ch] text-[1.0625rem] leading-relaxed text-muted">
           {builderContent.description}
         </p>
-        <ul className="mt-6 flex snap-x gap-2 overflow-x-auto pb-1 lg:mt-8 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0">
-          {venues.map((venue) => (
-            <li
-              key={venue.kind}
-              className="flex flex-none snap-start items-center justify-between gap-3 rounded-2xl border border-line bg-card p-2 pl-2"
-            >
-              <span className="flex min-w-0 items-center gap-3">
-                <span className="relative size-11 flex-none overflow-hidden rounded-xl bg-block">
-                  <Image
-                    src={venue.image.src}
-                    alt=""
-                    fill
-                    sizes="44px"
-                    className="object-cover"
-                  />
+        {/* The places are pieces of one glass; close neighbours melt. */}
+        <GlassGroup self={false} merge={14}>
+          <div
+            role="list"
+            className="mt-3 flex snap-x gap-2 overflow-x-auto py-3 lg:mt-5 lg:grid lg:grid-cols-2 lg:overflow-visible lg:py-3"
+          >
+            {venues.map((venue) => (
+              <GlassShape
+                key={venue.kind}
+                role="listitem"
+                radius={16}
+                className="flex flex-none snap-start items-center justify-between gap-3 p-2 pl-2"
+              >
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="relative size-11 flex-none overflow-hidden rounded-xl bg-block">
+                    <Image
+                      src={venue.image.src}
+                      alt=""
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="truncate font-semibold">{venue.label}</span>
                 </span>
-                <span className="truncate font-semibold">{venue.label}</span>
-              </span>
-              <Stepper
-                label={venue.label}
-                count={counts[venue.kind]}
-                onChange={(next) =>
-                  setCounts((current) => ({ ...current, [venue.kind]: next }))
-                }
-              />
-            </li>
-          ))}
-        </ul>
+                <Stepper
+                  label={venue.label}
+                  count={counts[venue.kind]}
+                  onChange={(next) =>
+                    setCounts((current) => ({ ...current, [venue.kind]: next }))
+                  }
+                />
+              </GlassShape>
+            ))}
+          </div>
+        </GlassGroup>
         <button
           type="button"
           onClick={() => setCounts(emptyCounts)}
@@ -138,9 +154,20 @@ export function NotchCardBuilder() {
         </button>
       </div>
 
-      {/* The live card. Always Ink, so Volt may sit inside it. */}
+      {/* The live card: thick Ink glass bending the page around it, so Volt
+          may sit inside it. Solid Ink until the glass draws. */}
       <div className="mx-auto w-full max-w-[24rem] lg:sticky lg:top-28">
-        <div className="rounded-3xl border border-white/10 bg-ink p-5 pt-7 text-paper notch notch-lg sm:p-7 sm:pt-9">
+        <GlassGroup
+          {...INK_GROUND}
+          floating
+          radius={24}
+          tintVar="--ink"
+          tintAmount={0.96}
+          rimShare={0.5}
+          frost={0.9}
+          fallback="own"
+          className="rounded-3xl p-5 pt-7 text-paper notch notch-lg not-data-glass-ready:bg-ink sm:p-7 sm:pt-9"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold tracking-[.14em] text-stone uppercase">
               {builderContent.month}
@@ -158,9 +185,17 @@ export function NotchCardBuilder() {
             {builderContent.countLabel}
           </p>
 
-          <p className="mt-4 inline-flex rounded-full bg-graphite px-3 py-1.5 font-mono text-sm lg:mt-5">
-            {total >= 3 ? builderContent.rankOpen : builderContent.rankLocked}
-          </p>
+          <GlassGroup
+            radius={999}
+            tintVar="--graphite"
+            tintAmount={0.75}
+            margin={10}
+            className="mt-4 inline-flex rounded-full px-3 py-1.5 font-mono text-sm lg:mt-5"
+          >
+            <p>
+              {total >= 3 ? builderContent.rankOpen : builderContent.rankLocked}
+            </p>
+          </GlassGroup>
           <p className="mt-2 min-h-6 text-[.9375rem] text-stone lg:mt-3">
             {total === 0
               ? builderContent.empty
@@ -175,29 +210,39 @@ export function NotchCardBuilder() {
                 <li
                   key={`${badge.name}-${on}`}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full border border-white/10 px-2.5 py-1 transition-colors duration-200 lg:gap-3 lg:rounded-xl lg:border-0 lg:px-3 lg:py-2",
-                    on ? "animate-rise bg-graphite" : "opacity-50",
+                    "rounded-full lg:rounded-xl",
+                    on ? "animate-rise" : "opacity-50",
                   )}
                 >
-                  <VerifiedIcon
-                    className={cn(
-                      "size-3.5 flex-none lg:size-4",
-                      on ? "text-volt" : "text-stone",
-                    )}
-                  />
-                  <span className="leading-tight">
-                    <span className="block text-xs font-semibold lg:text-[.9375rem]">
-                      {badge.name}
+                  {/* An unlocked badge turns into a glass chip. */}
+                  <GlassGroup
+                    self={on}
+                    radius={14}
+                    tintVar="--graphite"
+                    tintAmount={0.75}
+                    margin={10}
+                    className="flex items-center gap-1.5 rounded-full px-2.5 py-1 lg:gap-3 lg:rounded-xl lg:px-3 lg:py-2"
+                  >
+                    <VerifiedIcon
+                      className={cn(
+                        "size-3.5 flex-none lg:size-4",
+                        on ? "text-volt" : "text-stone",
+                      )}
+                    />
+                    <span className="leading-tight">
+                      <span className="block text-xs font-semibold lg:text-[.9375rem]">
+                        {badge.name}
+                      </span>
+                      <span className="sr-only text-sm text-stone lg:not-sr-only lg:block">
+                        {badge.rule}
+                      </span>
                     </span>
-                    <span className="sr-only text-sm text-stone lg:not-sr-only lg:block">
-                      {badge.rule}
-                    </span>
-                  </span>
+                  </GlassGroup>
                 </li>
               );
             })}
           </ul>
-        </div>
+        </GlassGroup>
         <p className="mt-3 text-center text-sm text-muted">
           {builderContent.preview}
         </p>

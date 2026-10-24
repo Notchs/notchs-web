@@ -21,32 +21,18 @@
   --graphite: #24242c;
   --stone: #8a8a94;
 
-  --background: var(--ink);
-  --foreground: var(--paper);
-  --muted: #8a8a94;
-  --line: rgb(245 243 236 / 0.12);
-  --unnotched: #ff5b35;
-  --block: #24242c;
-  --card: #17171d;
-  --btn: var(--volt);
-  --btn-fg: var(--ink);
-  --btn-hover: #ddff6b;
+  /* Dark is the default theme; the light theme overrides it below. */
+  @apply tone-ink;
+
+  /* Glass blur. Where real refraction runs (Level 3), <LiquidGlass> uses
+     its own lens filter instead. */
+  --glass-blur: 24px;
+  --glass-blur-clear: 14px;
 
   --gutter: 20px;
-  color-scheme: dark;
 
   @variant light {
-    --background: var(--paper);
-    --foreground: var(--ink);
-    --muted: #5c5c66;
-    --line: rgb(15 15 20 / 0.14);
-    --unnotched: #c2381a;
-    --block: #e3dfd2;
-    --card: #ffffff;
-    --btn: var(--ink);
-    --btn-fg: var(--volt);
-    --btn-hover: #24242c;
-    color-scheme: light;
+    @apply tone-paper;
   }
 
   @variant md {
@@ -84,10 +70,27 @@
 }
 
 @theme {
+  /* Hover and selected wash for items on glass, in either theme. */
+  --color-glass-tint: rgb(127 127 127 / 0.14);
+
   /* Where the hero switches from stacked to two columns. */
   --breakpoint-split: 56.25rem;
 
   --ease-notch: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A soft spring with a small overshoot, for glass that changes shape. */
+  --ease-spring: linear(
+    0,
+    0.06 2.2%,
+    0.23 4.7%,
+    0.75 12.6%,
+    0.95 18%,
+    1.03 23.4%,
+    1.05 28%,
+    1.03 37%,
+    1 50%,
+    0.995 63%,
+    1
+  );
 
   --animate-fade-in: fade-in 0.7s var(--ease-notch) both;
   --animate-cut: cut 0.55s var(--ease-notch) both;
@@ -213,6 +216,130 @@
     calc(100% - 8px) 100%,
     0 100%
   );
+}
+
+/* ---- Tones ---------------------------------------------------------------
+   Every theme colour, as a set that can be applied to any element. `:root`
+   takes Ink by default and Paper in the light theme; the glass header also
+   takes one locally to adapt to what scrolls under it. */
+
+/* Glass on light grounds: the light theme, and the map in either theme. */
+@utility glass-light {
+  --glass-fill: rgb(255 255 255 / 0.58);
+  --glass-fill-clear: rgb(255 255 255 / 0.34);
+  --glass-solid: #ffffff;
+  --glass-saturate: 160%;
+  --glass-saturate-clear: 180%;
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --glass-highlight: rgb(255 255 255 / 0.9);
+  --glass-shine: rgb(255 255 255 / 0.55);
+  --glass-shadow:
+    0 0 0 1px rgb(15 15 20 / 0.06), 0 10px 30px rgb(15 15 20 / 0.12);
+}
+
+@utility tone-ink {
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --muted: #8a8a94;
+  --line: rgb(245 243 236 / 0.1);
+  --unnotched: #ff5b35;
+  --block: #24242c;
+  --card: #17171d;
+  --btn: var(--volt);
+  --btn-fg: var(--ink);
+  --btn-hover: #ddff6b;
+
+  --glass-fill: rgb(23 23 29 / 0.58);
+  --glass-fill-clear: rgb(23 23 29 / 0.4);
+  --glass-solid: #17171d;
+  --glass-saturate: 140%;
+  --glass-saturate-clear: 140%;
+  --glass-edge: rgb(245 243 236 / 0.12);
+  --glass-highlight: rgb(245 243 236 / 0.16);
+  --glass-shine: rgb(255 255 255 / 0.08);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+
+  /* Ink panels on Ink: a whisper of an edge instead of a shadow. */
+  --surface-shadow-ink: 0 0 0 1px rgb(245 243 236 / 0.08);
+
+  color: var(--foreground);
+  color-scheme: dark;
+}
+
+@utility tone-paper {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --muted: #5c5c66;
+  --line: rgb(15 15 20 / 0.09);
+  --unnotched: #c2381a;
+  --block: #ebe8de;
+  --card: #ffffff;
+  --btn: var(--ink);
+  --btn-fg: var(--volt);
+  --btn-hover: #24242c;
+
+  @apply glass-light;
+
+  /* Ink panels on Paper: a soft, deep shadow, no outline. */
+  --surface-shadow-ink:
+    0 2px 6px rgb(15 15 20 / 0.12), 0 30px 60px -24px rgb(15 15 20 / 0.45);
+
+  color: var(--foreground);
+  color-scheme: light;
+}
+
+/* ---- CSS glass ------------------------------------------------------------
+   The fallback for the WebGL glass (<GlassGroup>): shown until it draws,
+   and where WebGL is unavailable. Frosted with a shine that follows the
+   pointer (--shine-x/y); solid with reduced transparency. */
+@utility glass {
+  background-color: var(--glass-solid);
+  background-image: radial-gradient(
+    160px circle at var(--shine-x, 24%) var(--shine-y, -70%),
+    var(--glass-shine),
+    transparent 70%
+  );
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    var(--glass-shadow);
+
+  @supports (backdrop-filter: blur(1px)) {
+    background-color: var(--glass-fill);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+
+    /* Where the rim really bends the content (Level 3), clearer glass lets
+       it show, like a thick clear slab. */
+    :root[data-glass-refraction] & {
+      background-color: color-mix(in oklab, var(--glass-fill) 75%, transparent);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--glass-solid);
+    background-image: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Clear glass, used with `glass` for chips over maps only. */
+@utility glass-clear {
+  --glass-fill: var(--glass-fill-clear);
+  --glass-blur: var(--glass-blur-clear);
+  --glass-saturate: var(--glass-saturate-clear);
+}
+
+/* A <GlassGroup> shows CSS glass until its WebGL glass has drawn, and keeps
+   it where WebGL is unavailable. */
+[data-glass-self]:not([data-glass-ready]) {
+  @apply glass;
+}
+
+/* Depth for photo and Ink panels that are not glass (the map, the demo
+   phone), so they sit on the page softly. Everything else is WebGL glass
+   (<GlassGroup>). */
+@utility surface-ink {
+  box-shadow: var(--surface-shadow-ink);
 }
 
 /* Opens and closes a <details> smoothly where the browser supports it. */
