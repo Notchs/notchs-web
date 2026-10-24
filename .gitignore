@@ -38,6 +38,8 @@ yarn-error.log*
 # (use `git add -f <path>` for the ones that must be pushed)
 *.md
 !/README.md
+!/CLAUDE.md
+!/.github/*.md
 *.test.*
 *.spec.*
 __tests__/
@@ -54,3 +56,9 @@ next-env.d.ts
 
 # local design references (mockups, PDFs); never shipped
 /All pages designs/
+
+# personal Claude Code settings (shared rules live in .claude/settings.json)
+.claude/settings.local.json
+
+# Lighthouse reports from the SEO quality bar (CLAUDE.md §3)
+lh.json
