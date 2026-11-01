@@ -55,6 +55,8 @@ export function SaturdayMap() {
   const listRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
+  // The lenses load the full map file and their own WebGL: only once seen.
+  const [seen, setSeen] = useState(false);
   const [manual, setManual] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
   // True once the WebGL lenses draw; until then pins use CSS glass.
@@ -67,7 +69,10 @@ export function SaturdayMap() {
     const root = rootRef.current;
     if (!root) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) setSeen(true);
+      },
       { threshold: 0.4 },
     );
     observer.observe(root);
@@ -189,14 +194,16 @@ export function SaturdayMap() {
             className="block size-full select-none"
             draggable={false}
           />
-          <MapLens
-            src={MAP_SRC}
-            width={MAP_W}
-            height={MAP_H}
-            lenses={lenses}
-            drop={drop}
-            onReady={setLensReady}
-          />
+          {seen && (
+            <MapLens
+              src={MAP_SRC}
+              width={MAP_W}
+              height={MAP_H}
+              lenses={lenses}
+              drop={drop}
+              onReady={setLensReady}
+            />
+          )}
           {mapDots.map(([x, y]) => (
             <span
               key={`${x}-${y}`}

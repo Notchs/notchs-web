@@ -112,11 +112,12 @@ export function AccessDialog({
                   "[transform:rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))] bg-(--glass-fill) shadow-[0_0_0_1px_rgb(255_255_255/.14),0_2px_6px_rgb(0_0_0/.25),0_40px_90px_-30px_rgb(0_0_0/.75)] backdrop-blur-2xl backdrop-saturate-150 transition-transform duration-75 [@media(prefers-reduced-transparency:reduce)]:bg-(--glass-solid)",
               )}
             >
-              {/* A light wash of the glass colour over the frosted middle. */}
+              {/* A strong wash of the glass colour over the middle, so the text and
+                  the code read over anything. */}
               {!webgl && (
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-2 rounded-[22px] bg-(--glass-solid) opacity-60 blur-lg"
+                  className="pointer-events-none absolute inset-2 rounded-[22px] bg-(--glass-solid) opacity-90 blur-lg"
                 />
               )}
               {/* While the glass grows out of the button, its contents wait. */}

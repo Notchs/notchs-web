@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { cn } from "@/shared/lib/cn";
 
@@ -29,7 +29,12 @@ type SectionProps = {
   children: ReactNode;
 };
 
-/** Page-width section; `scroll-mt` keeps headings clear of the floating header. */
+/**
+ * Page-width section; `scroll-mt` keeps headings clear of the floating header.
+ * Its own Suspense boundary lets React hydrate the sections one at a time,
+ * with breaks between them, instead of the whole page in one long block.
+ * Nothing here suspends on the server: the HTML stays complete.
+ */
 function Section({ id, className, children }: SectionProps) {
   return (
     <section
@@ -39,7 +44,7 @@ function Section({ id, className, children }: SectionProps) {
         className,
       )}
     >
-      {children}
+      <Suspense>{children}</Suspense>
     </section>
   );
 }
@@ -98,7 +103,9 @@ export function LandingPage() {
           <Faq />
         </Section>
       </main>
-      <LandingFooter />
+      <Suspense>
+        <LandingFooter />
+      </Suspense>
     </LandingProvider>
   );
 }

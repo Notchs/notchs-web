@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import { GlassGroup } from "@/shared/components/glass/glass-group";
@@ -75,22 +75,53 @@ function PlaceCard({
   );
 }
 
-/** Copies of the cards side by side; the middle one is the real one. */
-const COPIES = [0, 1, 2] as const;
-const REAL_COPY = 1;
+/** Start loading the extra copies this far before the row is on screen. */
+const NEAR_SCREEN = "600px";
 
 /**
  * Photo cards in a row that moves slowly from right to left, forever. Swipe
  * or drag it either way at any time; it carries on from there a moment
- * later (see useAutoScroll). The copies around the real one make the loop
- * seamless, so they are hidden from screen readers and keyboards. With
- * reduced motion it stands still as a row you can swipe. Picking a card
- * replays the WhatsApp demo at that place.
+ * later (see useAutoScroll). A copy of the cards on each side makes the loop
+ * seamless. They are added only when the row comes near the screen, so the
+ * page's HTML holds each card once, and hidden from screen readers and
+ * keyboards. With reduced motion it stands still as a row you can swipe.
+ * Picking a card replays the WhatsApp demo at that place.
  */
 export function PlaceCards() {
   const { selectVenue } = useLanding();
   const scrollerRef = useRef<HTMLDivElement>(null);
-  useAutoScroll(scrollerRef);
+  const [looping, setLooping] = useState(false);
+  useAutoScroll(scrollerRef, looping);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setLooping(true);
+        observer.disconnect();
+      },
+      { rootMargin: NEAR_SCREEN },
+    );
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, []);
+
+  const copy = (decoy: boolean, key: string) => (
+    <ul
+      key={key}
+      aria-hidden={decoy || undefined}
+      inert={decoy}
+      className="flex flex-none gap-3 pr-3 sm:gap-4 sm:pr-4"
+    >
+      {venues.map((venue) => (
+        <li key={venue.kind} className="w-[13.5rem] flex-none sm:w-64 lg:w-72">
+          <PlaceCard venue={venue} onPick={tryAt} />
+        </li>
+      ))}
+    </ul>
+  );
 
   const tryAt = (kind: Venue["kind"]) => {
     selectVenue(kind);
@@ -104,26 +135,9 @@ export function PlaceCards() {
       // Edges fade out, so cards slide in and out softly.
       className="flex reveal cursor-grab [scrollbar-width:none] overflow-x-auto overscroll-x-contain mask-x-from-94% mask-x-to-100% contain-inline-size select-none active:cursor-grabbing motion-reduce:mask-none [&::-webkit-scrollbar]:hidden"
     >
-      {COPIES.map((copy) => {
-        const decoy = copy !== REAL_COPY;
-        return (
-          <ul
-            key={copy}
-            aria-hidden={decoy || undefined}
-            inert={decoy}
-            className="flex flex-none gap-3 pr-3 sm:gap-4 sm:pr-4"
-          >
-            {venues.map((venue) => (
-              <li
-                key={venue.kind}
-                className="w-[13.5rem] flex-none sm:w-64 lg:w-72"
-              >
-                <PlaceCard venue={venue} onPick={tryAt} />
-              </li>
-            ))}
-          </ul>
-        );
-      })}
+      {looping && copy(true, "before")}
+      {copy(false, "cards")}
+      {looping && copy(true, "after")}
     </div>
   );
 }

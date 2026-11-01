@@ -10,7 +10,11 @@ import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { heroContent, heroSlides, sampleProof, venueByKind } from "../content";
 
+const FIRST_VISIBLE = [0, 1, heroSlides.length - 1];
+
 const SLIDE_MS = 2000;
+/** The first card stays longer, so nothing moves while the page is loading. */
+const FIRST_SLIDE_MS = 6000;
 
 /** How long a card takes to glide into its spot. */
 const SETTLE_MS = 700;
@@ -93,7 +97,8 @@ function DeckCard({
         draggable={false}
         sizes="(min-width: 1024px) 440px, 70vw"
         placeholder="blur"
-        preload={slideIndex === 0}
+        // The front card and the two beside it are all visible at first paint.
+        preload={FIRST_VISIBLE.includes(slideIndex)}
         className="object-cover"
       />
       <span
@@ -211,7 +216,10 @@ export function HeroShowcase() {
   useEffect(() => {
     if (hovered || dragging) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setTimeout(() => goTo(center + 1), SLIDE_MS);
+    const timer = setTimeout(
+      () => goTo(center + 1),
+      center === 0 ? FIRST_SLIDE_MS : SLIDE_MS,
+    );
     return () => clearTimeout(timer);
   });
 
@@ -297,7 +305,7 @@ export function HeroShowcase() {
       aria-roledescription="carousel"
       aria-label="Places you can get Notched"
       tabIndex={0}
-      className="relative aspect-[4/3.6] animate-fade-in cursor-grab touch-pan-y rounded-3xl select-none [--deck-speed:700ms] [animation-delay:250ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/5.2]"
+      className="relative aspect-[4/3.6] cursor-grab touch-pan-y rounded-3xl select-none [--deck-speed:700ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/5.2]"
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onPointerDown={onPointerDown}

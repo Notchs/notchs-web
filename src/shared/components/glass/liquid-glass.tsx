@@ -13,6 +13,7 @@ import {
 } from "react";
 
 import { cn } from "@/shared/lib/cn";
+import { pageSettled } from "@/shared/lib/glass/page-settled";
 import {
   createLensMaps,
   refractionEnabled,
@@ -45,17 +46,23 @@ type LensMap = LensMaps & { width: number; height: number };
 /** Wait for a resize to settle before rebuilding the maps. */
 const REBUILD_DELAY_MS = 120;
 
-/** Builds the lens maps sized to the element, rebuilt when its size changes. */
+/**
+ * Builds the lens maps sized to the element, rebuilt when its size changes.
+ * They are computed pixel by pixel, so only when wanted and once the page has
+ * settled; until then the CSS glass shows.
+ */
 function useLensMap(
   element: HTMLDivElement | null,
   radius: number,
   bezel: number,
+  wanted: boolean,
 ) {
   const [map, setMap] = useState<LensMap | null>(null);
 
   useEffect(() => {
-    if (!element || !refractionEnabled()) return;
+    if (!element || !wanted || !refractionEnabled()) return;
     let timer = 0;
+    let stopped = false;
 
     const build = () => {
       const width = Math.round(element.offsetWidth);
@@ -69,14 +76,19 @@ function useLensMap(
 
     const observer = new ResizeObserver(() => {
       clearTimeout(timer);
-      timer = window.setTimeout(build, REBUILD_DELAY_MS);
+      timer = window.setTimeout(() => {
+        void pageSettled().then(() => {
+          if (!stopped) build();
+        });
+      }, REBUILD_DELAY_MS);
     });
     observer.observe(element);
     return () => {
+      stopped = true;
       observer.disconnect();
       clearTimeout(timer);
     };
-  }, [element, radius, bezel]);
+  }, [element, radius, bezel, wanted]);
 
   return map;
 }
@@ -254,7 +266,7 @@ export function LiquidGlass({
 }: LiquidGlassProps) {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
   const filterId = `lens${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
-  const lens = useLensMap(element, radius, bezel);
+  const lens = useLensMap(element, radius, bezel, refract);
   const map = refract ? lens : null;
   const shineFrame = useRef(0);
 

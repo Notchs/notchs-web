@@ -25,6 +25,7 @@ import {
   type GlassBackdrop,
   type GlassShapeSpec,
 } from "@/shared/lib/glass/engine/glass-engine";
+import { pageSettled } from "@/shared/lib/glass/page-settled";
 import { canSnapshotPage } from "@/shared/lib/glass/page-snapshot";
 import { THEME_CHANGE_EVENT } from "@/shared/lib/theme";
 
@@ -54,17 +55,25 @@ const PRESS_SCALE = 0.965;
 const INK: Rgba = [0.059, 0.059, 0.078, 1];
 const PAPER: Rgba = [0.961, 0.953, 0.925, 1];
 
-/** Every group that wants a redraw, drawn together on the next frame. */
+/** How long one frame may spend drawing glass; the rest waits a frame. */
+const FRAME_BUDGET_MS = 8;
+
+/** Every group that wants a redraw, drawn on the next frames. */
 const pending = new Set<() => void>();
 let flushFrame = 0;
+function flushDraws() {
+  flushFrame = 0;
+  const deadline = performance.now() + FRAME_BUDGET_MS;
+  for (const run of pending) {
+    pending.delete(run);
+    run();
+    if (performance.now() > deadline) break;
+  }
+  if (pending.size) flushFrame = requestAnimationFrame(flushDraws);
+}
 function scheduleDraw(draw: () => void) {
   pending.add(draw);
-  flushFrame ||= requestAnimationFrame(() => {
-    flushFrame = 0;
-    const draws = [...pending];
-    pending.clear();
-    draws.forEach((run) => run());
-  });
+  flushFrame ||= requestAnimationFrame(flushDraws);
 }
 
 type GlassGroupProps = ComponentProps<"div"> & {
@@ -423,80 +432,92 @@ export function GlassGroup({
   }, [animateKey, animateFor, animate]);
 
   useEffect(() => {
-    const engine = getGlassEngine();
-    const element = groupRef.current;
-    if (!engine || !element) return;
-    // Glass over the page needs a page snapshot, which phones and tablets
-    // never take: there it stays CSS glass. Glass over a photo still draws.
-    if (backdrop === "page" && !image && !canSnapshotPage()) return;
-    const state = live.current;
-    drawer.current = () => {
-      const moving = drawGroup({
-        element: groupRef.current,
-        canvas: canvasRef.current,
-        shapes: shapes.current,
-        state,
-        options: optionsRef.current,
+    let stopped = false;
+    let teardown: (() => void) | undefined;
+    const setup = () => {
+      const engine = getGlassEngine();
+      const element = groupRef.current;
+      if (!engine || !element) return;
+      // Glass over the page needs a page snapshot, which phones and tablets
+      // never take: there it stays CSS glass. Glass over a photo still draws.
+      if (backdrop === "page" && !image && !canSnapshotPage()) return;
+      const state = live.current;
+      drawer.current = () => {
+        const moving = drawGroup({
+          element: groupRef.current,
+          canvas: canvasRef.current,
+          shapes: shapes.current,
+          state,
+          options: optionsRef.current,
+        });
+        if (moving) {
+          cancelAnimationFrame(state.frame);
+          state.frame = requestAnimationFrame(redraw);
+        }
+      };
+
+      const visibility = new IntersectionObserver(
+        ([entry]) => {
+          state.visible = entry.isIntersecting;
+          if (state.visible) redraw();
+        },
+        { rootMargin: "200px" },
+      );
+      visibility.observe(element);
+      const resize = new ResizeObserver(redraw);
+      resize.observe(element);
+
+      const scheme = window.matchMedia("(prefers-color-scheme: light)");
+      // The theme flips CSS variables (read them once the styles apply) and
+      // the page snapshot's colours, so that is retaken.
+      const onTheme = () =>
+        requestAnimationFrame(() => {
+          if (backdrop === "page") engine.refreshPage();
+          redraw();
+        });
+      window.addEventListener(THEME_CHANGE_EVENT, onTheme);
+      scheme.addEventListener("change", onTheme);
+      window.addEventListener("resize", redraw);
+      window.addEventListener(GLASS_LOST_EVENT, redraw);
+      // A strip inside the group scrolled: its pieces moved.
+      element.addEventListener("scroll", redraw, {
+        capture: true,
+        passive: true,
       });
-      if (moving) {
-        cancelAnimationFrame(state.frame);
-        state.frame = requestAnimationFrame(redraw);
+      if (floating)
+        window.addEventListener("scroll", redraw, { passive: true });
+
+      let offPage: (() => boolean) | undefined;
+      if (backdrop === "page") {
+        offPage = engine.onPage(redraw);
+        const start = () => engine.loadPage();
+        if ("requestIdleCallback" in window)
+          window.requestIdleCallback(start, { timeout: 2500 });
+        else setTimeout(start, 1200);
       }
+      const photo = image?.current;
+      photo?.addEventListener("load", redraw);
+
+      return () => {
+        visibility.disconnect();
+        resize.disconnect();
+        window.removeEventListener(THEME_CHANGE_EVENT, onTheme);
+        scheme.removeEventListener("change", onTheme);
+        window.removeEventListener("resize", redraw);
+        window.removeEventListener(GLASS_LOST_EVENT, redraw);
+        element.removeEventListener("scroll", redraw, { capture: true });
+        window.removeEventListener("scroll", redraw);
+        offPage?.();
+        photo?.removeEventListener("load", redraw);
+        cancelAnimationFrame(state.frame);
+      };
     };
-
-    const visibility = new IntersectionObserver(
-      ([entry]) => {
-        state.visible = entry.isIntersecting;
-        if (state.visible) redraw();
-      },
-      { rootMargin: "200px" },
-    );
-    visibility.observe(element);
-    const resize = new ResizeObserver(redraw);
-    resize.observe(element);
-
-    const scheme = window.matchMedia("(prefers-color-scheme: light)");
-    // The theme flips CSS variables (read them once the styles apply) and
-    // the page snapshot's colours, so that is retaken.
-    const onTheme = () =>
-      requestAnimationFrame(() => {
-        if (backdrop === "page") engine.refreshPage();
-        redraw();
-      });
-    window.addEventListener(THEME_CHANGE_EVENT, onTheme);
-    scheme.addEventListener("change", onTheme);
-    window.addEventListener("resize", redraw);
-    window.addEventListener(GLASS_LOST_EVENT, redraw);
-    // A strip inside the group scrolled: its pieces moved.
-    element.addEventListener("scroll", redraw, {
-      capture: true,
-      passive: true,
+    void pageSettled().then(() => {
+      if (!stopped) teardown = setup();
     });
-    if (floating) window.addEventListener("scroll", redraw, { passive: true });
-
-    let offPage: (() => boolean) | undefined;
-    if (backdrop === "page") {
-      offPage = engine.onPage(redraw);
-      const start = () => engine.loadPage();
-      if ("requestIdleCallback" in window)
-        window.requestIdleCallback(start, { timeout: 2500 });
-      else setTimeout(start, 1200);
-    }
-    const photo = image?.current;
-    photo?.addEventListener("load", redraw);
-
     return () => {
-      visibility.disconnect();
-      resize.disconnect();
-      window.removeEventListener(THEME_CHANGE_EVENT, onTheme);
-      scheme.removeEventListener("change", onTheme);
-      window.removeEventListener("resize", redraw);
-      window.removeEventListener(GLASS_LOST_EVENT, redraw);
-      element.removeEventListener("scroll", redraw, { capture: true });
-      window.removeEventListener("scroll", redraw);
-      offPage?.();
-      photo?.removeEventListener("load", redraw);
-      cancelAnimationFrame(state.frame);
+      stopped = true;
+      teardown?.();
     };
   }, [redraw, floating, backdrop, image]);
 

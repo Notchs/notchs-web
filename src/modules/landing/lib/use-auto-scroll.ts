@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from "react";
+import { useLayoutEffect, type RefObject } from "react";
 
 /** How fast the row moves on its own, px per second. */
 const SPEED = 40;
@@ -16,10 +16,15 @@ const DRAG_PX = 6;
  * Also waits while a card has keyboard focus, off screen, and with reduced
  * motion (then it is just a row to swipe).
  */
-export function useAutoScroll(scrollerRef: RefObject<HTMLElement | null>) {
-  useEffect(() => {
+export function useAutoScroll(
+  scrollerRef: RefObject<HTMLElement | null>,
+  /** False until the copies are on the page. */
+  enabled: boolean,
+) {
+  // Before paint, so the jump to the middle copy never shows.
+  useLayoutEffect(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) return;
+    if (!scroller || !enabled) return;
 
     const copyWidth = () => scroller.scrollWidth / 3;
     let position = copyWidth();
@@ -152,5 +157,5 @@ export function useAutoScroll(scrollerRef: RefObject<HTMLElement | null>) {
       window.removeEventListener("pointercancel", onPointerUp);
       scroller.removeEventListener("click", onClick, true);
     };
-  }, [scrollerRef]);
+  }, [scrollerRef, enabled]);
 }

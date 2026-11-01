@@ -136,6 +136,8 @@ export function LandingHeader() {
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  // The menu's lens is only built the first time it opens.
+  const [menuSeen, setMenuSeen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   useDismiss(headerRef, menuOpen, closeMenu, menuButtonRef);
   const onInk = useInkGround(headerRef);
@@ -200,7 +202,10 @@ export function LandingHeader() {
               type="button"
               aria-expanded={menuOpen}
               aria-controls="landing-menu"
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={() => {
+                setMenuSeen(true);
+                setMenuOpen((open) => !open);
+              }}
               className="relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 text-[.9375rem] font-medium transition-colors duration-150 hover:bg-glass-tint lg:hidden"
             >
               {menuOpen ? (
@@ -230,6 +235,7 @@ export function LandingHeader() {
               anything. The rim stays clear and bends. */}
           <LiquidGlass
             radius={MENU_RADIUS}
+            refract={menuSeen}
             bezel={18}
             depth={30}
             rimBlur={2}

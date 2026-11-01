@@ -1,5 +1,3 @@
-import { domToCanvas } from "modern-screenshot";
-
 /**
  * A picture of the whole page for WebGL glass to refract (Liquid Glass level
  * 4 over regular content). `scale` maps page px to picture px.
@@ -26,13 +24,18 @@ const FROST_DOWNSCALE = 14;
 const SCROLL_IDLE_MS = 250;
 
 /**
- * Whether this device may snapshot the page. Capturing clones every element
- * and its styles on the main thread: about 2–4 s on a desktop, and a freeze
- * of many seconds on a phone. So phones and tablets (touch first) never take
- * one; there, glass over the page is CSS glass, a live blur of what's behind.
+ * Off on every device. Capturing clones every element and its styles on the
+ * main thread: a freeze of 2–4 s on a desktop and many seconds on a phone. So
+ * glass over the page is CSS glass or the live <LiquidGlass> lens, and only
+ * glass over its own photo draws with WebGL. Turning this on brings back the
+ * WebGL bend over the page, and that freeze, on non-touch devices.
  */
+const PAGE_SNAPSHOTS: boolean = false;
+
+/** Whether this device may snapshot the page. */
 export function canSnapshotPage() {
   return (
+    PAGE_SNAPSHOTS &&
     typeof window !== "undefined" &&
     !window.matchMedia("(pointer: coarse)").matches
   );
@@ -120,6 +123,8 @@ async function capture(): Promise<PageSnapshot | null> {
   const height = root.scrollHeight;
   const scale = Math.min(MAX_SCALE, MAX_SIDE / Math.max(width, height));
   try {
+    // Loaded only if snapshots are on, so it isn't in the page's JavaScript.
+    const { domToCanvas } = await import("modern-screenshot");
     const page = await domToCanvas(root, {
       scale,
       width,
