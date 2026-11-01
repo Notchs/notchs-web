@@ -80,6 +80,8 @@ type GlassGroupProps = ComponentProps<"div"> & {
   image?: RefObject<HTMLImageElement | null>;
   /** Sticky or fixed: redraw while the page scrolls under it. */
   floating?: boolean;
+  /** Draw while off screen too, so it is ready before a rail brings it in. */
+  drawOffscreen?: boolean;
   /** Custom property holding the glass colour (default `--glass-solid`). */
   tintVar?: string;
   tintAmount?: number;
@@ -319,6 +321,7 @@ export function GlassGroup({
   backdrop = "page",
   image,
   floating = false,
+  drawOffscreen = false,
   tintVar = "--glass-solid",
   tintAmount,
   rimShare = 0.22,
@@ -422,7 +425,7 @@ export function GlassGroup({
 
     const visibility = new IntersectionObserver(
       ([entry]) => {
-        state.visible = entry.isIntersecting;
+        state.visible = drawOffscreen || entry.isIntersecting;
         if (state.visible) redraw();
       },
       { rootMargin: "200px" },
@@ -472,7 +475,7 @@ export function GlassGroup({
       photo?.removeEventListener("load", redraw);
       cancelAnimationFrame(state.frame);
     };
-  }, [redraw, floating, backdrop, image]);
+  }, [redraw, floating, drawOffscreen, backdrop, image]);
 
   const context = useMemo<GroupContext>(
     () => ({

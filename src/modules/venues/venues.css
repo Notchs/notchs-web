@@ -1,0 +1,171 @@
+/* Motion for the /venues page. Only transforms, opacity and stroke offsets, so
+   it stays smooth on phones. Every element's resting style is its finished
+   state: with reduced motion, or without scroll-driven animations, everything
+   simply shows. */
+
+/* The hero phone slides up without fading, so it never holds back first paint. */
+.venues-enter {
+  animation: venues-enter 0.7s var(--ease-notch) both;
+}
+
+.venues-float {
+  animation: venues-float 3s ease-in-out infinite alternate;
+}
+
+/* The three steps take turns over a 9s loop. */
+.venues-step {
+  animation: venues-step 9s var(--ease-notch) infinite;
+  animation-delay: calc(var(--i) * 3s);
+}
+
+.venues-arrow {
+  animation: venues-arrow 9s var(--ease-notch) infinite;
+  animation-delay: calc(var(--i) * 3s);
+}
+
+/* The reply lands while Send is the raised step, the badge during Share. */
+.venues-reply {
+  animation: venues-reply 9s var(--ease-notch) infinite;
+}
+
+.venues-badge {
+  animation: venues-badge 9s var(--ease-notch) infinite;
+}
+
+.venues-wave {
+  transform-origin: center;
+  animation: venues-wave 1.1s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -70ms);
+}
+
+.venues-grow {
+  transform-origin: bottom;
+}
+
+.venues-tally {
+  stroke-dasharray: 1;
+}
+
+.venues-slots {
+  view-timeline: --venues-slots block;
+}
+
+@supports (animation-timeline: view()) {
+  .venues-grow {
+    animation: venues-grow linear both;
+    animation-timeline: view();
+    animation-range: entry calc(20% + var(--i) * 6%) entry
+      calc(60% + var(--i) * 6%);
+  }
+
+  .venues-donut {
+    animation: venues-donut linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 45%;
+  }
+
+  .venues-tally {
+    animation: venues-tally linear both;
+    animation-timeline: view();
+    animation-range: entry calc(30% + var(--i) * 10%) entry
+      calc(50% + var(--i) * 10%);
+  }
+
+  .venues-slot {
+    animation: venues-slot linear both;
+    animation-timeline: --venues-slots;
+    animation-range: cover calc(var(--i) * 0.5%) cover
+      calc(var(--i) * 0.5% + 10%);
+  }
+}
+
+@keyframes venues-enter {
+  from {
+    transform: translateY(24px);
+  }
+}
+
+@keyframes venues-float {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes venues-step {
+  0%,
+  28% {
+    transform: translateY(-10px);
+  }
+  36%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes venues-arrow {
+  0%,
+  28% {
+    transform: translateX(6px);
+  }
+  36%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes venues-reply {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  44%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes venues-badge {
+  0%,
+  70% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  76%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes venues-wave {
+  from {
+    transform: scaleY(0.45);
+  }
+}
+
+@keyframes venues-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes venues-donut {
+  from {
+    stroke-dashoffset: 31;
+  }
+}
+
+@keyframes venues-tally {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes venues-slot {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}

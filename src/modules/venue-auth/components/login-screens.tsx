@@ -113,7 +113,7 @@ export function LoginForm({
           }
         />
         <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
+        <Button type="submit" pending={busy}>
           {busy ? copy.busy : copy.cta}
           {!busy && <ArrowRightIcon className="size-4.5" />}
         </Button>
@@ -186,7 +186,7 @@ export function ForgotForm({
         />
         {turnstile.widget}
         <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
+        <Button type="submit" pending={busy}>
           {busy ? forgotCopy.busy : forgotCopy.cta}
         </Button>
       </form>

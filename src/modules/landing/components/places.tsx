@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import { GlassGroup } from "@/shared/components/glass/glass-group";
@@ -14,6 +14,9 @@ type Venue = (typeof venues)[number];
 /** How long the photo's hover zoom runs; the glass follows it. */
 const ZOOM_MS = 700;
 
+/** Start loading every photo once the rail is this close to the screen. */
+const RAIL_PRELOAD_MARGIN = "800px";
+
 /**
  * A full-bleed photo with a glass caption floating over its lower part. The
  * glass bends the photo beneath it (and follows the photo's hover zoom),
@@ -22,9 +25,13 @@ const ZOOM_MS = 700;
 function PlaceCard({
   venue,
   onPick,
+  tabIndex,
+  preload,
 }: {
   venue: Venue;
   onPick: (kind: Venue["kind"]) => void;
+  tabIndex?: number;
+  preload: boolean;
 }) {
   const photoRef = useRef<HTMLImageElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -32,6 +39,7 @@ function PlaceCard({
   return (
     <button
       type="button"
+      tabIndex={tabIndex}
       onClick={() => onPick(venue.kind)}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
@@ -42,12 +50,16 @@ function PlaceCard({
         src={venue.image.src}
         alt={venue.image.alt}
         fill
-        sizes="(min-width: 1024px) 320px, 50vw"
+        sizes="(min-width: 640px) 288px, 224px"
         placeholder="blur"
+        // Ready before it slides in, and no blank frame when the rail loops.
+        loading={preload ? "eager" : "lazy"}
+        decoding="sync"
         className="object-cover transition-transform duration-700 ease-notch group-hover:scale-105 motion-reduce:transition-none"
       />
       <GlassGroup
         image={photoRef}
+        drawOffscreen
         radius={14}
         pressable
         tintAmount={0.6}
@@ -72,9 +84,32 @@ function PlaceCard({
   );
 }
 
-/** Photo cards; picking one replays the WhatsApp demo at that place. */
+/**
+ * One row of photo cards on an endless rail; picking one replays the WhatsApp
+ * demo at that place. It moves by CSS alone, so it stays smooth, and pauses on
+ * hover, press and focus. The second set only closes the loop, so it is hidden
+ * from screen readers and the tab order; with reduced motion it is dropped and
+ * the row scrolls by hand instead.
+ */
 export function PlaceCards() {
   const { selectVenue } = useLanding();
+  const railRef = useRef<HTMLDivElement>(null);
+  const [preload, setPreload] = useState(false);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setPreload(true);
+        near.disconnect();
+      },
+      { rootMargin: RAIL_PRELOAD_MARGIN },
+    );
+    near.observe(rail);
+    return () => near.disconnect();
+  }, []);
 
   const tryAt = (kind: Venue["kind"]) => {
     selectVenue(kind);
@@ -82,16 +117,40 @@ export function PlaceCards() {
   };
 
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {venues.map((venue, index) => (
-        <li
-          key={venue.kind}
-          className="reveal"
-          style={{ animationRangeStart: `entry ${(index % 4) * 8}%` }}
-        >
-          <PlaceCard venue={venue} onPick={tryAt} />
-        </li>
-      ))}
-    </ul>
+    <div
+      ref={railRef}
+      // Focus can scroll a card into view; put the row back when it leaves.
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          event.currentTarget.scrollLeft = 0;
+        }
+      }}
+      className="relative mx-auto w-[90%] overflow-hidden rounded-2xl motion-reduce:overflow-x-auto"
+    >
+      {/* Padding, not gap, so the two sets are exactly half the track each. */}
+      <ul className="flex w-max animate-rail py-1.5 will-change-transform hover:[animation-play-state:paused] active:[animation-play-state:paused] has-focus-visible:[animation-play-state:paused]">
+        {venues.map((venue) => (
+          <li key={venue.kind} className="w-59 flex-none pr-3 sm:w-76 sm:pr-4">
+            <PlaceCard venue={venue} onPick={tryAt} preload={preload} />
+          </li>
+        ))}
+        {venues.map((venue) => (
+          <li
+            key={`${venue.kind}-copy`}
+            aria-hidden
+            className="w-59 flex-none pr-3 motion-reduce:hidden sm:w-76 sm:pr-4"
+          >
+            <PlaceCard
+              venue={venue}
+              onPick={tryAt}
+              tabIndex={-1}
+              preload={preload}
+            />
+          </li>
+        ))}
+      </ul>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-linear-to-r from-background to-transparent sm:w-24" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-linear-to-l from-background to-transparent sm:w-24" />
+    </div>
   );
 }

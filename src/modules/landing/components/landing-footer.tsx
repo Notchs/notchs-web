@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { GlassGroup } from "@/shared/components/glass/glass-group";
@@ -47,13 +49,13 @@ export function LandingFooter() {
                 <ul className="-ml-3 flex flex-wrap gap-x-1 sm:ml-0">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a
+                      <Link
                         href={link.href}
                         className="relative inline-flex min-h-12 items-center rounded-full px-3 text-[.9375rem] font-medium text-muted transition-colors duration-150 hover:text-foreground"
                         {...LENS_ITEM}
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>

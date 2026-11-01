@@ -1,0 +1,29 @@
+/* The resting style is the finished N: the line has moved past the bottom edge,
+   so the N shows everywhere. With reduced motion it simply stands still there.
+   In the transforms below, 1px is 1 unit of the 24-unit logo grid. */
+
+/* The two clips and the line use the same animation, so they move as one. */
+.secondary-loader-scan {
+  transform: translateY(24px);
+  animation: secondary-loader-scan 3.2s cubic-bezier(0.6, 0, 0.4, 1)
+    var(--main-loader-delay, 0ms) infinite backwards;
+}
+
+@keyframes secondary-loader-scan {
+  0%,
+  10%,
+  90%,
+  100% {
+    transform: none;
+  }
+  45%,
+  55% {
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .secondary-loader-line {
+    display: none;
+  }
+}

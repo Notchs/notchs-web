@@ -2,6 +2,7 @@ import type { ComponentProps, ReactNode } from "react";
 import Link from "next/link";
 
 import { GlassGroup } from "@/shared/components/glass/glass-group";
+import { MainLoader } from "@/shared/components/ui/loaders/main-loader";
 import { cn } from "@/shared/lib/cn";
 
 /** The text and layout of the button; the glass behind it is the group's. */
@@ -61,15 +62,29 @@ export function Button({
   className,
   size = "default",
   type = "button",
+  pending = false,
+  disabled,
+  children,
   ...props
-}: ComponentProps<"button"> & { size?: ButtonSize }) {
+}: ComponentProps<"button"> & { size?: ButtonSize; pending?: boolean }) {
   return (
     <ButtonFrame className={className}>
       <button
         type={type}
+        disabled={disabled || pending}
         className={cn(baseStyles, sizeStyles[size])}
         {...props}
-      />
+      >
+        {/* The button's own colour: Volt on a Volt button would be invisible. */}
+        {pending && (
+          <MainLoader
+            size={24}
+            delayMs={0}
+            className="[--main-loader-color:currentColor]"
+          />
+        )}
+        {children}
+      </button>
     </ButtonFrame>
   );
 }

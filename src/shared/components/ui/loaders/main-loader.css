@@ -1,0 +1,237 @@
+/* The resting styles are the finished N. Animations only add the movement, so
+   with reduced motion (globals.css stops every animation) it stands still as the N. In the transforms
+   below, 1px is 1 unit of the 24-unit logo grid. */
+
+.main-loader-appear {
+  animation: main-loader-appear 0.2s ease-out var(--main-loader-delay, 0ms)
+    backwards;
+}
+
+.main-loader-block,
+.main-loader-shake,
+.main-loader-tally,
+.main-loader-strike,
+.main-loader-top-notch,
+.main-loader-bottom-notch {
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-delay: var(--main-loader-delay, 0ms);
+  animation-fill-mode: backwards;
+  animation-timing-function: linear;
+}
+
+/* A button whose own colour is Volt sets this, so the block stays visible. */
+.main-loader-block {
+  fill: var(--main-loader-color, var(--volt));
+  animation-name: main-loader-block;
+}
+
+.main-loader-shake {
+  animation-name: main-loader-shake;
+}
+
+.main-loader-tally {
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.main-loader-tally1 {
+  animation-name: main-loader-tally1;
+}
+
+.main-loader-tally2 {
+  animation-name: main-loader-tally2;
+}
+
+.main-loader-tally3 {
+  animation-name: main-loader-tally3;
+}
+
+.main-loader-tally4 {
+  animation-name: main-loader-tally4;
+}
+
+/* The line's length is set to 1 (pathLength). An offset just above 1 keeps the
+   round cap from showing as a dot before the strike starts. */
+.main-loader-strike {
+  stroke-width: 0;
+  stroke-linecap: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1.02;
+  animation-name: main-loader-strike;
+}
+
+.main-loader-top-notch {
+  animation-name: main-loader-top-notch;
+}
+
+.main-loader-bottom-notch {
+  animation-name: main-loader-bottom-notch;
+}
+
+@keyframes main-loader-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes main-loader-block {
+  0%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  4%,
+  86% {
+    opacity: 1;
+  }
+}
+
+/* One quick shake straight after each cut: 9, 16, 23, 30, 38, 58 and 65%. */
+@keyframes main-loader-shake {
+  0%,
+  9%,
+  11.1%,
+  16%,
+  18.1%,
+  23%,
+  25.1%,
+  30%,
+  32.1%,
+  38%,
+  40.1%,
+  58%,
+  60.1%,
+  65%,
+  67.1%,
+  100% {
+    transform: none;
+  }
+  9.7%,
+  16.7%,
+  23.7%,
+  30.7%,
+  38.7%,
+  58.7%,
+  65.7% {
+    transform: translateX(0.7px);
+  }
+  10.4%,
+  17.4%,
+  24.4%,
+  31.4%,
+  39.4%,
+  59.4%,
+  66.4% {
+    transform: translateX(-0.7px);
+  }
+}
+
+@keyframes main-loader-tally1 {
+  0%,
+  5% {
+    transform: scale(1, 0);
+  }
+  9%,
+  44% {
+    transform: scale(1, 1);
+  }
+  50%,
+  100% {
+    transform: scale(0, 1);
+  }
+}
+
+@keyframes main-loader-tally2 {
+  0%,
+  12% {
+    transform: scale(1, 0);
+  }
+  16%,
+  44% {
+    transform: scale(1, 1);
+  }
+  50%,
+  100% {
+    transform: scale(0, 1);
+  }
+}
+
+@keyframes main-loader-tally3 {
+  0%,
+  19% {
+    transform: scale(1, 0);
+  }
+  23%,
+  44% {
+    transform: scale(1, 1);
+  }
+  50%,
+  100% {
+    transform: scale(0, 1);
+  }
+}
+
+@keyframes main-loader-tally4 {
+  0%,
+  26% {
+    transform: scale(1, 0);
+  }
+  30%,
+  44% {
+    transform: scale(1, 1);
+  }
+  50%,
+  100% {
+    transform: scale(0, 1);
+  }
+}
+
+@keyframes main-loader-strike {
+  0%,
+  33% {
+    stroke-width: 1.8;
+    stroke-dashoffset: 1.02;
+  }
+  38%,
+  44% {
+    stroke-width: 1.8;
+    stroke-dashoffset: 0;
+  }
+  50%,
+  100% {
+    stroke-width: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* A notch waits outside the logo, slides in, and goes back while the block is
+   invisible, ready for the next loop. */
+@keyframes main-loader-top-notch {
+  0%,
+  52%,
+  97%,
+  100% {
+    transform: translateY(-16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  58%,
+  96.9% {
+    transform: none;
+  }
+}
+
+@keyframes main-loader-bottom-notch {
+  0%,
+  59%,
+  97%,
+  100% {
+    transform: translateY(16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  65%,
+  96.9% {
+    transform: none;
+  }
+}

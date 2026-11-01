@@ -99,7 +99,7 @@ export function ApplyEmailForm({
         />
         {turnstile.widget}
         <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
+        <Button type="submit" pending={busy}>
           {busy ? applyCopy.busy : applyCopy.cta}
           {!busy && <ArrowRightIcon className="size-4.5" />}
         </Button>
@@ -211,7 +211,7 @@ export function CodeForm({ email, onBack, onVerified }: CodeFormProps) {
             {message}
           </p>
         </div>
-        <Button type="submit" disabled={code.length < 6 || busy}>
+        <Button type="submit" disabled={code.length < 6} pending={busy}>
           {busy ? codeCopy.busy : codeCopy.cta}
         </Button>
       </form>
@@ -466,7 +466,7 @@ export function VenueForm({
           {tokenExpired && (
             <BackButton label={codeCopy.back} onClick={onBack} />
           )}
-          <Button type="submit" disabled={busy || options === "loading"}>
+          <Button type="submit" disabled={options === "loading"} pending={busy}>
             {busy ? venueCopy.busy : venueCopy.cta}
           </Button>
         </form>

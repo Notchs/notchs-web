@@ -21,7 +21,7 @@ export const navLinks = [
   { label: "How it works", href: `#${sectionIds.howItWorks}` },
   { label: "Ahmedabad", href: `#${sectionIds.map}` },
   { label: "Places", href: `#${sectionIds.places}` },
-  { label: "For venues", href: `#${sectionIds.venues}` },
+  { label: "For venues", href: routes.venues },
   { label: "FAQ", href: `#${sectionIds.faq}` },
 ] as const;
 

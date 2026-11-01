@@ -1,0 +1,199 @@
+/* The resting styles are the finished N. Animations only add the movement, so
+   with reduced motion the loader simply stands still as the N-shaped QR. */
+
+.notch-loader,
+.notch-loader-screen {
+  animation: notch-loader-appear 0.2s ease-out var(--loader-delay, 0ms)
+    backwards;
+}
+
+.notch-loader-data,
+.notch-loader-eye,
+.notch-loader-top-notch,
+.notch-loader-bottom-notch,
+.notch-loader-top-blade,
+.notch-loader-bottom-blade,
+.notch-loader-shake {
+  animation-duration: 3.2s;
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--loader-delay, 0ms) + var(--wave, 0s));
+  animation-fill-mode: backwards;
+  animation-timing-function: linear;
+}
+
+.notch-loader-data {
+  animation-name: notch-loader-data;
+}
+
+.notch-loader-eye {
+  animation-name: notch-loader-eye;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.notch-loader-top-notch {
+  animation-name: notch-loader-top-notch;
+}
+
+.notch-loader-bottom-notch {
+  animation-name: notch-loader-bottom-notch;
+}
+
+.notch-loader-top-blade,
+.notch-loader-bottom-blade {
+  opacity: 0;
+  stroke-width: 0.3;
+}
+
+.notch-loader-top-blade {
+  animation-name: notch-loader-top-blade;
+}
+
+.notch-loader-bottom-blade {
+  animation-name: notch-loader-bottom-blade;
+}
+
+.notch-loader-shake {
+  animation-name: notch-loader-shake;
+}
+
+@keyframes notch-loader-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes notch-loader-data {
+  0% {
+    opacity: 0;
+  }
+  6%,
+  70% {
+    opacity: 1;
+  }
+  78%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes notch-loader-eye {
+  0% {
+    transform: scale(0);
+    animation-timing-function: cubic-bezier(0.3, 1.3, 0.5, 1);
+  }
+  5% {
+    transform: scale(1.12);
+  }
+  9%,
+  70% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  78%,
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* A notch waits outside the logo, slides in, and goes back once the squares
+   have gone. 1 unit here is 1 unit of the 24-unit logo grid. */
+@keyframes notch-loader-top-notch {
+  0%,
+  38% {
+    transform: translateY(-16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  45%,
+  99% {
+    transform: none;
+  }
+  100% {
+    transform: translateY(-16.5px);
+  }
+}
+
+@keyframes notch-loader-bottom-notch {
+  0%,
+  47% {
+    transform: translateY(16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  54%,
+  99% {
+    transform: none;
+  }
+  100% {
+    transform: translateY(16.5px);
+  }
+}
+
+@keyframes notch-loader-top-blade {
+  0%,
+  38% {
+    opacity: 1;
+    transform: translateY(-16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  45.5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes notch-loader-bottom-blade {
+  0%,
+  47% {
+    opacity: 1;
+    transform: translateY(16.5px);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  54% {
+    opacity: 1;
+    transform: none;
+  }
+  54.5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes notch-loader-shake {
+  0%,
+  45%,
+  47%,
+  54%,
+  56%,
+  100% {
+    transform: none;
+  }
+  45.7%,
+  54.7% {
+    transform: translateX(-0.4px);
+  }
+  46.4%,
+  55.4% {
+    transform: translateX(0.4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notch-loader,
+  .notch-loader-screen,
+  .notch-loader-data,
+  .notch-loader-eye,
+  .notch-loader-top-notch,
+  .notch-loader-bottom-notch,
+  .notch-loader-top-blade,
+  .notch-loader-bottom-blade,
+  .notch-loader-shake {
+    animation: none;
+  }
+}

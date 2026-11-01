@@ -7,6 +7,7 @@ import {
   useState,
   type RefObject,
 } from "react";
+import Link from "next/link";
 
 import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
@@ -108,9 +109,13 @@ export function LandingHeader() {
                 <ul className="flex items-center gap-0.5">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a href={link.href} className={linkStyles} {...LENS_ITEM}>
+                      <Link
+                        href={link.href}
+                        className={linkStyles}
+                        {...LENS_ITEM}
+                      >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -178,14 +183,14 @@ export function LandingHeader() {
                 <ul className="grid gap-0.5">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a
+                      <Link
                         href={link.href}
                         onClick={closeMenu}
                         className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium"
                         {...LENS_ITEM}
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                   <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">

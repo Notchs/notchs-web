@@ -83,7 +83,7 @@ export function ForVenues() {
           className="mt-8 inline-flex w-full rounded-xl sm:mt-10 sm:w-auto"
         >
           <Link
-            href={routes.venueLogin}
+            href={routes.venues}
             className="group inline-flex min-h-12 w-full items-center justify-center gap-2 px-6 py-3 text-center font-semibold"
           >
             {venuesContent.cta}

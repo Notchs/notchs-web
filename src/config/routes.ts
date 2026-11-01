@@ -7,6 +7,7 @@ export const routes = {
   forbidden: "/403",
   login: "/login",
   loginVerify: "/login/verify",
+  venues: "/venues",
   venueLogin: "/venue/login",
   venueSetPassword: "/venue/set-password",
   /** Team builds only; a 404 on the live site. */
@@ -14,6 +15,28 @@ export const routes = {
   teamLoginSession: "/team-login/session",
   /** Team builds only: the All pages hub. */
   teamHub: "/team",
+  /** Local development only: the loader demo. */
+  devLoaders: "/dev/loaders",
+} as const;
+
+/** Venue dashboard paths. Private: never link them from public pages. */
+export const venueRoutes = {
+  overview: "/venue",
+  customers: "/venue/customers",
+  visits: "/venue/visits",
+  notchCard: "/venue/visits/card",
+  foundingVenue: "/venue/visits/founding",
+  analytics: "/venue/analytics",
+  reviews: "/venue/reviews",
+  discover: "/venue/discover",
+  rewards: "/venue/rewards",
+  counter: "/venue/counter",
+  counterSigns: "/venue/counter/signs",
+  billing: "/venue/billing",
+  profile: "/venue/profile",
+  content: "/venue/content",
+  team: "/venue/team",
+  settings: "/venue/settings",
 } as const;
 
 /**

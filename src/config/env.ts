@@ -9,6 +9,8 @@ export const env = {
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
   /** Cloudflare Turnstile site key; pairs with the secret key on the backend. */
   turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "",
+  /** False under `next dev`; local dev also counts as "public" below. */
+  isProductionBuild: process.env.NODE_ENV === "production",
   /**
    * "public" on the live site. Anything else, including a missing value, means
    * a team build: every page asks for the team login. Set by next.config.ts.

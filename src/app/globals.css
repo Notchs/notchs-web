@@ -75,6 +75,8 @@
 
   /* Where the hero switches from stacked to two columns. */
   --breakpoint-split: 56.25rem;
+  /* Where the venue dashboard gets its full sidebar and widest grids. */
+  --breakpoint-wide: 68.75rem;
 
   --ease-notch: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* A soft spring with a small overshoot, for glass that changes shape. */
@@ -99,10 +101,39 @@
   --animate-blink: blink 2.4s ease-in-out infinite;
   --animate-scan: scan 2.2s ease-in-out infinite alternate;
   --animate-rise: rise 0.6s var(--ease-notch) both;
+  /* Endless card rail: the track holds two sets and moves by one. */
+  --animate-rail: rail 60s linear infinite;
   /* "Logged in" / "Venue created" stamp on the venue login page. */
   --animate-stamp: stamp 0.5s var(--ease-notch) both;
   /* Story progress bar; the story moves on when it ends. */
   --animate-story: slide 4s linear both;
+  /* Venue dashboard: overlays and loading placeholders. */
+  --animate-panel: panel 0.26s var(--ease-notch) both;
+  --animate-pop: pop 0.16s var(--ease-notch) both;
+  --animate-skeleton: skeleton 1.4s var(--ease-notch) infinite alternate;
+
+  /* Important secondary text on Ink, where Stone is too faint. */
+  --color-stone-light: #b5b3ac;
+
+  @keyframes panel {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @keyframes skeleton {
+    from {
+      opacity: 0.55;
+    }
+  }
 
   @keyframes scan {
     from {
@@ -164,6 +195,12 @@
       opacity: 1;
       transform: rotate(-6deg);
     }
+  }
+}
+
+@keyframes rail {
+  to {
+    transform: translateX(-50%);
   }
 }
 

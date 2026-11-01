@@ -36,6 +36,7 @@ export const hubSections: readonly HubSection[] = [
     title: "Public website",
     screens: [
       { name: "Homepage", href: "/", note: "Mobile and desktop" },
+      { name: "For venues", href: "/venues", note: "The Founding Venue pitch" },
       { name: "Waitlist form", note: "Name, WhatsApp, city, area, consent" },
       { name: "Shared Notch Card page", code: "A12" },
       {
@@ -77,7 +78,11 @@ export const hubSections: readonly HubSection[] = [
       },
       { name: "Counter setup", code: "E3" },
       { name: "Counter screen with the QR", code: "E4" },
-      { name: "Venue dashboard", note: "Venue App mockup" },
+      {
+        name: "Venue dashboard",
+        href: "/venue",
+        note: "All pages built, on example data until the API is ready",
+      },
     ],
   },
   {

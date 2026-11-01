@@ -127,7 +127,7 @@ export function SetPasswordForm() {
                 error={errors.confirm}
               />
               <FormError message={formError} />
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" pending={busy}>
                 {busy ? copy.busy : copy.cta}
               </Button>
             </form>

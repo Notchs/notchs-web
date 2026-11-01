@@ -76,7 +76,7 @@ export function TeamLoginForm() {
       <p role="alert" className="min-h-5 text-sm text-unnotched">
         {error}
       </p>
-      <Button type="submit" disabled={sending}>
+      <Button type="submit" pending={sending}>
         {sending ? content.submitting : content.submit}
       </Button>
     </form>
