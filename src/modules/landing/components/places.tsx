@@ -7,6 +7,7 @@ import { GlassGroup } from "@/shared/components/glass/glass-group";
 import { ArrowRightIcon } from "@/shared/components/icons";
 
 import { howItWorksContent, sectionIds, venues } from "../content";
+import { useAutoScroll } from "../lib/use-auto-scroll";
 import { useLanding } from "./landing-provider";
 
 type Venue = (typeof venues)[number];
@@ -42,7 +43,9 @@ function PlaceCard({
         src={venue.image.src}
         alt={venue.image.alt}
         fill
-        sizes="(min-width: 1024px) 320px, 50vw"
+        sizes="(min-width: 1024px) 288px, (min-width: 640px) 256px, 216px"
+        // A drag moves the row; it must not start dragging the photo.
+        draggable={false}
         placeholder="blur"
         className="object-cover transition-transform duration-700 ease-notch group-hover:scale-105 motion-reduce:transition-none"
       />
@@ -72,9 +75,22 @@ function PlaceCard({
   );
 }
 
-/** Photo cards; picking one replays the WhatsApp demo at that place. */
+/** Copies of the cards side by side; the middle one is the real one. */
+const COPIES = [0, 1, 2] as const;
+const REAL_COPY = 1;
+
+/**
+ * Photo cards in a row that moves slowly from right to left, forever. Swipe
+ * or drag it either way at any time; it carries on from there a moment
+ * later (see useAutoScroll). The copies around the real one make the loop
+ * seamless, so they are hidden from screen readers and keyboards. With
+ * reduced motion it stands still as a row you can swipe. Picking a card
+ * replays the WhatsApp demo at that place.
+ */
 export function PlaceCards() {
   const { selectVenue } = useLanding();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  useAutoScroll(scrollerRef);
 
   const tryAt = (kind: Venue["kind"]) => {
     selectVenue(kind);
@@ -82,16 +98,32 @@ export function PlaceCards() {
   };
 
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {venues.map((venue, index) => (
-        <li
-          key={venue.kind}
-          className="reveal"
-          style={{ animationRangeStart: `entry ${(index % 4) * 8}%` }}
-        >
-          <PlaceCard venue={venue} onPick={tryAt} />
-        </li>
-      ))}
-    </ul>
+    <div
+      ref={scrollerRef}
+      // Inline-size containment: the long row must not widen the page.
+      // Edges fade out, so cards slide in and out softly.
+      className="flex reveal cursor-grab [scrollbar-width:none] overflow-x-auto overscroll-x-contain mask-x-from-94% mask-x-to-100% contain-inline-size select-none active:cursor-grabbing motion-reduce:mask-none [&::-webkit-scrollbar]:hidden"
+    >
+      {COPIES.map((copy) => {
+        const decoy = copy !== REAL_COPY;
+        return (
+          <ul
+            key={copy}
+            aria-hidden={decoy || undefined}
+            inert={decoy}
+            className="flex flex-none gap-3 pr-3 sm:gap-4 sm:pr-4"
+          >
+            {venues.map((venue) => (
+              <li
+                key={venue.kind}
+                className="w-[13.5rem] flex-none sm:w-64 lg:w-72"
+              >
+                <PlaceCard venue={venue} onPick={tryAt} />
+              </li>
+            ))}
+          </ul>
+        );
+      })}
+    </div>
   );
 }
