@@ -30,12 +30,14 @@ export type ApiRequestOptions = Omit<RequestInit, "body"> & {
   query?: Record<string, QueryValue>;
 };
 
+/** Relative in the browser (same-origin proxy), absolute on the server. */
 function buildUrl(path: string, query: ApiRequestOptions["query"] = {}) {
-  const url = new URL(`${apiConfig.baseUrl}${path}`);
+  const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
-    if (value != null) url.searchParams.set(key, String(value));
+    if (value != null) params.set(key, String(value));
   }
-  return url;
+  const search = params.size > 0 ? `?${params}` : "";
+  return `${apiConfig.baseUrl}${path}${search}`;
 }
 
 /**

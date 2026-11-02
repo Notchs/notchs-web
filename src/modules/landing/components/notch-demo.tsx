@@ -4,8 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
+import {
+  GlassLensTrack,
+  LENS_ITEM,
+} from "@/shared/components/glass/glass-lens-track";
 import { ReplayIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/cn";
+import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { howItWorksContent, steps, venues } from "../content";
 import { buildQrPattern } from "../lib/qr-pattern";
@@ -108,84 +114,90 @@ export function NotchDemo() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-16">
-      <ol className="hidden gap-3 lg:grid">
-        {steps.map((step, index) => {
-          const current = stage === index;
-          return (
-            <li key={step.title}>
-              <button
-                type="button"
-                aria-pressed={current}
-                onClick={() => jumpTo(index)}
-                className={cn(
-                  "w-full cursor-pointer rounded-2xl border p-5 pt-6 text-left transition-[background-color,border-color] duration-200 notch sm:p-6 sm:pt-7",
-                  current
-                    ? "border-foreground bg-card"
-                    : "border-line hover:border-foreground/40",
-                )}
-              >
-                <span className="flex items-baseline gap-4">
-                  <span
-                    className={cn(
-                      "font-display text-2xl font-extrabold tabular-nums transition-colors duration-200",
-                      current ? "text-foreground" : "text-muted",
-                    )}
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span>
-                    <span className="block font-display text-xl font-extrabold tracking-[-.02em]">
-                      {step.title}
-                    </span>
-                    <span className="mt-1.5 block text-base leading-relaxed text-muted">
-                      {step.body}
-                    </span>
-                  </span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-        <li>
-          <ReplayButton onClick={replay} />
-        </li>
-      </ol>
-
-      <div className="mx-auto w-full max-w-[18rem] sm:max-w-[20rem]">
-        {/* Phones and tablets: the steps as tabs, with the current one explained. */}
-        <div className="mb-5 lg:hidden">
-          <ol className="grid grid-cols-3 gap-2">
+      {/* Desktop: the steps are pieces of one glass, so neighbours melt
+          together; a raised lens marks the current step and flows to the
+          next as the demo plays, or to the one under the pointer. */}
+      <GlassGroup self={false} merge={16} className="hidden lg:block">
+        <GlassLensTrack restingIndex={stage} lensRadius={14} inset={6}>
+          <ol className="grid gap-3">
             {steps.map((step, index) => {
               const current = stage === index;
               return (
                 <li key={step.title}>
-                  <button
-                    type="button"
-                    aria-pressed={current}
-                    onClick={() => jumpTo(index)}
-                    className={cn(
-                      "flex min-h-12 w-full cursor-pointer flex-col items-center justify-center rounded-xl border px-1.5 py-2 text-center transition-[background-color,border-color] duration-200",
-                      current
-                        ? "border-foreground bg-card"
-                        : "border-line hover:border-foreground/40",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "font-display text-xs font-extrabold tabular-nums",
-                        current ? "text-foreground" : "text-muted",
-                      )}
+                  <GlassShape radius={16}>
+                    <button
+                      type="button"
+                      aria-pressed={current}
+                      onClick={() => jumpTo(index)}
+                      className="relative w-full cursor-pointer rounded-2xl p-5 pt-6 text-left sm:p-6 sm:pt-7"
+                      {...LENS_ITEM}
                     >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="font-display text-sm font-extrabold tracking-[-.02em]">
-                      {step.title}
-                    </span>
-                  </button>
+                      <span className="flex items-baseline gap-4">
+                        <span
+                          className={cn(
+                            "font-display text-2xl font-extrabold tabular-nums transition-colors duration-200",
+                            current ? "text-foreground" : "text-muted",
+                          )}
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span>
+                          <span className="block font-display text-xl font-extrabold tracking-[-.02em]">
+                            {step.title}
+                          </span>
+                          <span className="mt-1.5 block text-base leading-relaxed text-muted">
+                            {step.body}
+                          </span>
+                        </span>
+                      </span>
+                    </button>
+                  </GlassShape>
                 </li>
               );
             })}
           </ol>
+        </GlassLensTrack>
+        <div className="mt-3">
+          <ReplayButton onClick={replay} />
+        </div>
+      </GlassGroup>
+
+      <div className="mx-auto w-full max-w-[18rem] sm:max-w-[20rem]">
+        {/* Phones and tablets: the steps as a glass segmented control, with the
+            current one explained. A raised glass lens flows between them. */}
+        <div className="mb-5 lg:hidden">
+          <GlassGroup radius={20} className="rounded-[20px] p-1.5">
+            <GlassLensTrack restingIndex={stage} lensRadius={14} inset={0}>
+              <ol className="grid grid-cols-3 gap-1">
+                {steps.map((step, index) => {
+                  const current = stage === index;
+                  return (
+                    <li key={step.title} className="relative">
+                      <button
+                        type="button"
+                        aria-pressed={current}
+                        onClick={() => jumpTo(index)}
+                        className="relative flex min-h-12 w-full cursor-pointer flex-col items-center justify-center rounded-[14px] px-1.5 py-2 text-center"
+                        {...LENS_ITEM}
+                      >
+                        <span
+                          className={cn(
+                            "font-display text-xs font-extrabold tabular-nums",
+                            !current && "text-muted",
+                          )}
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="font-display text-sm font-extrabold tracking-[-.02em]">
+                          {step.title}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </GlassLensTrack>
+          </GlassGroup>
           <p
             aria-live="polite"
             className="mt-3 min-h-[3lh] text-[.9375rem] leading-snug text-muted"
@@ -197,7 +209,8 @@ export function NotchDemo() {
         {/* The phone. Always Ink, like the real WhatsApp screens in the demo. */}
         <div
           ref={phoneRef}
-          className="rounded-[2.5rem] border-[10px] border-graphite bg-ink text-paper"
+          {...INK_GROUND}
+          className="rounded-[2.5rem] border-[10px] border-graphite bg-ink text-paper surface-ink"
         >
           {/* Below lg the screen height follows the viewport (minus header,
               tabs and caption), so tabs and the whole phone fit in one view. */}

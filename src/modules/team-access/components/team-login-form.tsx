@@ -21,9 +21,9 @@ function nextPath(): string {
     next.startsWith("//") ||
     next.startsWith("/\\")
   ) {
-    return routes.home;
+    return routes.teamHub;
   }
-  return next.startsWith(routes.teamLogin) ? routes.home : next;
+  return next.startsWith(routes.teamLogin) ? routes.teamHub : next;
 }
 
 export function TeamLoginForm() {

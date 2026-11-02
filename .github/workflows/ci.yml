@@ -1,0 +1,61 @@
+# CI for notchs-web: the checks from CLAUDE.md §3 on every PR and on pushes to
+# development and main. A red result means the PR must not be merged.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [development, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, format, build, types, audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      # After the build, which generates Next.js route and image types.
+      - name: Types
+        run: npm run typecheck
+
+      - name: Security audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: No design files or env files committed
+        run: |
+          bad=$(git ls-files | grep -E '^All pages designs/|(^|/)\.env($|\.local$|\.[a-z]+\.local$)|\.pdf$' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::These files must not be committed (CLAUDE.md §2):"
+            echo "$bad"
+            exit 1
+          fi

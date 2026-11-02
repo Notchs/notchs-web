@@ -4,14 +4,15 @@ import { useEffect, useSyncExternalStore } from "react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeIcon } from "@/shared/components/icons";
+import { cn } from "@/shared/lib/cn";
 import {
   THEME_ATTRIBUTE,
+  THEME_CHANGE_EVENT,
   THEME_STORAGE_KEY,
   type Theme,
 } from "@/shared/lib/theme";
 
 const LIGHT_QUERY = "(prefers-color-scheme: light)";
-const THEME_CHANGE_EVENT = "notchs:theme-change";
 
 function getChosenTheme(): Theme | null {
   const value = document.documentElement.getAttribute(THEME_ATTRIBUTE);
@@ -58,7 +59,7 @@ function chooseTheme(theme: Theme) {
   window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
   const nextTheme: Theme = theme === "dark" ? "light" : "dark";
 
@@ -72,7 +73,10 @@ export function ThemeToggle() {
       type="button"
       aria-label={`Switch to ${nextTheme} theme`}
       onClick={() => chooseTheme(nextTheme)}
-      className="-mr-2.5 inline-grid size-11 cursor-pointer place-items-center rounded-full"
+      className={cn(
+        "relative inline-grid size-11 cursor-pointer place-items-center rounded-full",
+        className,
+      )}
     >
       <ThemeIcon className="size-4.5" />
     </button>
