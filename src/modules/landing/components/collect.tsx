@@ -14,7 +14,7 @@ export function Collect() {
       />
       {/* Four pieces of one glass: close neighbours melt together. The
           whole group fades in, so the glass and the text arrive together. */}
-      <GlassGroup self={false} merge={16} className="mt-10 reveal">
+      <GlassGroup self={false} className="mt-10 reveal">
         <div role="list" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {collectContent.items.map((item) => (
             <GlassShape

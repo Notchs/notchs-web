@@ -24,8 +24,7 @@
   /* Dark is the default theme; the light theme overrides it below. */
   @apply tone-ink;
 
-  /* Glass blur. Where real refraction runs (Level 3), <LiquidGlass> uses
-     its own lens filter instead. */
+  /* Glass blur. */
   --glass-blur: 24px;
   --glass-blur-clear: 14px;
 
@@ -289,9 +288,8 @@
 }
 
 /* ---- CSS glass ------------------------------------------------------------
-   The fallback for the WebGL glass (<GlassGroup>): shown until it draws,
-   and where WebGL is unavailable. Frosted with a shine that follows the
-   pointer (--shine-x/y); solid with reduced transparency. */
+   Floating controls (<GlassGroup>). Frosted; solid with reduced
+   transparency. */
 @utility glass {
   background-color: var(--glass-solid);
   background-image: radial-gradient(
@@ -307,12 +305,6 @@
   @supports (backdrop-filter: blur(1px)) {
     background-color: var(--glass-fill);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-
-    /* Where the rim really bends the content (Level 3), clearer glass lets
-       it show, like a thick clear slab. */
-    :root[data-glass-refraction] & {
-      background-color: color-mix(in oklab, var(--glass-fill) 75%, transparent);
-    }
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -329,15 +321,8 @@
   --glass-saturate: var(--glass-saturate-clear);
 }
 
-/* A <GlassGroup> shows CSS glass until its WebGL glass has drawn, and keeps
-   it where WebGL is unavailable. */
-[data-glass-self]:not([data-glass-ready]) {
-  @apply glass;
-}
-
-/* Depth for photo and Ink panels that are not glass (the map, the demo
-   phone), so they sit on the page softly. Everything else is WebGL glass
-   (<GlassGroup>). */
+/* Depth for photo and Ink panels (the map, the demo phone), so they sit on
+   the page softly. */
 @utility surface-ink {
   box-shadow: var(--surface-shadow-ink);
 }
