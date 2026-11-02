@@ -7,13 +7,15 @@ export const metadata: Metadata = {
   title: "Page not found",
 };
 
+/** A15: always Ink, in either theme. */
 export default function NotFound() {
   return (
-    <StatusPage
-      kicker="Error 404"
-      title="Unnotched."
-      description="This page doesn’t exist. Nothing to prove here."
-      mark={<GhostMark />}
-    />
+    <div className="row-span-full grid min-h-svh grid-rows-[auto_1fr_auto] bg-background tone-ink text-foreground">
+      <StatusPage
+        kicker="404 · Unnotched"
+        title="This place isn't on the map."
+        mark={<GhostMark />}
+      />
+    </div>
   );
 }
