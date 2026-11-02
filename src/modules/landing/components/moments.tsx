@@ -27,8 +27,6 @@ const { stories } = momentsContent;
  */
 export function Moments() {
   const listRef = useRef<HTMLDivElement>(null);
-  // The photo on screen: the glass chips over the story bend it.
-  const photoRef = useRef<HTMLImageElement | null>(null);
   const [active, setActive] = useState(0);
   const [held, setHeld] = useState(false);
   const story = stories[active];
@@ -47,8 +45,8 @@ export function Moments() {
           description={momentsContent.description}
           className="reveal"
         />
-        {/* Pieces of one glass; the lens sits on the story playing. */}
-        <GlassGroup self={false} merge={14}>
+        {/* A soft highlight sits on the story playing. */}
+        <GlassGroup self={false}>
           <GlassLensTrack
             ref={listRef}
             role="list"
@@ -101,9 +99,6 @@ export function Moments() {
           {stories.map((item, index) => (
             <Image
               key={item.caption}
-              ref={(node) => {
-                if (index === active) photoRef.current = node;
-              }}
               src={item.image.src}
               alt={index === active ? item.image.alt : ""}
               aria-hidden={index !== active}
@@ -139,17 +134,9 @@ export function Moments() {
           </div>
 
           <div className="absolute top-7 left-3 flex items-center gap-2 text-sm font-semibold">
-            <GlassGroup
-              image={photoRef}
-              radius={999}
-              tintVar="--ink"
-              tintAmount={0.8}
-              margin={10}
-              animateKey={active}
-              className="grid size-8 place-items-center rounded-full text-volt"
-            >
+            <div className="grid size-8 place-items-center rounded-full bg-ink/80 text-volt">
               <NotchGlyph className="size-4" />
-            </GlassGroup>
+            </div>
             notchs
           </div>
 
@@ -157,29 +144,14 @@ export function Moments() {
             key={active}
             className="absolute inset-x-4 bottom-5 grid animate-rise justify-items-start gap-3"
           >
-            {/* Ink glass over the photo, bending it. */}
-            <GlassGroup
-              image={photoRef}
-              radius={12}
-              tintVar="--ink"
-              tintAmount={0.82}
-              margin={12}
-              className="inline-flex items-center gap-2 rounded-xl px-3 py-2 font-mono text-sm"
-            >
+            {/* Ink over the photo keeps the text readable. */}
+            <div className="inline-flex items-center gap-2 rounded-xl bg-ink/82 px-3 py-2 font-mono text-sm">
               <VerifiedIcon className="size-4 text-volt" />
               {story.sticker}
-            </GlassGroup>
-            <GlassGroup
-              image={photoRef}
-              radius={12}
-              tintVar="--ink"
-              tintAmount={0.5}
-              frost={0.95}
-              margin={12}
-              className="rounded-xl px-3 py-2 font-display text-xl leading-tight font-extrabold tracking-[-.02em]"
-            >
+            </div>
+            <div className="rounded-xl bg-ink/70 px-3 py-2 font-display text-xl leading-tight font-extrabold tracking-[-.02em]">
               <p>{story.caption}</p>
-            </GlassGroup>
+            </div>
           </div>
 
           <button

@@ -16,9 +16,9 @@ export function Faq() {
         title={faqContent.title}
         className="reveal"
       />
-      {/* Each question is a piece of glass, kept just apart so the rows
-          read cleanly; a lens follows the pointer from question to question. */}
-      <GlassGroup self={false} merge={6} className="reveal">
+      {/* Each question is a piece of glass; a highlight follows the pointer
+          from question to question. */}
+      <GlassGroup self={false} className="reveal">
         <GlassLensTrack lensRadius={14} inset={4}>
           <div role="list" className="grid gap-2">
             {faqContent.items.map((item) => (

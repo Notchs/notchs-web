@@ -11,8 +11,6 @@ import {
 
 import { cn } from "@/shared/lib/cn";
 
-import { GlassShape } from "./glass-group";
-
 /** Marks an item the lens can move to (put it on the hoverable element). */
 export const LENS_ITEM = { "data-lens-item": "" } as const;
 
@@ -28,11 +26,10 @@ type GlassLensTrackProps = ComponentProps<"div"> & {
 };
 
 /**
- * A row or column of items with a liquid glass lens that slides to the item
- * under the pointer or keyboard focus, leaving a stretching neck as it goes,
- * and rests on `restingIndex` (or disappears) when left. Must sit inside a
- * <GlassGroup>; items carry `LENS_ITEM`. It may itself be a scroll container
- * (the lens scrolls with the items).
+ * A row or column of items with a soft highlight that slides to the item
+ * under the pointer or keyboard focus, and rests on `restingIndex` (or
+ * disappears) when left. Items carry `LENS_ITEM`. It may itself be a scroll
+ * container (the highlight scrolls with the items).
  */
 export function GlassLensTrack({
   lensRadius = 18,
@@ -108,7 +105,7 @@ export function GlassLensTrack({
         if (typeof ref === "function") ref(node);
         else if (ref) ref.current = node;
       }}
-      className={cn("relative", className)}
+      className={cn("relative isolate", className)}
       onPointerOver={(event: PointerEvent<HTMLDivElement>) => {
         onPointerOver?.(event);
         const next = boxOf(itemAt(event.target));
@@ -132,14 +129,10 @@ export function GlassLensTrack({
       {children}
       {/* After the items, so item positions among the children hold. */}
       {box && (
-        <GlassShape
+        <div
           aria-hidden="true"
-          lens
-          liquid
-          radius={lensRadius}
-          motionKey={`${box.left},${box.top},${box.width}`}
-          className="pointer-events-none absolute transition-[left,top,width,height] duration-300 ease-notch motion-reduce:transition-none"
-          style={box}
+          className="pointer-events-none absolute -z-10 bg-glass-tint transition-[left,top,width,height] duration-300 ease-notch motion-reduce:transition-none"
+          style={{ ...box, borderRadius: lensRadius }}
         />
       )}
     </div>

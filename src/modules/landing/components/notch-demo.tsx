@@ -114,10 +114,9 @@ export function NotchDemo() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-16">
-      {/* Desktop: the steps are pieces of one glass, so neighbours melt
-          together; a raised lens marks the current step and flows to the
+      {/* Desktop: the steps are glass pieces; a soft highlight marks the current step and slides to the
           next as the demo plays, or to the one under the pointer. */}
-      <GlassGroup self={false} merge={16} className="hidden lg:block">
+      <GlassGroup self={false} className="hidden lg:block">
         <GlassLensTrack restingIndex={stage} lensRadius={14} inset={6}>
           <ol className="grid gap-3">
             {steps.map((step, index) => {
@@ -164,7 +163,7 @@ export function NotchDemo() {
 
       <div className="mx-auto w-full max-w-[18rem] sm:max-w-[20rem]">
         {/* Phones and tablets: the steps as a glass segmented control, with the
-            current one explained. A raised glass lens flows between them. */}
+            current one explained. A soft highlight slides between them. */}
         <div className="mb-5 lg:hidden">
           <GlassGroup radius={20} className="rounded-[20px] p-1.5">
             <GlassLensTrack restingIndex={stage} lensRadius={14} inset={0}>

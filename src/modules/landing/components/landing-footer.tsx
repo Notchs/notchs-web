@@ -41,7 +41,7 @@ export function LandingFooter() {
             </span>
           </div>
           <nav aria-label="Footer">
-            {/* A glass lens follows the pointer along the links. */}
+            {/* A soft highlight follows the pointer along the links. */}
             <GlassGroup self={false}>
               <GlassLensTrack lensRadius={20} inset={2}>
                 <ul className="-ml-3 flex flex-wrap gap-x-1 sm:ml-0">

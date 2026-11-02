@@ -53,7 +53,7 @@ function Stepper({
   const keyStyles = "rounded-xl has-disabled:opacity-40";
   return (
     <div className="flex items-center gap-1.5">
-      <GlassGroup radius={12} pressable margin={10} className={keyStyles}>
+      <GlassGroup radius={12} className={keyStyles}>
         <button
           type="button"
           aria-label={`${builderContent.remove}: ${label}`}
@@ -70,7 +70,7 @@ function Stepper({
       >
         {count}
       </span>
-      <GlassGroup radius={12} pressable margin={10} className={keyStyles}>
+      <GlassGroup radius={12} className={keyStyles}>
         <button
           type="button"
           aria-label={`${builderContent.add}: ${label}`}
@@ -109,7 +109,7 @@ export function NotchCardBuilder() {
           {builderContent.description}
         </p>
         {/* The places are pieces of one glass; close neighbours melt. */}
-        <GlassGroup self={false} merge={14}>
+        <GlassGroup self={false}>
           <div
             role="list"
             className="mt-3 flex snap-x gap-2 overflow-x-auto py-3 lg:mt-5 lg:grid lg:grid-cols-2 lg:overflow-visible lg:py-3"
@@ -154,19 +154,11 @@ export function NotchCardBuilder() {
         </button>
       </div>
 
-      {/* The live card: thick Ink glass bending the page around it, so Volt
-          may sit inside it. Solid Ink until the glass draws. */}
+      {/* The live card: solid Ink, so Volt may sit inside it. */}
       <div className="mx-auto w-full max-w-[24rem] lg:sticky lg:top-28">
-        <GlassGroup
+        <div
           {...INK_GROUND}
-          floating
-          radius={24}
-          tintVar="--ink"
-          tintAmount={0.96}
-          rimShare={0.5}
-          frost={0.9}
-          fallback="own"
-          className="rounded-3xl p-5 pt-7 text-paper notch notch-lg not-data-glass-ready:bg-ink sm:p-7 sm:pt-9"
+          className="rounded-3xl bg-ink p-5 pt-7 text-paper notch-lg sm:p-7 sm:pt-9"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold tracking-[.14em] text-stone uppercase">
@@ -185,17 +177,11 @@ export function NotchCardBuilder() {
             {builderContent.countLabel}
           </p>
 
-          <GlassGroup
-            radius={999}
-            tintVar="--graphite"
-            tintAmount={0.75}
-            margin={10}
-            className="mt-4 inline-flex rounded-full px-3 py-1.5 font-mono text-sm lg:mt-5"
-          >
+          <div className="mt-4 inline-flex rounded-full bg-graphite px-3 py-1.5 font-mono text-sm lg:mt-5">
             <p>
               {total >= 3 ? builderContent.rankOpen : builderContent.rankLocked}
             </p>
-          </GlassGroup>
+          </div>
           <p className="mt-2 min-h-6 text-[.9375rem] text-stone lg:mt-3">
             {total === 0
               ? builderContent.empty
@@ -215,13 +201,11 @@ export function NotchCardBuilder() {
                   )}
                 >
                   {/* An unlocked badge turns into a glass chip. */}
-                  <GlassGroup
-                    self={on}
-                    radius={14}
-                    tintVar="--graphite"
-                    tintAmount={0.75}
-                    margin={10}
-                    className="flex items-center gap-1.5 rounded-full px-2.5 py-1 lg:gap-3 lg:rounded-xl lg:px-3 lg:py-2"
+                  <div
+                    className={cn(
+                      on && "bg-graphite",
+                      "flex items-center gap-1.5 rounded-full px-2.5 py-1 lg:gap-3 lg:rounded-xl lg:px-3 lg:py-2",
+                    )}
                   >
                     <VerifiedIcon
                       className={cn(
@@ -237,12 +221,12 @@ export function NotchCardBuilder() {
                         {badge.rule}
                       </span>
                     </span>
-                  </GlassGroup>
+                  </div>
                 </li>
               );
             })}
           </ul>
-        </GlassGroup>
+        </div>
         <p className="mt-3 text-center text-sm text-muted">
           {builderContent.preview}
         </p>

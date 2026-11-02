@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 
 import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
@@ -17,7 +11,6 @@ import {
 import { ArrowRightIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/cn";
-import { prewarmPageSnapshot } from "@/shared/lib/glass/page-snapshot";
 
 import {
   mapDots,
@@ -28,19 +21,11 @@ import {
 import { useStripScroll } from "../lib/use-strip-scroll";
 import ahmedabadMap from "../assets/ahmedabad-map.webp";
 import { useLanding } from "./landing-provider";
-import { MapLens, type DropTarget, type Lens } from "./map-lens";
 
 /** Size of the stitched map image, in pixels. */
 const MAP_W = 1280;
 const MAP_H = 1024;
-/** The map file's URL, which the WebGL lenses load as their texture. */
-const MAP_SRC = ahmedabadMap.src;
 const TOUR_MS = 3500;
-/** How long the map takes to fly to a stop (the layer's transition). */
-const FLY_MS = 1500;
-/** Lens radius under a resting pin (44px wide) and a hovered one. */
-const LENS_R = 22;
-const LENS_R_HOVER = 26;
 
 /**
  * A still map of Ahmedabad that "flies" to the chosen stop: the whole layer
@@ -50,15 +35,10 @@ const LENS_R_HOVER = 26;
 export function SaturdayMap() {
   const { openAccess } = useLanding();
   const rootRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<HTMLImageElement>(null);
-  const photoRef = useRef<HTMLImageElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
   const [manual, setManual] = useState(false);
-  const [hovered, setHovered] = useState<number | null>(null);
-  // True once the WebGL lenses draw; until then pins use CSS glass.
-  const [lensReady, setLensReady] = useState(false);
   const stop = saturdayStops[active];
   const venue = venueByKind(stop.kind);
   useStripScroll(listRef, active);
@@ -84,30 +64,6 @@ export function SaturdayMap() {
     return () => clearInterval(timer);
   }, [inView, manual]);
 
-  // A glass lens under every pin but the active one, which is solid Ink.
-  const lenses = useMemo<Lens[]>(
-    () =>
-      saturdayStops.flatMap((item, index) =>
-        index === active
-          ? []
-          : [
-              {
-                id: item.time,
-                x: (item.x / 100) * MAP_W,
-                y: (item.y / 100) * MAP_H,
-                r: index === hovered ? LENS_R_HOVER : LENS_R,
-              },
-            ],
-      ),
-    [active, hovered],
-  );
-
-  // The glass drop rests under the active pin and travels when it changes.
-  const drop = useMemo<DropTarget>(
-    () => ({ x: (stop.x / 100) * MAP_W, y: (stop.y / 100) * MAP_H }),
-    [stop],
-  );
-
   const choose = (index: number) => {
     setManual(true);
     setActive(index);
@@ -125,9 +81,9 @@ export function SaturdayMap() {
       ref={rootRef}
       className="grid gap-4 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-6"
     >
-      {/* The stops are pieces of one glass; a raised lens sits on the one
-          shown on the map and flows to the next. */}
-      <GlassGroup self={false} merge={14} className="min-w-0">
+      {/* The stops; a soft highlight sits on the one shown on the map and
+          slides to the next. */}
+      <GlassGroup self={false} className="min-w-0">
         <GlassLensTrack
           ref={listRef}
           role="list"
@@ -178,7 +134,6 @@ export function SaturdayMap() {
           style={layerStyle}
         >
           <Image
-            ref={mapRef}
             src={ahmedabadMap}
             alt={saturdayContent.mapAlt}
             width={MAP_W}
@@ -188,14 +143,6 @@ export function SaturdayMap() {
             placeholder="blur"
             className="block size-full select-none"
             draggable={false}
-          />
-          <MapLens
-            src={MAP_SRC}
-            width={MAP_W}
-            height={MAP_H}
-            lenses={lenses}
-            drop={drop}
-            onReady={setLensReady}
           />
           {mapDots.map(([x, y]) => (
             <span
@@ -213,15 +160,11 @@ export function SaturdayMap() {
                 type="button"
                 aria-label={`${venueByKind(item.kind).label}, ${item.area}, ${item.time}`}
                 onClick={() => choose(index)}
-                onPointerEnter={() => setHovered(index)}
-                onPointerLeave={() => setHovered(null)}
                 className={cn(
                   "absolute grid -translate-1/2 cursor-pointer place-items-center rounded-full font-mono text-xs transition-[width,height,background-color,color] duration-500 ease-notch",
                   current
                     ? "z-10 size-14 border-2 border-ink bg-ink text-paper"
-                    : lensReady
-                      ? "size-11 font-semibold text-ink [text-shadow:0_0_6px_rgb(255_255_255/.9),0_0_2px_rgb(255_255_255)]"
-                      : "size-11 glass text-ink glass-clear hover:[--glass-fill-clear:rgb(255_255_255/.72)]",
+                    : "size-11 glass text-ink glass-clear hover:[--glass-fill-clear:rgb(255_255_255/.72)]",
                 )}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}
               >
@@ -237,19 +180,10 @@ export function SaturdayMap() {
           className="absolute left-1/2 w-[min(17rem,calc(100%_-_2rem))] animate-rise"
           style={{ top: "var(--cy)", translate: "-50% calc(-100% - 2.25rem)" }}
         >
-          {/* Glass that bends the map beneath it, following it as it flies. */}
-          <GlassGroup
-            image={mapRef}
-            radius={16}
-            tintAmount={0.72}
-            frost={0.9}
-            animateKey={active}
-            animateFor={FLY_MS}
-            className="rounded-2xl p-1.5 text-foreground"
-          >
+          {/* Solid: it is content, and the map must not show through its text. */}
+          <div className="rounded-2xl border border-line bg-background p-1.5 text-foreground shadow-xl">
             <div className="relative aspect-[2/1] overflow-hidden rounded-[12px] bg-block">
               <Image
-                ref={photoRef}
                 src={venue.image.src}
                 alt=""
                 fill
@@ -257,17 +191,9 @@ export function SaturdayMap() {
                 placeholder="blur"
                 className="object-cover"
               />
-              <GlassGroup
-                image={photoRef}
-                radius={999}
-                tintVar="--ink"
-                tintAmount={0.55}
-                frost={0.8}
-                margin={10}
-                className="absolute top-2.5 left-2.5 rounded-full px-2.5 py-1 font-mono text-xs text-paper"
-              >
+              <div className="absolute top-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-xs text-paper">
                 {stop.time}
-              </GlassGroup>
+              </div>
             </div>
             <div className="p-2.5 pt-3">
               <p className="font-display text-lg leading-tight font-extrabold tracking-[-.02em]">
@@ -276,27 +202,16 @@ export function SaturdayMap() {
               <p className="mt-1 text-[.9375rem] text-muted">
                 {venue.label} · {stop.area}
               </p>
-              <Button
-                size="sm"
-                className="mt-3 w-full"
-                onClick={(event) => openAccess(event.currentTarget)}
-                onPointerEnter={prewarmPageSnapshot}
-                onFocus={prewarmPageSnapshot}
-              >
+              <Button size="sm" className="mt-3 w-full" onClick={openAccess}>
                 {saturdayContent.cta}
                 <ArrowRightIcon className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
               </Button>
             </div>
-          </GlassGroup>
+          </div>
         </div>
 
         <GlassGroup
-          image={mapRef}
           radius={999}
-          tintAmount={0.35}
-          margin={8}
-          animateKey={active}
-          animateFor={FLY_MS}
           className="absolute right-2 bottom-2 rounded-full px-2.5 py-0.5 text-xs text-ink/70 glass-light"
         >
           {saturdayContent.credit}
