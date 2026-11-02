@@ -46,7 +46,7 @@ export function LoggedInPanel({
       title={venueName ? `${copy.loginTitle}, ${venueName}` : copy.loginTitle}
       body={who ? copy.loginBody(who) : undefined}
     >
-      <ButtonLink href={routes.home} className="w-full">
+      <ButtonLink href={routes.mainSite} className="w-full">
         {copy.home}
       </ButtonLink>
       <button

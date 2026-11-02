@@ -18,7 +18,7 @@ export function VenueAuthShell({ children }: { children: ReactNode }) {
       <VenueShowcase />
       <main className="flex min-w-0 flex-col px-gutter py-5 lg:min-h-svh lg:px-14 lg:py-8">
         <Link
-          href={routes.home}
+          href={routes.mainSite}
           aria-label={`${siteConfig.name} home`}
           className="flex min-h-12 items-center gap-2.5 self-start lg:hidden"
         >

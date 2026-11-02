@@ -169,7 +169,7 @@ export function VenueAuthFlow() {
                 {flowContent.done.appliedRef} {application.reference}
               </span>
             )}
-            <ButtonLink href={routes.home} className="w-full">
+            <ButtonLink href={routes.mainSite} className="w-full">
               {flowContent.done.home}
             </ButtonLink>
           </DonePanel>
