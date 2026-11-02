@@ -5,6 +5,8 @@ import { env } from "./env";
 export const routes = {
   home: "/",
   forbidden: "/403",
+  privacy: "/privacy",
+  terms: "/terms",
   login: "/login",
   loginVerify: "/login/verify",
   venueLogin: "/venue/login",
