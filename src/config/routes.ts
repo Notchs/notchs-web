@@ -1,14 +1,24 @@
 import { adminConfig } from "./admin";
 import { env } from "./env";
+import { venueConfig, venueOrigin } from "./venue";
+
+/**
+ * The venue pages are on their own host (venues.notchs.com) on the live site,
+ * so links to them from anywhere include it. Team builds (Netlify test links)
+ * have no venue host, so there the pages live under /venue.
+ */
+const venueBase = env.siteAccess === "team" ? venueConfig.appPath : venueOrigin;
 
 /** Application route paths. Reference these instead of hard-coding strings. */
 export const routes = {
   home: "/",
+  /** The main site's homepage, for links from the venue host. */
+  mainSite: env.siteAccess === "team" ? "/" : env.appUrl,
   forbidden: "/403",
   login: "/login",
   loginVerify: "/login/verify",
-  venueLogin: "/venue/login",
-  venueSetPassword: "/venue/set-password",
+  venueLogin: `${venueBase}/login`,
+  venueSetPassword: `${venueBase}/set-password`,
   /** Team builds only; a 404 on the live site. */
   teamLogin: "/team-login",
   teamLoginSession: "/team-login/session",

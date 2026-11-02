@@ -31,7 +31,7 @@ export function VenueShowcase() {
       </svg>
 
       <Link
-        href={routes.home}
+        href={routes.mainSite}
         className="relative flex flex-wrap items-center gap-3 self-start"
       >
         <Logo variant="on-dark" height={40} />
