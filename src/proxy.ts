@@ -6,7 +6,7 @@ import { isVenueHost, venueConfig, venueOrigin } from "@/config/venue";
 import { guardTeamAccess } from "@/shared/lib/team-access";
 
 const { appPath: adminPath } = adminConfig;
-const { appPath: venuePath, homePath: venueHome } = venueConfig;
+const { appPath: venuePath } = venueConfig;
 
 function isUnder(appPath: string, pathname: string) {
   return pathname === appPath || pathname.startsWith(`${appPath}/`);
@@ -41,9 +41,9 @@ function redirectOnHost(url: URL, host: string, pathname: string) {
  *    - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
  *    - admin.notchs.com/admin/... redirects to the same page without "/admin".
  *    - notchs.com/admin/... is a 404, so the panel is only on its own host.
- *    - venues.notchs.com/login shows src/app/venue/login (URL stays /login).
- *    - venues.notchs.com/venue/... redirects to the same page without "/venue",
- *      and the bare host redirects to the login.
+ *    - venues.notchs.com/login shows src/app/venue/login (URL stays /login),
+ *      and the bare host shows the dashboard overview.
+ *    - venues.notchs.com/venue/... redirects to the same page without "/venue".
  *    - notchs.com/venue/... redirects to the venue host, so links already sent
  *      in emails keep working.
  */
@@ -69,8 +69,7 @@ export async function proxy(request: NextRequest) {
     if (isUnder(venuePath, pathname)) {
       return redirectOnHost(url, host, pathname.slice(venuePath.length) || "/");
     }
-    if (pathname === "/") return redirectOnHost(url, host, venueHome);
-    url.pathname = `${venuePath}${pathname}`;
+    url.pathname = pathname === "/" ? venuePath : `${venuePath}${pathname}`;
     return NextResponse.rewrite(url);
   }
 
