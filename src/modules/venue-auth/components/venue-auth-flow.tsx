@@ -43,9 +43,10 @@ const linkedScreens: Record<string, VenueAuthScreen> = {
 /**
  * Venue owner log in, password reset request and venue application,
  * as one page that swaps screens in place. `?view=apply` or `?view=forgot`
- * opens that screen first.
+ * opens that screen first. A logged-in owner goes on to `dashboardHref`, or
+ * sees the logged-in panel on builds without the dashboard.
  */
-export function VenueAuthFlow() {
+export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
   const view = useSearchParams().get("view");
   const [screen, setScreen] = useState<VenueAuthScreen>(
     () => (view && linkedScreens[view]) || "login",
@@ -79,6 +80,12 @@ export function VenueAuthFlow() {
     };
   }, []);
 
+  useEffect(() => {
+    if (screen === "loggedIn" && dashboardHref) {
+      window.location.replace(dashboardHref);
+    }
+  }, [screen, dashboardHref]);
+
   function body() {
     switch (screen) {
       case "login":
@@ -87,7 +94,10 @@ export function VenueAuthFlow() {
             email={email}
             onEmailChange={setEmail}
             onForgot={() => setScreen("forgot")}
-            onLoggedIn={() => window.location.replace(routes.venueHome)}
+            onLoggedIn={(data) => {
+              setMember(data);
+              setScreen("loggedIn");
+            }}
           />
         );
       case "forgot":
