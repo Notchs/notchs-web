@@ -31,9 +31,9 @@ type State = { status: "form" } | { status: "invalid" };
 /**
  * Landing page for the emailed link (first password after approval, or a
  * reset). Setting the password also logs the owner in, so they go straight
- * on to the venue homepage.
+ * on to the dashboard, or to the login page's logged-in panel without it.
  */
-export function SetPasswordForm() {
+export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
   const [state, setState] = useState<State>({ status: "form" });
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -62,7 +62,7 @@ export function SetPasswordForm() {
     try {
       await setVenuePassword(tokenRef.current ?? "", password);
       // Replace, so Back doesn't return to the used link. Stays busy until it loads.
-      window.location.replace(routes.venueHome);
+      window.location.replace(dashboardHref ?? routes.venueLogin);
     } catch (error) {
       const fields = fieldErrors(error);
       if (
