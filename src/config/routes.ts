@@ -19,13 +19,39 @@ export const routes = {
   loginVerify: "/login/verify",
   venueLogin: `${venueBase}/login`,
   venueSetPassword: `${venueBase}/set-password`,
-  /** The venue homepage: where the venue host's bare address leads. */
-  venueHome: `${venueBase}${venueConfig.homePath}`,
+  /** The venue homepage: the dashboard overview. */
+  venueHome: env.siteAccess === "team" ? venueBase : `${venueBase}/`,
   /** Team builds only; a 404 on the live site. */
   teamLogin: "/team-login",
   teamLoginSession: "/team-login/session",
   /** Team builds only: the All pages hub. */
   teamHub: "/team",
+} as const;
+
+/**
+ * Venue dashboard paths, used only inside the dashboard. On the live site they
+ * are as seen on the venue host (venues.notchs.com/customers). Private: never
+ * link them from public pages.
+ */
+const dashboardBase = env.siteAccess === "team" ? venueConfig.appPath : "";
+
+export const venueRoutes = {
+  overview: dashboardBase || "/",
+  customers: `${dashboardBase}/customers`,
+  visits: `${dashboardBase}/visits`,
+  notchCard: `${dashboardBase}/visits/card`,
+  foundingVenue: `${dashboardBase}/visits/founding`,
+  analytics: `${dashboardBase}/analytics`,
+  reviews: `${dashboardBase}/reviews`,
+  discover: `${dashboardBase}/discover`,
+  rewards: `${dashboardBase}/rewards`,
+  counter: `${dashboardBase}/counter`,
+  counterSigns: `${dashboardBase}/counter/signs`,
+  billing: `${dashboardBase}/billing`,
+  profile: `${dashboardBase}/profile`,
+  content: `${dashboardBase}/content`,
+  team: `${dashboardBase}/team`,
+  settings: `${dashboardBase}/settings`,
 } as const;
 
 /**

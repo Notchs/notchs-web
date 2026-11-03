@@ -87,10 +87,7 @@ export function VenueAuthFlow() {
             email={email}
             onEmailChange={setEmail}
             onForgot={() => setScreen("forgot")}
-            onLoggedIn={(data) => {
-              setMember(data);
-              setScreen("loggedIn");
-            }}
+            onLoggedIn={() => window.location.replace(routes.venueHome)}
           />
         );
       case "forgot":
