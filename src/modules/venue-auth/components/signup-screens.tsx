@@ -314,7 +314,7 @@ export function VenueForm({
         landmark: landmark.trim() || null,
       });
       const data = response.data;
-      onApplied(venueName.trim(), data?.code ?? data?.ref);
+      onApplied(venueName.trim(), data?.application_code);
     } catch (err) {
       const fields = fieldErrors(err);
       const expired =
