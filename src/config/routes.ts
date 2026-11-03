@@ -19,6 +19,8 @@ export const routes = {
   loginVerify: "/login/verify",
   venueLogin: `${venueBase}/login`,
   venueSetPassword: `${venueBase}/set-password`,
+  /** The venue homepage: where the venue host's bare address leads. */
+  venueHome: `${venueBase}${venueConfig.homePath}`,
   /** Team builds only; a 404 on the live site. */
   teamLogin: "/team-login",
   teamLoginSession: "/team-login/session",

@@ -127,7 +127,6 @@ export const flowContent = {
     loginStamp: "Logged in",
     loginTitle: "Welcome back",
     loginBody: (who: string) => `You're logged in as ${who}.`,
-    passwordStamp: "Password set",
     appliedStamp: "Application sent",
     appliedTitle: (venue: string) => `Thanks, ${venue}`,
     appliedBody: (email: string) =>

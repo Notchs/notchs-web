@@ -10,7 +10,10 @@ export const venueConfig = {
   hostPrefix: "venues.",
   /** Folder of the venue pages inside src/app. Never shown in venue URLs. */
   appPath: "/venue",
-  /** Where the bare host goes while the dashboard is not on the live site. */
+  /**
+   * Where the bare host goes while the dashboard is not on the live site, and
+   * where owners land after setting their password (`routes.venueHome`).
+   */
   homePath: "/login",
 } as const;
 
