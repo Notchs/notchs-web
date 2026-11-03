@@ -9,6 +9,7 @@ import { cn } from "@/shared/lib/cn";
 
 import { flowContent } from "../content";
 import { getVenueMe, type VenueMember } from "../lib/api";
+import { ApplicationPath } from "./application-path";
 import { DonePanel } from "./done-panel";
 import { LoggedInPanel } from "./logged-in-panel";
 import { ForgotForm, LoginForm } from "./login-screens";
@@ -25,21 +26,23 @@ export type VenueAuthScreen =
   | "venue"
   | "applied";
 
-const signupScreens: VenueAuthScreen[] = ["apply", "code", "venue", "applied"];
+const applyScreens: VenueAuthScreen[] = ["apply", "code", "venue", "applied"];
 
-/** How many of the three sign-up steps are complete on this screen. */
+/** How many of the three application steps are complete on this screen. */
 const stepOf = (screen: VenueAuthScreen) =>
   screen === "venue" ? 1 : screen === "applied" ? 3 : 0;
 
 /** `?view=` values that open a screen other than log in. */
 const linkedScreens: Record<string, VenueAuthScreen> = {
+  apply: "apply",
+  /** Older links. */
   signup: "apply",
   forgot: "forgot",
 };
 
 /**
- * Venue owner log in, password reset request and sign-up (venue application),
- * as one page that swaps screens in place. `?view=signup` or `?view=forgot`
+ * Venue owner log in, password reset request and venue application,
+ * as one page that swaps screens in place. `?view=apply` or `?view=forgot`
  * opens that screen first.
  */
 export function VenueAuthFlow() {
@@ -55,10 +58,10 @@ export function VenueAuthFlow() {
     reference?: string;
   }>();
 
-  const signup = signupScreens.includes(screen);
-  const swap = flowContent.swap[signup ? "signup" : "login"];
-  /** The log in / sign up switch sits under the form, not on end screens. */
-  const showSwap = screen === "login" || (signup && screen !== "applied");
+  const applying = applyScreens.includes(screen);
+  const swap = flowContent.swap[applying ? "apply" : "login"];
+  /** The log in / apply switch sits under the form, not on end screens. */
+  const showSwap = screen === "login" || (applying && screen !== "applied");
 
   // Someone who is still logged in skips the form.
   useEffect(() => {
@@ -169,6 +172,7 @@ export function VenueAuthFlow() {
                 {flowContent.done.appliedRef} {application.reference}
               </span>
             )}
+            <ApplicationPath current={1} />
             <ButtonLink href={routes.mainSite} className="w-full">
               {flowContent.done.home}
             </ButtonLink>
@@ -180,8 +184,8 @@ export function VenueAuthFlow() {
   return (
     <>
       <ScreenFrame screenKey={screen}>
-        {signup && (
-          <ol aria-label="Sign up progress" className="flex gap-2">
+        {applying && (
+          <ol aria-label="Application progress" className="flex gap-2">
             {flowContent.steps.map((step, i) => {
               const completed = stepOf(screen);
               const done = i < completed;
@@ -219,7 +223,7 @@ export function VenueAuthFlow() {
             {swap.question}{" "}
             <button
               type="button"
-              onClick={() => setScreen(signup ? "login" : "apply")}
+              onClick={() => setScreen(applying ? "login" : "apply")}
               className="cursor-pointer py-3 font-semibold text-foreground underline underline-offset-[3px] hover:text-muted"
             >
               {swap.cta}

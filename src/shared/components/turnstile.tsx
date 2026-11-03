@@ -12,7 +12,7 @@ type TurnstileApi = {
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
-      appearance: "interaction-only";
+      appearance: "always";
       size: "flexible";
       theme: "auto";
     },
@@ -65,8 +65,8 @@ function TurnstileWidget({ onToken }: { onToken: (token: string) => void }) {
           callback: onToken,
           "expired-callback": () => onToken(""),
           "error-callback": () => onToken(""),
-          // Stays hidden unless Cloudflare needs the person to tick a box.
-          appearance: "interaction-only",
+          // Always shown, so people can see the check they need to pass.
+          appearance: "always",
           size: "flexible",
           theme: "auto",
         });
@@ -80,7 +80,8 @@ function TurnstileWidget({ onToken }: { onToken: (token: string) => void }) {
     };
   }, [onToken]);
 
-  return <div ref={containerRef} className="empty:hidden" />;
+  // Cloudflare's box is 71px tall; reserving it stops the form jumping.
+  return <div ref={containerRef} className="min-h-[71px]" />;
 }
 
 /**
@@ -96,7 +97,11 @@ export function useTurnstile() {
     token,
     /** True when no site key is set, so forms don't wait for a token. */
     disabled: !env.turnstileSiteKey,
-    widget: <TurnstileWidget key={round} onToken={setToken} />,
+    /** True once the check has passed, or when there is no check. */
+    ready: !env.turnstileSiteKey || token !== "",
+    widget: env.turnstileSiteKey ? (
+      <TurnstileWidget key={round} onToken={setToken} />
+    ) : null,
     reset() {
       setToken("");
       setRound((n) => n + 1);

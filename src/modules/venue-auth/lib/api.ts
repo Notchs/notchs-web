@@ -76,8 +76,9 @@ export function verifyApplicationCode(email: string, code: string) {
   );
 }
 
+/** Returns the application code, e.g. APP-7K3M9QX2. */
 export function submitApplication(application: VenueApplication) {
-  return apiRequest<ApiSuccess<{ code?: string; ref?: string; id?: string }>>(
+  return apiRequest<ApiSuccess<{ application_code: string }>>(
     "/venue-applications",
     { method: "POST", body: application },
   );

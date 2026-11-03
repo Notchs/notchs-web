@@ -66,7 +66,7 @@ export const hubSections: readonly HubSection[] = [
     title: "Venue",
     screens: [
       {
-        name: "Venue log in and sign-up",
+        name: "Venue log in and application",
         code: "E1, E2",
         href: "/venue/login",
       },
