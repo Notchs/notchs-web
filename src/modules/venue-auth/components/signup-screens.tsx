@@ -31,6 +31,7 @@ import {
 import { CodeInput } from "./code-input";
 import { Field } from "./field";
 import { BackButton } from "./login-screens";
+import { ApplicationPath } from "./application-path";
 import { FormError, ScreenHeading } from "./venue-auth-shell";
 
 const { apply: applyCopy, code: codeCopy, venue: venueCopy } = flowContent;
@@ -104,6 +105,7 @@ export function ApplyEmailForm({
           {!busy && <ArrowRightIcon className="size-4.5" />}
         </Button>
       </form>
+      <ApplicationPath current={0} />
     </>
   );
 }
