@@ -37,7 +37,7 @@ export const flowContent = {
   steps: ["Email", "Venue", "Done"],
   emailLabel: "Email",
   emailPlaceholder: "owner@kahwahouse.in",
-  checking: "Running a quick security check. Try again in a second.",
+  verifyHint: "Complete the check above to continue.",
   emailInvalid: "Enter a full email, like owner@kahwahouse.in.",
   login: {
     kicker: "Venue log in",

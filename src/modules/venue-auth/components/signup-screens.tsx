@@ -30,7 +30,7 @@ import {
 } from "../lib/validation";
 import { CodeInput } from "./code-input";
 import { Field } from "./field";
-import { BackButton } from "./login-screens";
+import { BackButton, VerifyHint } from "./login-screens";
 import { ApplicationPath } from "./application-path";
 import { FormError, ScreenHeading } from "./venue-auth-shell";
 
@@ -61,9 +61,7 @@ export function ApplyEmailForm({
     setFormError(undefined);
     if (!isEmail(address)) return setError(flowContent.emailInvalid);
     setError(undefined);
-    if (!turnstile.token && !turnstile.disabled) {
-      return setFormError(flowContent.checking);
-    }
+    if (!turnstile.ready) return setFormError(flowContent.verifyHint);
 
     setBusy(true);
     try {
@@ -100,7 +98,8 @@ export function ApplyEmailForm({
         />
         {turnstile.widget}
         <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
+        <VerifyHint show={!turnstile.ready} />
+        <Button type="submit" disabled={busy || !turnstile.ready}>
           {busy ? applyCopy.busy : applyCopy.cta}
           {!busy && <ArrowRightIcon className="size-4.5" />}
         </Button>
@@ -154,9 +153,7 @@ export function CodeForm({ email, onBack, onVerified }: CodeFormProps) {
 
   async function resend() {
     setNotice(undefined);
-    if (!turnstile.token && !turnstile.disabled) {
-      return setError(flowContent.checking);
-    }
+    if (!turnstile.ready) return setError(flowContent.verifyHint);
     setError(undefined);
     setCode("");
     setResendAt(Date.now() + RESEND_WAIT * 1000);
@@ -228,7 +225,8 @@ export function CodeForm({ email, onBack, onVerified }: CodeFormProps) {
           <button
             type="button"
             onClick={resend}
-            className="h-12 cursor-pointer font-semibold underline underline-offset-[3px]"
+            disabled={!turnstile.ready}
+            className="h-12 cursor-pointer font-semibold underline underline-offset-[3px] disabled:cursor-default disabled:text-muted disabled:no-underline"
           >
             {codeCopy.resend}
           </button>
