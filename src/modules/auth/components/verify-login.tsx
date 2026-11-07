@@ -95,7 +95,7 @@ export function VerifyLogin() {
         <StatusPage
           kicker="Log in"
           title="Link expired or already used."
-          description="Each link works once. Send LOGIN on WhatsApp for a fresh one."
+          description="Each link works once. Log in with WhatsApp again for a fresh one."
           mark={<LockedMark />}
           action={<WhatsAppLoginButton />}
         />
