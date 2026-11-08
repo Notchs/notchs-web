@@ -53,7 +53,12 @@ export const hubSections: readonly HubSection[] = [
         href: "/login/verify",
         note: "Normally opened from the link the WhatsApp bot sends",
       },
-      { name: "My Notchs (passport)", code: "C1–C4, C13" },
+      {
+        name: "My Notchs (passport)",
+        code: "C1–C4, C13",
+        href: "/passport",
+        note: "Needs a customer login (WhatsApp)",
+      },
       { name: "Notch Card reveal and past cards", code: "C9, C10" },
       {
         name: "WhatsApp bot replies",

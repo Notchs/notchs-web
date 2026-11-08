@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
+import { routes } from "@/config/routes";
 import {
   GhostMark,
   LockedMark,
   NotchedMark,
 } from "@/shared/components/brand/status-marks";
 import { StatusPage } from "@/shared/components/status-page";
-import { Button } from "@/shared/components/ui/button";
+import { Button, ButtonLink } from "@/shared/components/ui/button";
 import { ApiError } from "@/shared/lib/api-client";
 
 import { consumeLoginLink } from "../lib/api";
@@ -61,6 +63,15 @@ export function VerifyLogin() {
     void verify(tokenRef.current).then(setState);
   }, []);
 
+  // A moment to see the "Logged in" stamp, then on to the passport.
+  const router = useRouter();
+  const success = state.status === "success";
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => router.replace(routes.passport), 1500);
+    return () => clearTimeout(timer);
+  }, [success, router]);
+
   function retry() {
     setState({ status: "verifying" });
     void verify(tokenRef.current ?? null).then(setState);
@@ -86,8 +97,11 @@ export function VerifyLogin() {
               ? `You’re logged in, ${state.name}!`
               : "You’re logged in!"
           }
-          description="Go touch grass. Your Notchs are waiting."
+          description="Taking you to your passport…"
           mark={<NotchedMark />}
+          action={
+            <ButtonLink href={routes.passport}>Go to my passport</ButtonLink>
+          }
         />
       );
     case "invalid":

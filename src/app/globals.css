@@ -57,6 +57,7 @@
   --color-unnotched: var(--unnotched);
   --color-block: var(--block);
   --color-card: var(--card);
+  --color-panel: var(--panel);
   --color-btn: var(--btn);
   --color-btn-fg: var(--btn-fg);
   --color-btn-hover: var(--btn-hover);
@@ -274,6 +275,8 @@
   --unnotched: #ff5b35;
   --block: #24242c;
   --card: #17171d;
+  /* Always-dark panels (e.g. passport totals): lifted off the Ink page. */
+  --panel: var(--graphite);
   --btn: var(--volt);
   --btn-fg: var(--ink);
   --btn-hover: #ddff6b;
@@ -303,6 +306,7 @@
   --unnotched: #c2381a;
   --block: #ebe8de;
   --card: #ffffff;
+  --panel: var(--ink);
   --btn: var(--ink);
   --btn-fg: var(--volt);
   --btn-hover: #24242c;
