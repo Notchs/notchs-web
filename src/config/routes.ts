@@ -17,6 +17,11 @@ export const routes = {
   forbidden: "/403",
   login: "/login",
   loginVerify: "/login/verify",
+  /** The customer's passport, after logging in. Private: never link it from public pages. */
+  passport: "/passport",
+  passportNotchs: "/passport/notchs",
+  passportLeaderboard: "/passport/leaderboard",
+  passportProfile: "/passport/profile",
   venueLogin: `${venueBase}/login`,
   venueSetPassword: `${venueBase}/set-password`,
   /** The venue homepage: the dashboard overview. */
