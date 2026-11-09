@@ -82,6 +82,35 @@ export const notchsContent = {
   colours: "Each kind of place keeps its colour.",
 };
 
+export const claimsContent = {
+  title: "Missed a Notch?",
+  body: "If the counter phone wasn’t working, send us your bill instead. We check it and add the Notch. It works on the day of your visit only.",
+  search: "Find the place",
+  searchHint: "Type at least 2 letters of its name",
+  noPlaces: "No live Notchs place has that name.",
+  searchFailed: "Couldn’t search right now. Please try again.",
+  start: (place: string) => `Claim a Notch at ${place}`,
+  starting: "Starting…",
+  change: "Pick another place",
+  startFailed: "That didn’t work. Please try again.",
+  step1: (message: string) => `1. Send “${message}” to Notchs on WhatsApp.`,
+  step2:
+    "2. Then send a clear photo of your bill. It should show the place’s name, the date and the total.",
+  open: "Open WhatsApp",
+  noLink:
+    "WhatsApp isn’t connected here yet. Send the message to the Notchs number.",
+  expires: (time: string) => `Send the photo before ${time} today.`,
+  yours: "Your claims",
+  status: {
+    awaiting_photo: "Waiting for your bill photo",
+    expired: "No photo came that day",
+    in_review: "We’re checking your bill",
+    approved: "Notch added",
+    rejected: "Not accepted",
+  } as const,
+  notch: (no: string) => `Notch ${no}`,
+};
+
 export const notchRowContent = {
   meta: (niche: string, no: string, visit: string, date: string) =>
     `${niche} · Notch ${no} · ${visit} visit · ${date}`,
@@ -108,9 +137,42 @@ export const profileContent = {
   chooseArea: "Choose your area",
   instagram: "Instagram (optional)",
   instagramPlaceholder: "@yourname",
+  showInstagram: "Show my Instagram to places I visit",
+  showInstagramNote:
+    "Off by default. Places never see your name or number, only this if you turn it on.",
   phoneNote: "WhatsApp number: the one you log in with. Never shown to venues.",
   save: "Save",
   saving: "Saving…",
   saved: "Saved.",
   saveFailed: "Couldn’t save. Try again.",
+  phoneTitle: "Changed your WhatsApp number?",
+  phoneBody:
+    "Move your Notchs, rank and passport to your new number. You’ll get a code to send from it.",
+  phoneStart: "Change number",
+  phoneStarting: "Getting a code…",
+  phoneSend: (message: string) =>
+    `From your new number, send “${message}” to Notchs on WhatsApp.`,
+  phoneOpen: "Open WhatsApp",
+  phoneExpires: (time: string) =>
+    `The code works once, until ${time}. Notchs replies on the new number when it’s done.`,
+  phoneNoLink: "Notchs’ WhatsApp number isn’t set up yet. Try again later.",
+  phoneTooMany: "Too many codes. Please try again in 15 minutes.",
+  phoneFailed: "Couldn’t get a code. Try again.",
+  inviteTitle: "Invite friends",
+  inviteBody:
+    "Get 50 Star Points for each friend who joins with your code and gets their first Notch at a Notchs place.",
+  inviteCode: "Your invite code",
+  inviteCopy: "Copy invite link",
+  inviteCopied: "Link copied.",
+  inviteCopyFailed: "Couldn’t copy. Your code is above.",
+  inviteShare: "Share",
+  starPoints: (points: number) => `${points} Star Points`,
+  invited: (invited: number, rewarded: number) =>
+    `${invited} invited · ${rewarded} got their first Notch`,
+  invitedBy: (handle: string) => `You joined with ${handle}’s code.`,
+  inviterLabel: "Who invited you? Their invite code",
+  inviterSave: "Add",
+  inviterSaved:
+    "Thanks! They get their Star Points when you get your first Notch.",
+  inviterFailed: "Couldn’t add that code. Check it and try again.",
 };

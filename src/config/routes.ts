@@ -69,8 +69,12 @@ const adminBase = env.siteAccess === "team" ? adminConfig.appPath : "";
 
 export const adminRoutes = {
   dashboard: adminBase || "/",
+  applications: `${adminBase}/applications`,
+  claims: `${adminBase}/claims`,
   venues: `${adminBase}/venues`,
   customers: `${adminBase}/customers`,
   notchs: `${adminBase}/notchs`,
   settings: `${adminBase}/settings`,
+  login: `${adminBase}/login`,
+  setPassword: `${adminBase}/set-password`,
 } as const;

@@ -28,6 +28,15 @@ export type MeUpdate = {
   name?: string | null;
   area_id?: string | null;
   instagram_handle?: string | null;
+  show_instagram_to_venues?: boolean;
+};
+
+/** POST /me/phone-change: send `message` from the new number. */
+export type PhoneChange = {
+  message: string;
+  expires_at: string;
+  /** Null until the Notchs WhatsApp number is set up. */
+  whatsapp_link: string | null;
 };
 
 export type MyRank = { rank: number; points: number };
@@ -137,6 +146,69 @@ export const getNotches = (page: number, size: number) =>
   call<Paginated<Notch>>("/me/notches", { query: { page, size } });
 
 export const getReward = () => call<Reward>("/me/reward");
+
+/** GET /me/referral: my invite link and Star Points. */
+export type Referral = {
+  code: string;
+  link: string;
+  star_points: number;
+  invited: number;
+  rewarded: number;
+  invited_by: string | null;
+  can_add_inviter: boolean;
+};
+
+export const getReferral = () => call<Referral>("/me/referral");
+
+/** Once, in the first 14 days. */
+export const addInviter = (code: string) =>
+  call<Referral>("/me/referral/inviter", { method: "POST", body: { code } });
+
+/** A code to send from the new number; a new one cancels the old. */
+export const startPhoneChange = () =>
+  call<PhoneChange>("/me/phone-change", { method: "POST" });
+
+/** A live place to claim a missed Notch at (GET /me/claims/venues). */
+export type ClaimVenue = {
+  venue_code: string;
+  name: string;
+  area: string | null;
+  /** Already a label, e.g. "café". */
+  niche: string;
+};
+
+/** POST /me/claims: what to send on WhatsApp, then the bill photo, today. */
+export type ClaimStart = {
+  claim_code: string;
+  venue_name: string;
+  message: string;
+  whatsapp_link: string | null;
+  expires_at: string;
+};
+
+export type ClaimStatus =
+  "awaiting_photo" | "expired" | "in_review" | "approved" | "rejected";
+
+export type MyClaim = {
+  claim_code: string;
+  venue_name: string;
+  visit_date: string;
+  status: ClaimStatus;
+  notch_no: number | null;
+  reject_reason: string | null;
+  created_at: string;
+};
+
+export const findClaimVenues = (q: string) =>
+  call<ClaimVenue[]>("/me/claims/venues", { query: { q } });
+
+export const startClaim = (venueCode: string) =>
+  call<ClaimStart>("/me/claims", {
+    method: "POST",
+    body: { venue_code: venueCode },
+  });
+
+export const getClaims = () => call<MyClaim[]>("/me/claims");
 
 export const getAreas = (cityId: string) =>
   call<Option[]>("/dropdowns/areas", { query: { city_id: cityId } });

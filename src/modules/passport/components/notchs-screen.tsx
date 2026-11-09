@@ -12,6 +12,7 @@ import {
   safeColour,
 } from "../lib/format";
 import { useLoad } from "../lib/use-load";
+import { ClaimCard } from "./claim-card";
 import { useMe } from "./me-context";
 import { NotchTile } from "./notch-tile";
 import { LoadError, Loading } from "./states";
@@ -125,6 +126,8 @@ export function NotchsScreen() {
           {copy.more}
         </button>
       )}
+
+      <ClaimCard />
     </div>
   );
 }
