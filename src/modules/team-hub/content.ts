@@ -93,14 +93,40 @@ export const hubSections: readonly HubSection[] = [
     title: "Notchs team",
     screens: [
       {
+        name: "Admin log in",
+        href: "/admin/login",
+        note: "Admins are created with the API's create-admin command",
+      },
+      {
         name: "Admin dashboard",
         href: "/admin",
-        note: "Screens only, not connected to real data yet",
+        note: "Real totals; needs an admin login",
       },
-      { name: "Admin: Venues", href: "/admin/venues" },
-      { name: "Admin: Customers", href: "/admin/customers" },
-      { name: "Admin: Notchs", href: "/admin/notchs" },
-      { name: "Admin: Settings", href: "/admin/settings" },
+      {
+        name: "Admin: Applications",
+        href: "/admin/applications",
+        note: "Approve or reject venues that registered",
+      },
+      {
+        name: "Admin: Venues",
+        href: "/admin/venues",
+        note: "Pause, resume, close",
+      },
+      {
+        name: "Admin: Customers",
+        href: "/admin/customers",
+        note: "Block, unblock",
+      },
+      {
+        name: "Admin: Notchs",
+        href: "/admin/notchs",
+        note: "Remove fraudulent Notchs",
+      },
+      {
+        name: "Admin: Settings",
+        href: "/admin/settings",
+        note: "Not connected yet",
+      },
     ],
   },
 ];
