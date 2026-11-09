@@ -76,6 +76,10 @@ export const content = {
     errorBody:
       "Your visits are safe. This is a connection problem on our side or yours.",
     actionFailed: "That didn't go through. Please try again.",
+    notLiveBadge: "Opens soon",
+    notLiveTitle: "This page isn't switched on yet.",
+    notLiveBody:
+      "We're connecting it to your real numbers. Overview, Visits and Guests already show them.",
     copied: "Copied.",
     copyFailed: "Couldn't copy. Please copy it by hand.",
     chartEmpty: "No data for this period yet.",
@@ -119,6 +123,7 @@ export const content = {
     Duplicate: "soft",
     "Expired code": "warn",
     "In review": "line",
+    "Not counted": "warn",
   } satisfies Record<VisitStatus, "ink" | "soft" | "line" | "warn">,
   overview: {
     greeting: (name: string) => `Good evening, ${name}.`,
@@ -207,6 +212,7 @@ export const content = {
       of: (target: number) => `of ${target}`,
       counterQuestion: "Is your counter phone on?",
       counterOn: "On · showing your QR",
+      counterOff: "Not checked in",
       lastHeartbeat: (time: string) => `Last heartbeat ${time}`,
       staffTitle: "Tell staff one line:",
       staffLine: '"Scan the screen before you leave."',
@@ -298,6 +304,7 @@ export const content = {
       gap: "Avg gap",
       gapDays: (days: number) => `${days} days`,
       usual: "Usual time",
+      instagram: "Instagram (shared by the guest)",
       byMonth: "Visits by month",
       whyTitle: "Why no name?",
       whyBody:
@@ -346,6 +353,7 @@ export const content = {
       "Duplicate",
       "Expired code",
       "In review",
+      "Not counted",
     ] as VisitStatus[],
     guestFilter: (id: string) => `Guest ${id}`,
     clearGuest: "Show all guests",

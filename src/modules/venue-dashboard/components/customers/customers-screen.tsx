@@ -402,6 +402,15 @@ function CustomerDrawer({
             mono: true,
           },
           { label: labels.usual, value: customer.usualTime },
+          ...(customer.instagram
+            ? [
+                {
+                  label: labels.instagram,
+                  value: `@${customer.instagram}`,
+                  mono: true,
+                },
+              ]
+            : []),
         ]}
       />
       <div className="flex flex-col gap-2">

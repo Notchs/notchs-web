@@ -135,7 +135,8 @@ function VenueMenu({
         <span className={cn("min-w-0 flex-1", labelClass)}>
           <b className="block truncate text-sm">{session?.venueName}</b>
           <span className="block truncate text-xs text-muted">
-            {session && `${session.area} · ${session.city}`}
+            {session &&
+              [session.area, session.city].filter(Boolean).join(" · ")}
           </span>
         </span>
         <span className={cn("text-muted", labelClass)}>

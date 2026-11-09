@@ -1,7 +1,7 @@
 import type { GuestId, IsoDateTime } from "./common.types";
 
 export type VisitStatus =
-  "Verified" | "Duplicate" | "Expired code" | "In review";
+  "Verified" | "Duplicate" | "Expired code" | "In review" | "Not counted";
 
 export type VisitRecord = {
   reference: string;

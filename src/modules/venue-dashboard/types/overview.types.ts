@@ -29,7 +29,9 @@ export type DiscoveryStats = {
 
 export type CounterSnapshot = {
   online: boolean;
+  /** Empty when it has never checked in. */
   lastHeartbeat: IsoDateTime;
+  /** Empty before the first verified visit. */
   lastVerifiedVisit: IsoDateTime;
   batteryPercent: number | null;
 };
@@ -52,4 +54,6 @@ export type OverviewResponse = {
   recentVisits: VisitRecord[];
   recentRatings: RatingSummaryItem[];
   firstDays: { verifiedVisits: number; target: number; steps: SetupStep[] };
+  /** Which numbers exist yet. Missing means all of them (example data). */
+  available?: { views: boolean; ratings: boolean; discovery: boolean };
 };

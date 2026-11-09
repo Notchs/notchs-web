@@ -8,12 +8,15 @@ export const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 export const percentChange = (current: number, previous: number) =>
   previous ? Math.round(((current - previous) / previous) * 100) : 0;
 
+/** "—" for an empty or unreadable time (e.g. a counter that never checked in). */
 export const formatTime = (iso: string) =>
-  new Date(iso).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: TIME_ZONE,
-  });
+  !iso || Number.isNaN(Date.parse(iso))
+    ? "—"
+    : new Date(iso).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: TIME_ZONE,
+      });
 
 export const formatTimeSeconds = (iso: string) =>
   new Date(iso).toLocaleTimeString("en-GB", { timeZone: TIME_ZONE });
