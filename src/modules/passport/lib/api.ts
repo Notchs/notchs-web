@@ -147,6 +147,23 @@ export const getNotches = (page: number, size: number) =>
 
 export const getReward = () => call<Reward>("/me/reward");
 
+/** GET /me/referral: my invite link and Star Points. */
+export type Referral = {
+  code: string;
+  link: string;
+  star_points: number;
+  invited: number;
+  rewarded: number;
+  invited_by: string | null;
+  can_add_inviter: boolean;
+};
+
+export const getReferral = () => call<Referral>("/me/referral");
+
+/** Once, in the first 14 days. */
+export const addInviter = (code: string) =>
+  call<Referral>("/me/referral/inviter", { method: "POST", body: { code } });
+
 /** A code to send from the new number; a new one cancels the old. */
 export const startPhoneChange = () =>
   call<PhoneChange>("/me/phone-change", { method: "POST" });

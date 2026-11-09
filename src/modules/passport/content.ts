@@ -129,4 +129,21 @@ export const profileContent = {
   phoneNoLink: "Notchs’ WhatsApp number isn’t set up yet. Try again later.",
   phoneTooMany: "Too many codes. Please try again in 15 minutes.",
   phoneFailed: "Couldn’t get a code. Try again.",
+  inviteTitle: "Invite friends",
+  inviteBody:
+    "Get 50 Star Points for each friend who joins with your code and gets their first Notch at a Notchs place.",
+  inviteCode: "Your invite code",
+  inviteCopy: "Copy invite link",
+  inviteCopied: "Link copied.",
+  inviteCopyFailed: "Couldn’t copy. Your code is above.",
+  inviteShare: "Share",
+  starPoints: (points: number) => `${points} Star Points`,
+  invited: (invited: number, rewarded: number) =>
+    `${invited} invited · ${rewarded} got their first Notch`,
+  invitedBy: (handle: string) => `You joined with ${handle}’s code.`,
+  inviterLabel: "Who invited you? Their invite code",
+  inviterSave: "Add",
+  inviterSaved:
+    "Thanks! They get their Star Points when you get your first Notch.",
+  inviterFailed: "Couldn’t add that code. Check it and try again.",
 };

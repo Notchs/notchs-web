@@ -9,6 +9,7 @@ import { profileContent as copy, shellContent } from "../content";
 import { getAreas, logOut, updateMe } from "../lib/api";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
+import { InviteCard } from "./invite-card";
 import { PhoneChangeCard } from "./phone-change";
 import { VisibilitySwitch } from "./visibility-switch";
 
@@ -140,6 +141,8 @@ export function ProfileScreen() {
           </p>
         </div>
       </form>
+
+      <InviteCard />
 
       <VisibilitySwitch />
 
