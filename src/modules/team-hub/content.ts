@@ -85,7 +85,7 @@ export const hubSections: readonly HubSection[] = [
       {
         name: "Venue dashboard",
         href: "/venue",
-        note: "All pages built, on example data until the API is ready",
+        note: "Real numbers on Overview, Visits and Guests; other pages say Opens soon",
       },
     ],
   },

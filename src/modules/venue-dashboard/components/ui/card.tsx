@@ -68,6 +68,7 @@ export function PanelTitle({ className, ...props }: ComponentProps<"h2">) {
 }
 
 const gridColumns = {
+  1: "grid-cols-1",
   2: "grid-cols-1 sm:grid-cols-2",
   3: "grid-cols-1 sm:grid-cols-3",
   4: "grid-cols-2 wide:grid-cols-4",

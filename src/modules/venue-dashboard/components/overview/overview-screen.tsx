@@ -70,6 +70,11 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
   const session = sessionData?.session;
   const rangeInfo = sessionData?.ranges.find((item) => item.key === range);
   const { activity, counter, discovery } = data;
+  const available = data.available ?? {
+    views: true,
+    ratings: true,
+    discovery: true,
+  };
   const visits = sum(activity.visits);
   const previous = sum(activity.previousVisits);
   const fresh = sum(activity.newVisitors);
@@ -106,7 +111,16 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
         </div>
       </div>
 
-      <Grid columns={5} className="gap-3">
+      <Grid
+        columns={
+          available.views && available.ratings
+            ? 5
+            : available.views || available.ratings
+              ? 4
+              : 3
+        }
+        className="gap-3"
+      >
         <MetricCard
           icon="check"
           label={metrics.visits.label}
@@ -142,32 +156,38 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           foot={metrics.returning.foot(activity.uniqueGuests)}
           href={venueRoutes.customers}
         />
-        <MetricCard
-          icon="eye"
-          label={metrics.views.label}
-          tip={metrics.views.tip}
-          value={formatNumber(views)}
-          delta={
-            compare ? percentChange(views, activity.profileViewsPrevious) : null
-          }
-          foot={metrics.views.foot}
-          href={venueRoutes.discover}
-        />
-        <MetricCard
-          icon="star"
-          label={metrics.rating.label}
-          tip={metrics.rating.tip}
-          value={activity.rating.toFixed(1)}
-          unit="/ 5"
-          delta={
-            compare
-              ? Number((activity.rating - activity.ratingPrevious).toFixed(1))
-              : null
-          }
-          deltaUnit=""
-          foot={metrics.rating.foot(activity.ratingCount)}
-          href={venueRoutes.reviews}
-        />
+        {available.views && (
+          <MetricCard
+            icon="eye"
+            label={metrics.views.label}
+            tip={metrics.views.tip}
+            value={formatNumber(views)}
+            delta={
+              compare
+                ? percentChange(views, activity.profileViewsPrevious)
+                : null
+            }
+            foot={metrics.views.foot}
+            href={venueRoutes.discover}
+          />
+        )}
+        {available.ratings && (
+          <MetricCard
+            icon="star"
+            label={metrics.rating.label}
+            tip={metrics.rating.tip}
+            value={activity.rating.toFixed(1)}
+            unit="/ 5"
+            delta={
+              compare
+                ? Number((activity.rating - activity.ratingPrevious).toFixed(1))
+                : null
+            }
+            deltaUnit=""
+            foot={metrics.rating.foot(activity.ratingCount)}
+            href={venueRoutes.reviews}
+          />
+        )}
       </Grid>
 
       <SideGrid>
@@ -280,7 +300,12 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
         </div>
       </SideGrid>
 
-      <Grid columns={3} className="sm:grid-cols-2 wide:grid-cols-3">
+      <Grid
+        columns={available.discovery ? 3 : 2}
+        className={
+          available.discovery ? "sm:grid-cols-2 wide:grid-cols-3" : undefined
+        }
+      >
         <Card>
           <SectionHead title={copy.newVsReturning}>
             <ChartLegend
@@ -325,39 +350,44 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           />
           <span className="text-[13px] text-muted">{copy.returningNote}</span>
         </Card>
-        <Card>
-          <SectionHead title={copy.discovery}>
-            <ButtonLink
-              variant="text"
-              iconRight="arrowR"
-              href={venueRoutes.discover}
-            >
-              {content.common.open}
-            </ButtonLink>
-          </SectionHead>
-          <div className="flex flex-col divide-y divide-line">
-            {[
-              { ...copy.discoveryRows.seen, value: discovery.seen },
-              { ...copy.discoveryRows.views, value: views },
-              { ...copy.discoveryRows.directions, value: discovery.directions },
-              { ...copy.discoveryRows.saves, value: discovery.saves },
-            ].map((row) => (
-              <div key={row.label} className="flex items-center gap-3 py-2.5">
-                <span className="min-w-0 flex-1">
-                  <b className="block text-sm">{row.label}</b>
-                  <span className="text-xs text-muted">{row.note}</span>
-                </span>
-                <span className="font-mono text-[15px]">
-                  {formatNumber(row.value)}
-                </span>
-              </div>
-            ))}
-          </div>
-          <span className="text-xs text-muted">{copy.discoveryNote}</span>
-        </Card>
+        {available.discovery && (
+          <Card>
+            <SectionHead title={copy.discovery}>
+              <ButtonLink
+                variant="text"
+                iconRight="arrowR"
+                href={venueRoutes.discover}
+              >
+                {content.common.open}
+              </ButtonLink>
+            </SectionHead>
+            <div className="flex flex-col divide-y divide-line">
+              {[
+                { ...copy.discoveryRows.seen, value: discovery.seen },
+                { ...copy.discoveryRows.views, value: views },
+                {
+                  ...copy.discoveryRows.directions,
+                  value: discovery.directions,
+                },
+                { ...copy.discoveryRows.saves, value: discovery.saves },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center gap-3 py-2.5">
+                  <span className="min-w-0 flex-1">
+                    <b className="block text-sm">{row.label}</b>
+                    <span className="text-xs text-muted">{row.note}</span>
+                  </span>
+                  <span className="font-mono text-[15px]">
+                    {formatNumber(row.value)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <span className="text-xs text-muted">{copy.discoveryNote}</span>
+          </Card>
+        )}
       </Grid>
 
-      <Grid columns={2}>
+      <Grid columns={available.ratings ? 2 : 1}>
         <Card className="gap-2">
           <SectionHead title={copy.recentVisits}>
             <ButtonLink
@@ -389,39 +419,41 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
             ))}
           </div>
         </Card>
-        <Card className="gap-2">
-          <SectionHead title={copy.recentRatings}>
-            <ButtonLink
-              variant="text"
-              iconRight="arrowR"
-              href={venueRoutes.reviews}
-            >
-              {copy.allRatings}
-            </ButtonLink>
-          </SectionHead>
-          <div className="flex flex-col divide-y divide-line">
-            {data.recentRatings.map((rating) => (
-              <div key={rating.id} className="flex items-start gap-3 py-2.5">
-                <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="flex items-center gap-2">
-                    <Stars value={rating.stars} size={12} />
-                    <span className="font-mono text-xs text-muted">
-                      {rating.guestId}
+        {available.ratings && (
+          <Card className="gap-2">
+            <SectionHead title={copy.recentRatings}>
+              <ButtonLink
+                variant="text"
+                iconRight="arrowR"
+                href={venueRoutes.reviews}
+              >
+                {copy.allRatings}
+              </ButtonLink>
+            </SectionHead>
+            <div className="flex flex-col divide-y divide-line">
+              {data.recentRatings.map((rating) => (
+                <div key={rating.id} className="flex items-start gap-3 py-2.5">
+                  <span className="flex min-w-0 flex-1 flex-col gap-1">
+                    <span className="flex items-center gap-2">
+                      <Stars value={rating.stars} size={12} />
+                      <span className="font-mono text-xs text-muted">
+                        {rating.guestId}
+                      </span>
+                    </span>
+                    <span
+                      className={`text-sm ${rating.message ? "" : "text-muted"}`}
+                    >
+                      {rating.message || copy.ratingOnly}
                     </span>
                   </span>
-                  <span
-                    className={`text-sm ${rating.message ? "" : "text-muted"}`}
-                  >
-                    {rating.message || copy.ratingOnly}
+                  <span className="text-xs whitespace-nowrap text-muted">
+                    {rating.whenLabel}
                   </span>
-                </span>
-                <span className="text-xs whitespace-nowrap text-muted">
-                  {rating.whenLabel}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </Grid>
     </>
   );

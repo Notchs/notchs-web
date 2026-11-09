@@ -1,11 +1,23 @@
 import { apiRequest } from "@/shared/lib/api-client";
 import type { ApiSuccess } from "@/shared/types/api";
 
+import {
+  toCustomers,
+  toOverview,
+  toSession,
+  toVisits,
+  type ApiGuests,
+  type ApiOverview,
+  type ApiScans,
+  type ApiVenueMe,
+} from "./api-mappers";
+import { notLive } from "./not-live";
 import type { VenueDataProvider } from "./venue-data.provider";
 
 /**
- * Real backend, used when VENUE_DATA_MODE is "api". The paths are the
- * proposed contract: most of these endpoints don't exist on the API yet.
+ * Real backend, used when VENUE_DATA_MODE is "api". Screens the API can't
+ * serve yet reject with NotLiveError and show "Opens soon"; none of them
+ * falls back to example data.
  */
 async function get<T>(path: string, query?: Record<string, string>) {
   const response = await apiRequest<ApiSuccess<T>>(path, { query });
@@ -18,64 +30,57 @@ async function send(path: string, method: string, body?: unknown) {
 }
 
 export const apiProvider: VenueDataProvider = {
-  getSession: () => get("/venue/dashboard/session"),
+  getSession: async () => toSession(await get<ApiVenueMe>("/venue/me")),
   logOut: () => send("/auth/venue/logout", "POST"),
-  markNotificationsRead: () =>
-    send("/venue/dashboard/notifications/read", "POST"),
+  // No notifications yet: the list is always empty.
+  markNotificationsRead: async () => {},
 
-  getOverview: (range) => get("/venue/dashboard/overview", { range }),
-  getCustomers: (range) => get("/venue/dashboard/customers", { range }),
-  getVisits: (range) => get("/venue/dashboard/visits", { range }),
-  reportVisit: (reference) =>
-    send(`/venue/dashboard/visits/${reference}/report`, "POST"),
-  getNotchCard: () => get("/venue/dashboard/notch-card"),
-  getFoundingVenue: () => get("/venue/dashboard/founding"),
-  getAnalytics: (range) => get("/venue/dashboard/analytics", { range }),
-  getRevenue: () => get("/venue/dashboard/revenue"),
-  requestPosIntegration: () =>
-    send("/venue/dashboard/revenue/interest", "POST"),
+  getOverview: async (range) =>
+    toOverview(await get<ApiOverview>("/venue/insights/overview", { range })),
+  getCustomers: async () =>
+    toCustomers(await get<ApiGuests>("/venue/insights/guests")),
+  getVisits: async (range) =>
+    toVisits(await get<ApiScans>("/venue/insights/scans", { range })),
+  reportVisit: notLive("Reporting a visit"),
+  getNotchCard: notLive("The Notch Card"),
+  getFoundingVenue: notLive("Founding venue"),
+  getAnalytics: notLive("Analytics"),
+  getRevenue: notLive("Revenue"),
+  requestPosIntegration: notLive("POS integration"),
 
-  getReviews: () => get("/venue/dashboard/reviews"),
-  replyToReview: (id, reply) =>
-    send(`/venue/dashboard/reviews/${id}/reply`, "POST", { reply }),
+  getReviews: notLive("Reviews"),
+  replyToReview: notLive("Replying to reviews"),
 
-  getDiscover: (range) => get("/venue/dashboard/discover", { range }),
+  getDiscover: notLive("Discover"),
 
-  getRewards: () => get("/venue/dashboard/campaigns"),
-  saveCampaign: (input) =>
-    input.id
-      ? send(`/venue/dashboard/campaigns/${input.id}`, "PUT", input)
-      : send("/venue/dashboard/campaigns", "POST", input),
-  deleteCampaign: (id) => send(`/venue/dashboard/campaigns/${id}`, "DELETE"),
-  endCampaign: (id) => send(`/venue/dashboard/campaigns/${id}/end`, "POST"),
-  requestRewardsAccess: () =>
-    send("/venue/dashboard/campaigns/interest", "POST"),
+  getRewards: notLive("Rewards"),
+  saveCampaign: notLive("Campaigns"),
+  deleteCampaign: notLive("Campaigns"),
+  endCampaign: notLive("Campaigns"),
+  requestRewardsAccess: notLive("Rewards"),
 
-  getCounter: () => get("/venue/dashboard/counter"),
-  renameCounter: (name) => send("/venue/dashboard/counter", "PATCH", { name }),
-  pairCounter: () => send("/venue/dashboard/counter/pair", "POST"),
-  removeCounter: () => send("/venue/dashboard/counter", "DELETE"),
+  getCounter: notLive("The counter page"),
+  renameCounter: notLive("The counter page"),
+  pairCounter: notLive("The counter page"),
+  removeCounter: notLive("The counter page"),
 
-  getVenueProfile: () => get("/venue/dashboard/profile"),
-  saveVenueProfile: (profile) =>
-    send("/venue/dashboard/profile", "PUT", profile),
+  getVenueProfile: notLive("The venue page"),
+  saveVenueProfile: notLive("The venue page"),
 
-  getTeam: () => get("/venue/dashboard/team"),
-  inviteMember: (email, role) =>
-    send("/venue/dashboard/team/invites", "POST", { email, role }),
-  removeMember: (id) => send(`/venue/dashboard/team/${id}`, "DELETE"),
+  getTeam: notLive("Team"),
+  inviteMember: notLive("Team"),
+  removeMember: notLive("Team"),
 
-  getBilling: () => get("/venue/dashboard/billing"),
+  getBilling: notLive("Billing"),
 
-  getSettings: () => get("/venue/dashboard/settings"),
-  saveNotificationPreferences: (preferences) =>
-    send("/venue/dashboard/settings/notifications", "PUT", preferences),
+  getSettings: notLive("Settings"),
+  saveNotificationPreferences: notLive("Settings"),
   changePassword: (current, next) =>
-    send("/venue/dashboard/settings/password", "POST", { current, next }),
-  requestEmailChange: (email, password) =>
-    send("/venue/dashboard/settings/email", "POST", { email, password }),
-  confirmEmailChange: (code) =>
-    send("/venue/dashboard/settings/email/confirm", "POST", { code }),
-  requestVenueDeletion: () =>
-    send("/venue/dashboard/settings/delete-request", "POST"),
+    send("/venue/auth/change-password", "POST", {
+      current_password: current,
+      new_password: next,
+    }),
+  requestEmailChange: notLive("Changing the email"),
+  confirmEmailChange: notLive("Changing the email"),
+  requestVenueDeletion: notLive("Deleting the venue"),
 };

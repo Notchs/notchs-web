@@ -85,8 +85,13 @@ export function FirstDays({ data }: { data: OverviewResponse }) {
             {copy.counterQuestion}
           </Overline>
           <span className="flex items-center gap-2 font-semibold">
-            <span className="size-2 rounded-full bg-volt" />
-            {copy.counterOn}
+            <span
+              className={cn(
+                "size-2 rounded-full",
+                data.counter.online ? "bg-volt" : "bg-[#ff5b35]",
+              )}
+            />
+            {data.counter.online ? copy.counterOn : copy.counterOff}
           </span>
           <span className="text-sm text-stone-light">
             {copy.lastHeartbeat(formatTime(data.counter.lastHeartbeat))}

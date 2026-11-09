@@ -14,6 +14,8 @@ export type Customer = {
   /** Oldest first, matching `monthLabels` in the response. */
   visitsByMonth: number[];
   usualTime: string;
+  /** Only when the guest chose to show it to venues. */
+  instagram?: string | null;
 };
 
 export type CustomersSummary = {
