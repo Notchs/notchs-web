@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { adminRoutes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 
-export type AdminSectionKey = keyof typeof adminRoutes;
+export type AdminSectionKey = Exclude<
+  keyof typeof adminRoutes,
+  "login" | "setPassword"
+>;
 
 type AdminSection = {
   key: AdminSectionKey;
@@ -21,6 +24,12 @@ export const adminSections: readonly AdminSection[] = [
     description: "Venues, customers and Notchs at a glance.",
   },
   {
+    key: "applications",
+    label: "Applications",
+    href: adminRoutes.applications,
+    description: "Venues that registered themselves, waiting for review.",
+  },
+  {
     key: "venues",
     label: "Venues",
     href: adminRoutes.venues,
@@ -30,13 +39,14 @@ export const adminSections: readonly AdminSection[] = [
     key: "customers",
     label: "Customers",
     href: adminRoutes.customers,
-    description: "People who log in with WhatsApp and collect Notchs.",
+    description:
+      "People who collect Notchs. Only the last 4 digits of a number show.",
   },
   {
     key: "notchs",
     label: "Notchs",
     href: adminRoutes.notchs,
-    description: "Every verified visit, newest first.",
+    description: "Every Notch, newest first. Remove fraudulent ones here.",
   },
   {
     key: "settings",
@@ -57,13 +67,160 @@ export const adminContent = {
   pendingTitle: "Connects when the API is ready",
   pendingBody:
     "This section is laid out and waiting for its backend endpoints. Data shows up here once they are live.",
-  stats: [
-    { label: "Venues", hint: "Live and onboarding" },
-    { label: "Customers", hint: "With at least one Notch" },
-    { label: "Notchs this month", hint: "Verified visits" },
-    { label: "New this week", hint: "First-time customers" },
-  ],
   emptyValue: "—",
+  empty: "Nothing here yet.",
+  loading: "Loading…",
+  loadFailed: "Couldn't load this. Check the connection and try again.",
+  retry: "Try again",
+  actionFailed: "That didn't go through. Please try again.",
+  previous: "Previous",
+  next: "Next",
+  totalLabel: (total: number) => `${total.toLocaleString("en-IN")} in total`,
+  dashboard: {
+    live: "Live venues",
+    liveHint: (signed: number, paused: number) =>
+      `${signed} approved, not live yet · ${paused} paused`,
+    applications: "Applications to review",
+    applicationsHint: "Venues waiting for approval",
+    customers: "Customers",
+    customersHint: (fresh: number) => `${fresh} new in the last 7 days`,
+    notchs: "Notchs today",
+    notchsHint: (week: number, refused: number) =>
+      `${week} in the last 7 days · ${refused} scans refused today`,
+  },
+  venues: {
+    search: "Search name or code",
+    status: "Status",
+    statusOptions: [
+      { value: "", label: "All" },
+      { value: "counter_live", label: "Live" },
+      { value: "signed", label: "Approved, not live" },
+      { value: "paused", label: "Paused" },
+      { value: "closed", label: "Closed" },
+    ],
+    statusLabel: {
+      pending: "Pending",
+      signed: "Approved",
+      counter_live: "Live",
+      paused: "Paused",
+      closed: "Closed",
+    } as Record<string, string>,
+    category: {
+      cafe: "Café",
+      restaurant: "Restaurant",
+      bar: "Bar",
+      hotel: "Hotel",
+      turf_gym: "Turf or gym",
+      other: "Other",
+    } as Record<string, string>,
+    columns: [
+      "Venue",
+      "Kind · area",
+      "Status",
+      "Counter phone",
+      "Notchs 7d / all",
+      "Joined",
+      "",
+    ],
+    notPaired: "Not paired",
+    online: "Online",
+    offline: "Offline",
+    pause: "Pause",
+    resume: "Resume",
+    close: "Close",
+    confirmClose: (name: string) =>
+      `Close ${name}? Scans stop for good and it can't be reopened here.`,
+  },
+  notchs: {
+    venueFilter: "Venue code",
+    status: "Status",
+    statusOptions: [
+      { value: "", label: "All" },
+      { value: "valid", label: "Counted" },
+      { value: "revoked", label: "Removed" },
+    ],
+    statusLabel: { valid: "Counted", revoked: "Removed" },
+    columns: ["Notch", "Venue", "Customer", "When", "Points", "Status", ""],
+    deletedCustomer: "Deleted account",
+    visitNo: (n: number) => `Visit ${n} here`,
+    remove: "Remove",
+    reasonPrompt: (notchNo: number, venue: string) =>
+      `Why remove Notch #${notchNo} at ${venue}? It stops counting for ranks and rewards.`,
+  },
+  customers: {
+    search: "Search handle or name",
+    status: "Status",
+    statusOptions: [
+      { value: "", label: "All" },
+      { value: "active", label: "Active" },
+      { value: "blocked", label: "Blocked" },
+    ],
+    statusLabel: { active: "Active", blocked: "Blocked" },
+    columns: [
+      "Customer",
+      "Phone",
+      "City",
+      "Notchs",
+      "Founding",
+      "Joined · last seen",
+      "Status",
+      "",
+    ],
+    block: "Block",
+    unblock: "Unblock",
+    confirmBlock: (handle: string) =>
+      `Block ${handle}? Their scans stop counting and the bot stops replying.`,
+  },
+  applications: {
+    status: "Status",
+    statusOptions: [
+      { value: "pending", label: "Waiting for review" },
+      { value: "approved", label: "Approved" },
+      { value: "rejected", label: "Rejected" },
+    ],
+    statusLabel: {
+      pending: "Waiting",
+      approved: "Approved",
+      rejected: "Rejected",
+    },
+    category: {
+      cafe: "Café",
+      restaurant: "Restaurant",
+      bar: "Bar",
+      hotel: "Hotel",
+      turf_gym: "Turf or gym",
+      other: "Other",
+    } as Record<string, string>,
+    empty: "No applications here.",
+    contact: "Contact",
+    email: "Email",
+    landmark: "Landmark",
+    maps: "Location",
+    openMaps: "Open in Google Maps",
+    notes: "Notes",
+    area: "Area",
+    noArea: "Choose later",
+    approve: "Approve",
+    reject: "Reject",
+    confirmApprove: (venue: string, email: string) =>
+      `Approve ${venue}? This creates the venue and emails ${email} a link to set their password.`,
+    rejectPrompt: (venue: string) =>
+      `Reject ${venue}? Optionally write the reason; it is emailed to the applicant.`,
+  },
+  auth: {
+    loginTitle: "Log in",
+    email: "Email",
+    password: "Password",
+    login: "Log in",
+    loginHelp: "New admins get a link by email from the Notchs team.",
+    setTitle: "Set your password",
+    newPassword: "New password (10 or more characters)",
+    confirm: "Type it again",
+    save: "Save and log in",
+    mismatch: "The two passwords don't match.",
+    noToken:
+      "This page needs the link from your email. Ask the team for a new one.",
+  },
 } as const;
 
 const adminTitle = `${siteConfig.name} Admin`;

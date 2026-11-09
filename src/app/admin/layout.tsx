@@ -1,7 +1,10 @@
-import { AdminShell, adminMetadata } from "@/modules/admin";
+import type { ReactNode } from "react";
+
+import { adminMetadata } from "@/modules/admin";
 
 export const metadata = adminMetadata;
 
-export default function AdminLayout({ children }: LayoutProps<"/admin">) {
-  return <AdminShell>{children}</AdminShell>;
+/** Login and set-password stand alone; the panel pages add the shell in (panel). */
+export default function AdminLayout({ children }: { children: ReactNode }) {
+  return children;
 }

@@ -3,6 +3,7 @@ import type { ComponentProps, ComponentType } from "react";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import {
   DashboardIcon,
+  MailIcon,
   SettingsIcon,
   UsersIcon,
   VenueIcon,
@@ -12,6 +13,7 @@ import type { AdminSectionKey } from "../content";
 
 const icons: Record<AdminSectionKey, ComponentType<ComponentProps<"svg">>> = {
   dashboard: DashboardIcon,
+  applications: MailIcon,
   venues: VenueIcon,
   customers: UsersIcon,
   notchs: NotchGlyph,

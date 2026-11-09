@@ -1,4 +1,10 @@
+export { AdminApplications } from "./components/admin-applications";
+export { AdminLogin, AdminSetPassword } from "./components/admin-auth-forms";
+export { AdminCustomers } from "./components/admin-customers";
 export { AdminDashboard } from "./components/admin-dashboard";
+export { AdminGate } from "./components/admin-gate";
+export { AdminNotchs } from "./components/admin-notchs";
 export { AdminSectionPage } from "./components/admin-section-page";
 export { AdminShell } from "./components/admin-shell";
+export { AdminVenues } from "./components/admin-venues";
 export { adminMetadata, adminSectionMetadata } from "./content";
