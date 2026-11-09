@@ -27,3 +27,11 @@ export type CounterResponse = {
   exampleCodes: string[];
   rotationSeconds: number;
 };
+
+/** A one-time link that pairs a phone as the counter display. */
+export type PairingLink = {
+  url: string;
+  expiresAt: IsoDateTime;
+  /** Example data: the QR doesn't pair anything. */
+  example?: boolean;
+};

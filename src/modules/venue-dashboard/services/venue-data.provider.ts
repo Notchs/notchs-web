@@ -9,6 +9,7 @@ import type {
   FoundingVenueResponse,
   NotchCardResponse,
   NotificationPreferences,
+  PairingLink,
   OverviewResponse,
   RevenueResponse,
   ReviewsResponse,
@@ -51,7 +52,8 @@ export type VenueDataProvider = {
 
   getCounter(): Promise<CounterResponse>;
   renameCounter(name: string): Promise<void>;
-  pairCounter(): Promise<void>;
+  /** A fresh 10-minute pairing link; opening it on a phone pairs it. */
+  pairCounter(): Promise<PairingLink>;
   removeCounter(): Promise<void>;
 
   getVenueProfile(): Promise<VenueProfileResponse>;

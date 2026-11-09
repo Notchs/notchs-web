@@ -1,10 +1,12 @@
 import type {
   CohortRow,
+  CounterResponse,
   Customer,
   CustomerSegment,
   CustomersResponse,
   DateRangeOption,
   OverviewResponse,
+  PairingLink,
   SessionResponse,
   ShareStat,
   VisitRecord,
@@ -360,4 +362,64 @@ export function cohorts(api: ApiGuests): CohortRow[] {
       );
     return [{ month: monthName(label), guests: group.length, retention }];
   });
+}
+
+export type ApiCounter = {
+  label: string;
+  paired: boolean;
+  paired_at: string | null;
+  last_seen_at: string | null;
+  online: boolean;
+  code_interval_s: number;
+};
+
+export const toPairingLink = (api: {
+  url: string;
+  expires_at: string;
+}): PairingLink => ({ url: api.url, expiresAt: api.expires_at });
+
+/** The counter page: the phone (none until one pairs) and what Notchs can
+ * see of the setup. `overview` gives the latest visit and today's count. */
+export function toCounter(
+  counter: ApiCounter | null,
+  overview: ApiOverview,
+): CounterResponse {
+  const paired = counter?.paired ?? false;
+  const lastSeen = counter?.last_seen_at ?? "";
+  const today = overview.activity.days.at(-1)?.visits ?? 0;
+  return {
+    device: {
+      name: counter?.label ?? "Counter 1",
+      status: !paired ? "none" : counter?.online ? "online" : "offline",
+      lastHeartbeat: lastSeen,
+      minutesSinceHeartbeat: lastSeen
+        ? Math.max(
+            0,
+            Math.round(
+              (Date.parse(overview.as_of) - Date.parse(lastSeen)) / 60_000,
+            ),
+          )
+        : 0,
+      lastVerifiedVisit: overview.counter.last_verified_visit_at ?? "",
+      batteryPercent: null,
+      charging: false,
+      pairedOn: counter?.paired_at
+        ? new Date(counter.paired_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            timeZone: "Asia/Kolkata",
+          })
+        : "—",
+      browser: "—",
+      verifiedToday: today,
+    },
+    // Only the steps Notchs can see; signs and tents aren't tracked yet.
+    checklist: [
+      { key: "paired", done: paired },
+      { key: "liveTest", done: overview.first_days.verified_visits > 0 },
+    ],
+    exampleCodes: ["000000"],
+    rotationSeconds: counter?.code_interval_s ?? 30,
+  };
 }
