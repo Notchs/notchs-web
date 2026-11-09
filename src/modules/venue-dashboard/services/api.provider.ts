@@ -1,11 +1,14 @@
-import { apiRequest } from "@/shared/lib/api-client";
+import { ApiError, apiRequest } from "@/shared/lib/api-client";
 import type { ApiSuccess } from "@/shared/types/api";
 
 import {
+  toCounter,
   toCustomers,
+  toPairingLink,
   toOverview,
   toSession,
   toVisits,
+  type ApiCounter,
   type ApiGuests,
   type ApiOverview,
   type ApiScans,
@@ -21,6 +24,12 @@ import type { VenueDataProvider } from "./venue-data.provider";
  */
 async function get<T>(path: string, query?: Record<string, string>) {
   const response = await apiRequest<ApiSuccess<T>>(path, { query });
+  if (response.data === undefined) throw new Error(`No data from ${path}`);
+  return response.data;
+}
+
+async function post<T>(path: string) {
+  const response = await apiRequest<ApiSuccess<T>>(path, { method: "POST" });
   if (response.data === undefined) throw new Error(`No data from ${path}`);
   return response.data;
 }
@@ -59,10 +68,25 @@ export const apiProvider: VenueDataProvider = {
   endCampaign: notLive("Campaigns"),
   requestRewardsAccess: notLive("Rewards"),
 
-  getCounter: notLive("The counter page"),
-  renameCounter: notLive("The counter page"),
-  pairCounter: notLive("The counter page"),
-  removeCounter: notLive("The counter page"),
+  getCounter: async () => {
+    const [counter, overview] = await Promise.all([
+      get<ApiCounter>("/venue/counter").catch((error: unknown) => {
+        // No counter until the first pairing link is made.
+        if (error instanceof ApiError && error.status === 404) return null;
+        throw error;
+      }),
+      get<ApiOverview>("/venue/insights/overview", { range: "7d" }),
+    ]);
+    return toCounter(counter, overview);
+  },
+  renameCounter: (name) => send("/venue/counter", "PATCH", { label: name }),
+  pairCounter: async () =>
+    toPairingLink(
+      await post<{ url: string; expires_at: string }>(
+        "/venue/counter/pairing-link",
+      ),
+    ),
+  removeCounter: () => send("/venue/counter", "DELETE"),
 
   getVenueProfile: notLive("The venue page"),
   saveVenueProfile: notLive("The venue page"),

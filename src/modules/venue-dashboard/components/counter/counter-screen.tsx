@@ -11,6 +11,7 @@ import { useAction } from "../../hooks/use-action";
 import { useSession } from "../../hooks/use-session";
 import { useToast } from "../../hooks/use-toast";
 import { useCounter } from "../../hooks/use-venue-data";
+import { useVenueQuery } from "../../hooks/use-venue-query";
 import { copyText } from "../../lib/browser-actions";
 import { formatTime } from "../../lib/format";
 import { venueData } from "../../services/venue-data.service";
@@ -47,7 +48,8 @@ function PairModal({
   onPaired: () => void;
 }) {
   const toast = useToast();
-  const { run, isBusy } = useAction();
+  const query = useVenueQuery(venueData.pairCounter);
+  const link = query.data;
   return (
     <Modal
       title={copy.pairTitle}
@@ -58,50 +60,58 @@ function PairModal({
           <Button onClick={onClose}>{content.common.cancel}</Button>
           <Button
             icon="copy"
+            disabled={!link}
             onClick={async () => {
-              const copied = await copyText(copy.pairLink);
+              if (!link) return;
+              const copied = await copyText(link.url);
               toast(copied ? content.common.copied : content.common.copyFailed);
             }}
           >
             {copy.copyLink}
           </Button>
-          <Button
-            variant="dark"
-            disabled={isBusy}
-            onClick={async () => {
-              if (await run(venueData.pairCounter, copy.pairedDone)) onPaired();
-            }}
-          >
+          <Button variant="dark" disabled={!link} onClick={onPaired}>
             {copy.paired}
           </Button>
         </>
       }
     >
       <p className="m-0 text-muted">{copy.pairBody}</p>
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="size-35 rounded-xl bg-paper p-2.5">
-          <QRCodeSVG
-            value={`Example pairing ${copy.pairLink}`}
-            size={256}
-            bgColor="transparent"
-            fgColor="#0f0f14"
-            className="size-full"
-          />
-        </div>
-        <div className="min-w-40 flex-1">
-          <KeyValues
-            items={[
-              {
-                label: copy.pairExpires,
-                value: copy.pairExpiresValue,
-                mono: true,
-              },
-              { label: copy.pairUses, value: copy.pairUsesValue },
-            ]}
-          />
-        </div>
-      </div>
-      <span className="text-xs text-muted">{copy.pairNote}</span>
+      {query.error ? (
+        <p role="alert" className="m-0 text-sm font-semibold">
+          {copy.pairFailed}
+        </p>
+      ) : !link ? (
+        <p className="m-0 text-sm text-muted">{copy.pairLoading}</p>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="size-35 rounded-xl bg-paper p-2.5">
+              <QRCodeSVG
+                value={link.url}
+                size={256}
+                bgColor="transparent"
+                fgColor="#0f0f14"
+                className="size-full"
+              />
+            </div>
+            <div className="min-w-40 flex-1">
+              <KeyValues
+                items={[
+                  {
+                    label: copy.pairExpires,
+                    value: copy.pairExpiresValue(formatTime(link.expiresAt)),
+                    mono: true,
+                  },
+                  { label: copy.pairUses, value: copy.pairUsesValue },
+                ]}
+              />
+            </div>
+          </div>
+          {link.example && (
+            <span className="text-xs text-muted">{copy.pairNote}</span>
+          )}
+        </>
+      )}
     </Modal>
   );
 }

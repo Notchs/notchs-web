@@ -218,6 +218,11 @@ export const mockProvider: VenueDataProvider = {
   },
   async pairCounter() {
     store.counterRemoved = false;
+    return {
+      url: "Example pairing link",
+      expiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
+      example: true,
+    };
   },
   async removeCounter() {
     store.counterRemoved = true;

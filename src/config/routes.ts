@@ -57,6 +57,8 @@ export const venueRoutes = {
   content: `${dashboardBase}/content`,
   team: `${dashboardBase}/team`,
   settings: `${dashboardBase}/settings`,
+  /** The counter phone's screen (opened on the phone, not in the dashboard). */
+  display: `${dashboardBase}/display`,
 } as const;
 
 /**
