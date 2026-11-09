@@ -108,6 +108,11 @@ export const hubSections: readonly HubSection[] = [
         note: "Approve or reject venues that registered",
       },
       {
+        name: "Admin: Claims",
+        href: "/admin/claims",
+        note: "Bill photos when a counter phone was down: approve or reject",
+      },
+      {
         name: "Admin: Venues",
         href: "/admin/venues",
         note: "Pause, resume, close",

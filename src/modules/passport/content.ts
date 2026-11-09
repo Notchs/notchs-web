@@ -82,6 +82,35 @@ export const notchsContent = {
   colours: "Each kind of place keeps its colour.",
 };
 
+export const claimsContent = {
+  title: "Missed a Notch?",
+  body: "If the counter phone wasn’t working, send us your bill instead. We check it and add the Notch. It works on the day of your visit only.",
+  search: "Find the place",
+  searchHint: "Type at least 2 letters of its name",
+  noPlaces: "No live Notchs place has that name.",
+  searchFailed: "Couldn’t search right now. Please try again.",
+  start: (place: string) => `Claim a Notch at ${place}`,
+  starting: "Starting…",
+  change: "Pick another place",
+  startFailed: "That didn’t work. Please try again.",
+  step1: (message: string) => `1. Send “${message}” to Notchs on WhatsApp.`,
+  step2:
+    "2. Then send a clear photo of your bill. It should show the place’s name, the date and the total.",
+  open: "Open WhatsApp",
+  noLink:
+    "WhatsApp isn’t connected here yet. Send the message to the Notchs number.",
+  expires: (time: string) => `Send the photo before ${time} today.`,
+  yours: "Your claims",
+  status: {
+    awaiting_photo: "Waiting for your bill photo",
+    expired: "No photo came that day",
+    in_review: "We’re checking your bill",
+    approved: "Notch added",
+    rejected: "Not accepted",
+  } as const,
+  notch: (no: string) => `Notch ${no}`,
+};
+
 export const notchRowContent = {
   meta: (niche: string, no: string, visit: string, date: string) =>
     `${niche} · Notch ${no} · ${visit} visit · ${date}`,

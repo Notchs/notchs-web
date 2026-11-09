@@ -168,6 +168,48 @@ export const addInviter = (code: string) =>
 export const startPhoneChange = () =>
   call<PhoneChange>("/me/phone-change", { method: "POST" });
 
+/** A live place to claim a missed Notch at (GET /me/claims/venues). */
+export type ClaimVenue = {
+  venue_code: string;
+  name: string;
+  area: string | null;
+  /** Already a label, e.g. "café". */
+  niche: string;
+};
+
+/** POST /me/claims: what to send on WhatsApp, then the bill photo, today. */
+export type ClaimStart = {
+  claim_code: string;
+  venue_name: string;
+  message: string;
+  whatsapp_link: string | null;
+  expires_at: string;
+};
+
+export type ClaimStatus =
+  "awaiting_photo" | "expired" | "in_review" | "approved" | "rejected";
+
+export type MyClaim = {
+  claim_code: string;
+  venue_name: string;
+  visit_date: string;
+  status: ClaimStatus;
+  notch_no: number | null;
+  reject_reason: string | null;
+  created_at: string;
+};
+
+export const findClaimVenues = (q: string) =>
+  call<ClaimVenue[]>("/me/claims/venues", { query: { q } });
+
+export const startClaim = (venueCode: string) =>
+  call<ClaimStart>("/me/claims", {
+    method: "POST",
+    body: { venue_code: venueCode },
+  });
+
+export const getClaims = () => call<MyClaim[]>("/me/claims");
+
 export const getAreas = (cityId: string) =>
   call<Option[]>("/dropdowns/areas", { query: { city_id: cityId } });
 

@@ -1,7 +1,8 @@
+import { apiConfig } from "@/config/api";
 import { apiRequest } from "@/shared/lib/api-client";
 import type { ApiSuccess } from "@/shared/types/api";
 
-/** The admin panel's calls (notchs-api `admin_panel`, `venue_applications`, admin auth). */
+/** The admin panel's calls (notchs-api `admin_panel`, `venue_applications`, `claims`, admin auth). */
 
 export type Paginated<T> = {
   items: T[];
@@ -85,6 +86,27 @@ export type Application = {
   created_at: string;
 };
 
+/** A bill-photo claim (notchs-api `claims`). The customer's handle, never their number. */
+export type AdminClaim = {
+  claim_code: string;
+  status: "awaiting_photo" | "in_review" | "approved" | "rejected";
+  venue_name: string;
+  venue_code: string;
+  niche: string;
+  customer_handle: string;
+  visit_date: string;
+  created_at: string;
+  photo_received_at: string | null;
+  photo_available: boolean;
+  counter_last_seen_at: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  reject_reason: string | null;
+  notch_no: number | null;
+};
+
+export type ClaimDecision = { claim: AdminClaim; customer_notified: boolean };
+
 export type Option = { value: string; label: string };
 
 type Query = Record<string, string | number | undefined>;
@@ -98,6 +120,17 @@ async function get<T>(path: string, query?: Query) {
 async function send(path: string, method: string, body?: unknown) {
   await apiRequest<ApiSuccess<unknown>>(path, { method, body });
 }
+
+async function decide(path: string, body?: unknown) {
+  const response = await apiRequest<ApiSuccess<ClaimDecision>>(path, {
+    method: "POST",
+    body,
+  });
+  if (response.data === undefined) throw new Error(`No data from ${path}`);
+  return response.data;
+}
+
+const claimPath = (code: string) => `/admin/claims/${encodeURIComponent(code)}`;
 
 export const adminApi = {
   me: () => get<AdminMe>("/admin/me"),
@@ -138,6 +171,13 @@ export const adminApi = {
       reason: reason || null,
       notify,
     }),
+  claims: (query: Query) => get<Paginated<AdminClaim>>("/admin/claims", query),
+  /** For an <img>: the API fetches it from WhatsApp, with the admin's cookie. */
+  claimPhotoUrl: (code: string) =>
+    `${apiConfig.baseUrl}${claimPath(code)}/photo`,
+  approveClaim: (code: string) => decide(`${claimPath(code)}/approve`),
+  rejectClaim: (code: string, reason: string) =>
+    decide(`${claimPath(code)}/reject`, { reason }),
   areas: (cityId: string) =>
     get<Option[]>("/dropdowns/areas", { city_id: cityId }),
 };

@@ -1,4 +1,5 @@
 export { AdminApplications } from "./components/admin-applications";
+export { AdminClaims } from "./components/admin-claims";
 export { AdminLogin, AdminSetPassword } from "./components/admin-auth-forms";
 export { AdminCustomers } from "./components/admin-customers";
 export { AdminDashboard } from "./components/admin-dashboard";

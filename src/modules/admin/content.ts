@@ -30,6 +30,13 @@ export const adminSections: readonly AdminSection[] = [
     description: "Venues that registered themselves, waiting for review.",
   },
   {
+    key: "claims",
+    label: "Claims",
+    href: adminRoutes.claims,
+    description:
+      "Bill photos from customers whose counter phone wasn’t working. Check them within 30 days: WhatsApp deletes photos after that.",
+  },
+  {
     key: "venues",
     label: "Venues",
     href: adminRoutes.venues,
@@ -206,6 +213,45 @@ export const adminContent = {
       `Approve ${venue}? This creates the venue and emails ${email} a link to set their password.`,
     rejectPrompt: (venue: string) =>
       `Reject ${venue}? Optionally write the reason; it is emailed to the applicant.`,
+  },
+  claims: {
+    status: "Status",
+    statusOptions: [
+      { value: "in_review", label: "Waiting for review" },
+      { value: "approved", label: "Approved" },
+      { value: "rejected", label: "Rejected" },
+      { value: "awaiting_photo", label: "No photo yet" },
+    ],
+    statusLabel: {
+      awaiting_photo: "No photo yet",
+      in_review: "Waiting",
+      approved: "Approved",
+      rejected: "Rejected",
+    } as Record<string, string>,
+    empty: "No claims here.",
+    customer: "Customer",
+    visitDay: "Day of the visit",
+    photoAt: "Photo sent",
+    counter: "Counter phone last online",
+    counterNever: "Never",
+    reviewed: "Reviewed",
+    reason: "Reason",
+    notch: (no: number) => `Notch #${String(no).padStart(4, "0")}`,
+    showPhoto: "Show bill photo",
+    photoAlt: (venue: string) => `Bill photo for ${venue}`,
+    photoGone:
+      "The photo is no longer on WhatsApp (it keeps photos about 30 days).",
+    photoFailed:
+      "The photo didn’t load. WhatsApp may have deleted it, or try again.",
+    approve: "Approve",
+    reject: "Reject",
+    confirmApprove: (venue: string, handle: string) =>
+      `Approve ${handle}’s claim at ${venue}? This adds the Notch and its points.`,
+    rejectPrompt: (venue: string) =>
+      `Reject the claim at ${venue}? Write the reason (3 to 200 characters); the customer sees it.`,
+    notified: "The customer was told on WhatsApp.",
+    notNotified:
+      "Saved. The customer sees it in their passport (WhatsApp only replies within 24 hours of their last message).",
   },
   auth: {
     loginTitle: "Log in",
