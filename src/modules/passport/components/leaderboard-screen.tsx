@@ -119,7 +119,8 @@ export function LeaderboardScreen() {
 function DecayNote({ standing }: { standing: Standing }) {
   const percent = standing.rank_points_percent;
   const drops = standing.rank_drops_on;
-  if (percent === 100 && !drops) return null;
+  // An API without rank decay sends neither field.
+  if (typeof percent !== "number" || (percent === 100 && !drops)) return null;
   const day = drops ? dayMonth(drops) : null;
   return (
     <p
