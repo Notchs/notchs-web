@@ -6,6 +6,7 @@ export { AdminDashboard } from "./components/admin-dashboard";
 export { AdminGate } from "./components/admin-gate";
 export { AdminNotchs } from "./components/admin-notchs";
 export { AdminSectionPage } from "./components/admin-section-page";
+export { AdminSettings } from "./components/admin-settings";
 export { AdminShell } from "./components/admin-shell";
 export { AdminVenues } from "./components/admin-venues";
 export { adminMetadata, adminSectionMetadata } from "./content";
