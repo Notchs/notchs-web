@@ -108,9 +108,25 @@ export const profileContent = {
   chooseArea: "Choose your area",
   instagram: "Instagram (optional)",
   instagramPlaceholder: "@yourname",
+  showInstagram: "Show my Instagram to places I visit",
+  showInstagramNote:
+    "Off by default. Places never see your name or number, only this if you turn it on.",
   phoneNote: "WhatsApp number: the one you log in with. Never shown to venues.",
   save: "Save",
   saving: "Saving…",
   saved: "Saved.",
   saveFailed: "Couldn’t save. Try again.",
+  phoneTitle: "Changed your WhatsApp number?",
+  phoneBody:
+    "Move your Notchs, rank and passport to your new number. You’ll get a code to send from it.",
+  phoneStart: "Change number",
+  phoneStarting: "Getting a code…",
+  phoneSend: (message: string) =>
+    `From your new number, send “${message}” to Notchs on WhatsApp.`,
+  phoneOpen: "Open WhatsApp",
+  phoneExpires: (time: string) =>
+    `The code works once, until ${time}. Notchs replies on the new number when it’s done.`,
+  phoneNoLink: "Notchs’ WhatsApp number isn’t set up yet. Try again later.",
+  phoneTooMany: "Too many codes. Please try again in 15 minutes.",
+  phoneFailed: "Couldn’t get a code. Try again.",
 };

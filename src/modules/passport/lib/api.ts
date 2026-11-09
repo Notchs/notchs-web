@@ -28,6 +28,15 @@ export type MeUpdate = {
   name?: string | null;
   area_id?: string | null;
   instagram_handle?: string | null;
+  show_instagram_to_venues?: boolean;
+};
+
+/** POST /me/phone-change: send `message` from the new number. */
+export type PhoneChange = {
+  message: string;
+  expires_at: string;
+  /** Null until the Notchs WhatsApp number is set up. */
+  whatsapp_link: string | null;
 };
 
 export type MyRank = { rank: number; points: number };
@@ -137,6 +146,10 @@ export const getNotches = (page: number, size: number) =>
   call<Paginated<Notch>>("/me/notches", { query: { page, size } });
 
 export const getReward = () => call<Reward>("/me/reward");
+
+/** A code to send from the new number; a new one cancels the old. */
+export const startPhoneChange = () =>
+  call<PhoneChange>("/me/phone-change", { method: "POST" });
 
 export const getAreas = (cityId: string) =>
   call<Option[]>("/dropdowns/areas", { query: { city_id: cityId } });

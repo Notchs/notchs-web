@@ -9,6 +9,7 @@ import { profileContent as copy, shellContent } from "../content";
 import { getAreas, logOut, updateMe } from "../lib/api";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
+import { PhoneChangeCard } from "./phone-change";
 import { VisibilitySwitch } from "./visibility-switch";
 
 const fieldStyles =
@@ -20,6 +21,9 @@ export function ProfileScreen() {
   const [name, setName] = useState(me.name ?? "");
   const [areaId, setAreaId] = useState(me.area?.id ?? "");
   const [instagram, setInstagram] = useState(me.instagram_handle ?? "");
+  const [showInstagram, setShowInstagram] = useState(
+    me.show_instagram_to_venues,
+  );
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "failed">(
     "idle",
   );
@@ -38,6 +42,7 @@ export function ProfileScreen() {
         name: name.trim() || null,
         area_id: areaId || null,
         instagram_handle: instagram.trim().replace(/^@/, "") || null,
+        show_instagram_to_venues: showInstagram && Boolean(instagram.trim()),
       });
       setMe(updated);
       setStatus("saved");
@@ -101,6 +106,21 @@ export function ProfileScreen() {
             className={fieldStyles}
           />
         </label>
+        <label className="flex items-start gap-3 text-[.9375rem]">
+          <input
+            type="checkbox"
+            checked={showInstagram && Boolean(instagram.trim())}
+            disabled={!instagram.trim()}
+            onChange={(e) => setShowInstagram(e.target.checked)}
+            className="mt-1 size-5 flex-none"
+          />
+          <span className="flex flex-col gap-0.5">
+            <span className="font-semibold">{copy.showInstagram}</span>
+            <span className="text-[.8125rem] text-muted">
+              {copy.showInstagramNote}
+            </span>
+          </span>
+        </label>
         <p className="text-[.8125rem] text-muted">{copy.phoneNote}</p>
         <div className="flex flex-wrap items-center gap-4">
           <Button
@@ -122,6 +142,8 @@ export function ProfileScreen() {
       </form>
 
       <VisibilitySwitch />
+
+      <PhoneChangeCard />
 
       <button
         type="button"
