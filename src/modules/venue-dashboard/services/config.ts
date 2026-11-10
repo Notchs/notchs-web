@@ -10,10 +10,12 @@ export type VenueDataMode = "mock" | "api";
 export const VENUE_DATA_MODE = "api" as VenueDataMode;
 
 /**
- * Whether the live site serves the dashboard to logged-in venues. Off until
- * the team agrees to open it; team builds show it either way.
+ * Whether the live site serves the dashboard to logged-in venues. On since
+ * 10 Nov 2026: an owner needs it to pair the counter phone (Counter & QR), and
+ * every screen shows real data or "Opens soon" (never example data). Team
+ * builds show it either way.
  */
-export const VENUE_DASHBOARD_LIVE = false as boolean;
+export const VENUE_DASHBOARD_LIVE = true as boolean;
 
 /**
  * Team test links and local dev fill the screens the API can't serve yet with
