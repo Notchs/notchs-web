@@ -10,6 +10,7 @@ import { getAreas, logOut, updateMe } from "../lib/api";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
 import { DeleteAccountCard } from "./delete-account";
+import { InactivityNote } from "./inactivity-note";
 import { InviteCard } from "./invite-card";
 import { PhoneChangeCard } from "./phone-change";
 import { VisibilitySwitch } from "./visibility-switch";
@@ -64,6 +65,8 @@ export function ProfileScreen() {
       <h1 className="font-display text-[2rem] font-extrabold tracking-[-.03em] md:text-5xl">
         {copy.title}
       </h1>
+
+      <InactivityNote />
 
       <form
         onSubmit={save}
