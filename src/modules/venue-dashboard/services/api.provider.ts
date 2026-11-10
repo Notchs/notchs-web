@@ -1,4 +1,5 @@
-import { ApiError, apiRequest } from "@/shared/lib/api-client";
+import { ApiError } from "@/shared/lib/api-client";
+import { sessionRequest } from "@/shared/lib/session";
 import type { ApiSuccess } from "@/shared/types/api";
 
 import {
@@ -22,20 +23,23 @@ import type { VenueDataProvider } from "./venue-data.provider";
  * serve yet reject with NotLiveError and show "Opens soon"; none of them
  * falls back to example data.
  */
+// The owner's login lasts 15 minutes and renews quietly for 30 days.
+const request = sessionRequest("venue");
+
 async function get<T>(path: string, query?: Record<string, string>) {
-  const response = await apiRequest<ApiSuccess<T>>(path, { query });
+  const response = await request<ApiSuccess<T>>(path, { query });
   if (response.data === undefined) throw new Error(`No data from ${path}`);
   return response.data;
 }
 
 async function post<T>(path: string) {
-  const response = await apiRequest<ApiSuccess<T>>(path, { method: "POST" });
+  const response = await request<ApiSuccess<T>>(path, { method: "POST" });
   if (response.data === undefined) throw new Error(`No data from ${path}`);
   return response.data;
 }
 
 async function send(path: string, method: string, body?: unknown) {
-  await apiRequest<ApiSuccess<unknown>>(path, { method, body });
+  await request<ApiSuccess<unknown>>(path, { method, body });
 }
 
 export const apiProvider: VenueDataProvider = {
