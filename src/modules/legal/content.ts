@@ -14,22 +14,19 @@ export type LegalContent = {
 const UPDATED = "Last updated 10 Nov 2026";
 
 /**
- * The business behind Notchs. The DPDP Act needs the Data Fiduciary's name and
- * a grievance contact on the notice. TODO(team): fill these in before these
- * pages go live; until then the pages say "to be added".
+ * The business behind Notchs (Harsh, 10 Nov 2026): no registered company,
+ * address or appointed grievance officer yet, so the notice names Notchs, its
+ * city, and the team's contact email for every data request and complaint.
+ * When a company is registered or an officer is named, add them here.
  */
 export const legalDetails = {
-  legalName: "",
-  registeredAddress: "",
-  grievanceOfficer: "",
-  grievanceEmail: "",
-  /** Courts for disputes, e.g. "Ahmedabad, Gujarat". */
-  jurisdiction: "",
+  name: "Notchs",
+  basedIn: "Ahmedabad, Gujarat, India",
+  /** Courts for disputes. */
+  jurisdiction: "Ahmedabad, Gujarat",
 };
 
-const orToAdd = (value: string) => value || "(to be added)";
-const grievanceEmail = () =>
-  legalDetails.grievanceEmail || siteConfig.contactEmail;
+const contactEmail = siteConfig.contactEmail;
 
 function legalMetadata(
   title: string,
@@ -75,7 +72,7 @@ export const privacyContent: LegalContent = {
   sections: [
     {
       q: "Who we are",
-      a: `Notchs is run by ${orToAdd(legalDetails.legalName)}, ${orToAdd(legalDetails.registeredAddress)}. Under India's Digital Personal Data Protection Act, 2023 (DPDP Act) we are the Data Fiduciary for your personal data. Questions or complaints: our grievance officer, ${orToAdd(legalDetails.grievanceOfficer)}, at ${grievanceEmail()}.`,
+      a: `${legalDetails.name} is based in ${legalDetails.basedIn}. Under India's Digital Personal Data Protection Act, 2023 (DPDP Act) we are the Data Fiduciary for your personal data. For any question, request or complaint about your data, write to the Notchs team at ${contactEmail}. We handle every request ourselves and reply within 30 days.`,
     },
     {
       q: "What we collect",
@@ -107,11 +104,11 @@ export const privacyContent: LegalContent = {
     },
     {
       q: "Deleting your account",
-      a: `Go to Profile → Delete my account and type DELETE, or ask us at ${grievanceEmail()}. It happens at once and can't be undone. Your number, name, Instagram, area, consent, logins, claims, invites, Star Points and messages with Notchs are deleted. The visits you made stay with each place as anonymous counts, with nothing that says who you are, so their totals stay correct. If you message Notchs again later, you start a new account.`,
+      a: `Go to Profile → Delete my account and type DELETE, or ask us at ${contactEmail}. It happens at once and can't be undone. Your number, name, Instagram, area, consent, logins, claims, invites, Star Points and messages with Notchs are deleted. The visits you made stay with each place as anonymous counts, with nothing that says who you are, so their totals stay correct. If you message Notchs again later, you start a new account.`,
     },
     {
       q: "Your rights",
-      a: `Under the DPDP Act you can ask what data we have about you and how we use it, correct or update it (most of it you can change yourself in Profile), have it erased, nominate someone to act for you if you die or can't act yourself, and complain to us. Write to our grievance officer at ${grievanceEmail()}; we reply within 30 days. If you're not satisfied, you can complain to the Data Protection Board of India.`,
+      a: `Under the DPDP Act you can ask what data we have about you and how we use it, correct or update it (most of it you can change yourself in Profile), have it erased, nominate someone to act for you if you die or can't act yourself, and complain to us. Write to the Notchs team at ${contactEmail}; we reply within 30 days. If you're not satisfied, you can complain to the Data Protection Board of India.`,
     },
     {
       q: "Children",
@@ -130,7 +127,7 @@ export const privacyContent: LegalContent = {
       a: "If we change what we collect or why, we update this page and ask for your consent again in WhatsApp where the law needs it.",
     },
   ],
-  updated: `${grievanceEmail()} · ${UPDATED}`,
+  updated: `${contactEmail} · ${UPDATED}`,
 };
 
 export const termsContent: LegalContent = {
@@ -146,7 +143,7 @@ export const termsContent: LegalContent = {
   sections: [
     {
       q: "About these terms",
-      a: `Notchs is run by ${orToAdd(legalDetails.legalName)}. By using Notchs, as a customer or as a place, you agree to these terms and to our Privacy notice. If you don't agree, please don't use Notchs.`,
+      a: `Notchs is based in ${legalDetails.basedIn}. By using Notchs, as a customer or as a place, you agree to these terms and to our Privacy notice. If you don't agree, please don't use Notchs.`,
     },
     {
       q: "Who can use Notchs",
@@ -182,11 +179,11 @@ export const termsContent: LegalContent = {
     },
     {
       q: "The law",
-      a: `These terms are governed by the laws of India. Disputes go to the courts of ${orToAdd(legalDetails.jurisdiction)}. If we change these terms we update this page; using Notchs after that means you accept them.`,
+      a: `These terms are governed by the laws of India. Disputes go to the courts of ${legalDetails.jurisdiction}. If we change these terms we update this page; using Notchs after that means you accept them.`,
     },
     {
       q: "Contact",
-      a: `Questions about these terms: ${grievanceEmail()}.`,
+      a: `Questions about these terms: ${contactEmail}.`,
     },
   ],
   updated: UPDATED,
