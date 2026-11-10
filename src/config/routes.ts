@@ -15,6 +15,8 @@ export const routes = {
   /** The main site's homepage, for links from the venue host. */
   mainSite: env.siteAccess === "team" ? "/" : env.appUrl,
   forbidden: "/403",
+  privacy: "/privacy",
+  terms: "/terms",
   login: "/login",
   loginVerify: "/login/verify",
   /** The customer's passport, after logging in. Private: never link it from public pages. */

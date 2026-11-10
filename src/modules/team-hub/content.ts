@@ -39,6 +39,19 @@ export const hubSections: readonly HubSection[] = [
       { name: "Waitlist form", note: "Name, WhatsApp, city, area, consent" },
       { name: "Shared Notch Card page", code: "A12" },
       {
+        name: "Privacy",
+        code: "A10",
+        href: "/privacy",
+        note: "Draft copy, needs legal review",
+      },
+      {
+        name: "Terms",
+        code: "A11",
+        href: "/terms",
+        note: "Draft copy, needs legal review",
+      },
+      { name: "Not found", code: "A15", href: "/404" },
+      {
         name: "City and area pages",
         note: "e.g. /ahmedabad/cafes, once real verified-visit data exists",
       },
