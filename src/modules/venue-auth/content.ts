@@ -112,8 +112,9 @@ export const flowContent = {
     phone: { label: "Phone", placeholder: "98765 43210" },
     phoneHint: "We call this number if we have questions.",
     phoneInvalid: "Enter a 10-digit mobile number.",
-    offerTitle: "Founding Venue: 2 months free",
-    offerBody: "Then ₹1,499 a month + GST. Cancel any time.",
+    offerTitle: "Your first 3 months are free",
+    offerBody:
+      "Then the subscription charges apply, and we tell you the amount first. The first 100 places of each kind get 25% off for life.",
     agree: "I agree to the Terms and Privacy policy",
     agreeMissing: "Tick the box to continue.",
     cta: "Send application",

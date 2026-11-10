@@ -4,6 +4,8 @@ import { useState, type ReactNode } from "react";
 
 import { venueRoutes } from "@/config/routes";
 
+import { siteConfig } from "@/config/site";
+
 import { content, pageTitles } from "../../content";
 import { useAction } from "../../hooks/use-action";
 import { useDateRange } from "../../hooks/use-date-range";
@@ -13,6 +15,7 @@ import { useSettings } from "../../hooks/use-venue-data";
 import { useSession } from "../../hooks/use-session";
 import { copyText } from "../../lib/browser-actions";
 import { exportCustomersCsv, exportVisitsCsv } from "../../lib/exports";
+import { VENUE_DATA_MODE } from "../../services/config";
 import { venueData } from "../../services/venue-data.service";
 import type { NotificationPreferences, SettingsResponse } from "../../types";
 import { VenuePage } from "../shell/venue-page";
@@ -31,6 +34,9 @@ const copy = content.settings;
 const TOGGLE_KEYS = Object.keys(
   copy.toggles,
 ) as (keyof NotificationPreferences)[];
+
+const mailto = (subject: string) =>
+  `mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent(subject)}`;
 
 export function SettingsScreen() {
   const query = useSettings();
@@ -242,13 +248,24 @@ function SettingsBody({ data }: { data: SettingsResponse }) {
               </span>
             }
           >
-            <Button
-              variant="text"
-              size="sm"
-              onClick={() => toast(copy.bookToast)}
-            >
-              {copy.book}
-            </Button>
+            {VENUE_DATA_MODE === "api" ? (
+              // Real venues: the request reaches the team by email.
+              <ButtonLink
+                variant="text"
+                size="sm"
+                href={mailto(copy.bookSubject(venueName))}
+              >
+                {copy.book}
+              </ButtonLink>
+            ) : (
+              <Button
+                variant="text"
+                size="sm"
+                onClick={() => toast(copy.bookToast)}
+              >
+                {copy.book}
+              </Button>
+            )}
           </Row>
         </SectionCard>
       </Grid>
@@ -257,13 +274,24 @@ function SettingsBody({ data }: { data: SettingsResponse }) {
         <Button icon="logout" onClick={logOut}>
           {copy.logOut}
         </Button>
-        <Button
-          variant="danger"
-          icon="trash"
-          onClick={() => setDialog("delete")}
-        >
-          {copy.deleteVenue}
-        </Button>
+        {VENUE_DATA_MODE === "api" ? (
+          // Closing a real venue is done with the team (billing, guests' Notchs).
+          <ButtonLink
+            variant="danger"
+            icon="trash"
+            href={mailto(copy.closeSubject(venueName))}
+          >
+            {copy.closeVenue}
+          </ButtonLink>
+        ) : (
+          <Button
+            variant="danger"
+            icon="trash"
+            onClick={() => setDialog("delete")}
+          >
+            {copy.deleteVenue}
+          </Button>
+        )}
       </div>
 
       {dialog === "password" && <ChangePasswordModal onClose={close} />}

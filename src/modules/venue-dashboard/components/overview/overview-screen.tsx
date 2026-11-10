@@ -26,6 +26,7 @@ import {
 import { MetricCard } from "../ui/metric-card";
 import { QueryBoundary } from "../ui/query-boundary";
 import { Banner } from "../ui/states";
+import { SHOWS_EXAMPLES, VENUE_DATA_MODE } from "../../services/config";
 import { FirstDays } from "./first-days";
 
 const copy = content.overview;
@@ -48,7 +49,11 @@ export function OverviewScreen() {
                 <Banner
                   icon="wifiOff"
                   title={copy.counterOffTitle}
-                  body={copy.counterOffBody}
+                  body={copy.counterOffBody(
+                    data.counter.lastHeartbeat
+                      ? formatTime(data.counter.lastHeartbeat)
+                      : content.common.never,
+                  )}
                 >
                   <ButtonLink variant="dark" href={venueRoutes.counter}>
                     {copy.troubleshoot}
@@ -284,19 +289,22 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
               {copy.counterLink}
             </ButtonLink>
           </Card>
-          <Card className="p-5">
-            <Overline>{copy.nextStep}</Overline>
-            <b className="text-base leading-[1.3]">{copy.nextTitle}</b>
-            <span className="text-sm text-muted">{copy.nextBody}</span>
-            <ButtonLink
-              size="sm"
-              iconRight="arrowR"
-              href={venueRoutes.notchCard}
-              className="self-start"
-            >
-              {copy.nextCta}
-            </ButtonLink>
-          </Card>
+          {/* The Notch Card isn't on real data yet: no "next step" pointing at it. */}
+          {(VENUE_DATA_MODE === "mock" || SHOWS_EXAMPLES) && (
+            <Card className="p-5">
+              <Overline>{copy.nextStep}</Overline>
+              <b className="text-base leading-[1.3]">{copy.nextTitle}</b>
+              <span className="text-sm text-muted">{copy.nextBody}</span>
+              <ButtonLink
+                size="sm"
+                iconRight="arrowR"
+                href={venueRoutes.notchCard}
+                className="self-start"
+              >
+                {copy.nextCta}
+              </ButtonLink>
+            </Card>
+          )}
         </div>
       </SideGrid>
 

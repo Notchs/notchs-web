@@ -87,6 +87,7 @@ export const content = {
     exampleTitle: "Example data",
     exampleBody:
       "This page isn't connected to real numbers yet, so test links show an example. Places on the live site see “Opens soon” here.",
+    never: "—",
     notLiveBadge: "Opens soon",
     notLiveTitle: "This page isn't switched on yet.",
     notLiveBody:
@@ -213,11 +214,11 @@ export const content = {
     allRatings: "All ratings",
     ratingOnly: "Rating only",
     counterOffTitle: "Counter phone is off.",
-    counterOffBody:
-      "No heartbeat since 17:40. Guests can't notch until it's back. Check it's plugged in and the Notchs screen is open.",
+    counterOffBody: (time: string) =>
+      `No heartbeat since ${time}. Guests can't notch until it's back. Check it's plugged in and the Notchs screen is open.`,
     troubleshoot: "Troubleshoot",
     firstDays: {
-      overline: (venue: string) => `${venue} · Day 2`,
+      overline: (venue: string) => `${venue} · First days`,
       title: "Your first guests are on their way.",
       body: "Charts open after 10 verified visits, so the numbers mean something. So far:",
       of: (target: number) => `of ${target}`,
@@ -870,7 +871,7 @@ export const content = {
     keepEditing: "Keep editing",
     discardLeave: "Discard and leave",
     toastReview: "Sent to Notchs review. Everything else is live.",
-    toastPublished: "Published. Guests see it now.",
+    toastPublished: "Saved. Your venue page is up to date.",
     saveBar: {
       region: "Unsaved changes",
       title: "Unsaved changes.",
@@ -886,9 +887,9 @@ export const content = {
       noCover: "No cover photo yet",
       open: (time: string) => `Open till ${time}`,
       closed: "Closed today",
-      visits: "visits · Oct",
-      rating: "rating (38)",
-      rank: "cafés · city",
+      visits: "visits",
+      rating: "rating",
+      rank: "rank in city",
       directions: "Directions",
       menu: "Menu",
       placeholderName: "Venue name",
@@ -1021,7 +1022,7 @@ export const content = {
     visitsCycle: "verified visits this cycle",
     after: "After the free months",
     perOutlet: "/month + GST · per outlet",
-    cancelAnyTime: "Cancel any time from here. No contract.",
+    cancelAnyTime: "No contract: you can stop any time.",
     setupAutopay: "Set up UPI AutoPay",
     invoices: "Invoices",
     noInvoices: "No invoices yet.",
@@ -1099,6 +1100,10 @@ export const content = {
     pilot: "Pilot",
     book: "Book",
     bookToast: "Noted. The Notchs team will call you to book a visit.",
+    /** Real venues: requests go to the team by email until there's a form for them. */
+    bookSubject: (venue: string) => `Setup visit for ${venue}`,
+    closeSubject: (venue: string) => `Close ${venue} on Notchs`,
+    closeVenue: "Close venue",
     logOut: "Log out",
     deleteVenue: "Delete venue",
     passwordModal: {
