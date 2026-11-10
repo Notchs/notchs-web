@@ -43,14 +43,20 @@ export function profileErrors(profile: VenueProfile) {
   return found;
 }
 
-export function profileCompleteness(profile: VenueProfile) {
-  const items = [
+/** `withMedia` false leaves out logo, cover, photos and video (real venues
+ * can't add them until file storage exists). */
+export function profileCompleteness(profile: VenueProfile, withMedia = true) {
+  const media = [
     { label: labels.logo, done: profile.hasLogo },
     { label: labels.cover, done: profile.hasCover },
     {
       label: labels.photos,
       done: profile.galleryCount >= VENUE_PAGE_LIMITS.minGalleryForComplete,
     },
+    { label: labels.video, done: profile.hasVideo },
+  ];
+  const items = [
+    ...(withMedia ? media : []),
     { label: labels.tagline, done: Boolean(profile.tagline) },
     {
       label: labels.description,
@@ -62,7 +68,6 @@ export function profileCompleteness(profile: VenueProfile) {
     { label: labels.instagram, done: Boolean(profile.instagram) },
     { label: labels.amenities, done: profile.amenities.length > 0 },
     { label: labels.hours, done: profile.hours.some((day) => !day.closed) },
-    { label: labels.video, done: profile.hasVideo },
   ];
   const done = items.filter((item) => item.done).length;
   return {

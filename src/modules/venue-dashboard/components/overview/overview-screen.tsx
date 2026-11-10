@@ -92,6 +92,8 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
   };
   const visits = sum(activity.visits);
   const previous = sum(activity.previousVisits);
+  // A change needs something to compare with: no "0% vs before" in a first week.
+  const hadBefore = compare && previous > 0;
   const fresh = sum(activity.newVisitors);
   const returningVisits = activity.visits.map(
     (value, index) => value - activity.newVisitors[index],
@@ -117,9 +119,12 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ButtonLink size="sm" icon="share" href={venueRoutes.notchCard}>
-            {copy.shareCard}
-          </ButtonLink>
+          {/* The Notch Card isn't on real data yet (test links show an example). */}
+          {(VENUE_DATA_MODE === "mock" || SHOWS_EXAMPLES) && (
+            <ButtonLink size="sm" icon="share" href={venueRoutes.notchCard}>
+              {copy.shareCard}
+            </ButtonLink>
+          )}
           <ButtonLink size="sm" icon="edit" href={venueRoutes.content}>
             {copy.editPage}
           </ButtonLink>
@@ -141,7 +146,7 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           label={metrics.visits.label}
           tip={metrics.visits.tip}
           value={formatNumber(visits)}
-          delta={compare ? percentChange(visits, previous) : null}
+          delta={hadBefore ? percentChange(visits, previous) : null}
           foot={compare ? rangeInfo?.comparisonLabel : rangeInfo?.label}
           href={venueRoutes.visits}
         />
@@ -151,7 +156,9 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           tip={metrics.newVisitors.tip}
           value={formatNumber(fresh)}
           delta={
-            compare ? percentChange(fresh, activity.newVisitorsPrevious) : null
+            hadBefore
+              ? percentChange(fresh, activity.newVisitorsPrevious)
+              : null
           }
           foot={metrics.newVisitors.foot}
           href={venueRoutes.customers}
@@ -163,7 +170,7 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
           value={activity.returningRate}
           unit="%"
           delta={
-            compare
+            hadBefore
               ? activity.returningRate - activity.returningRatePrevious
               : null
           }

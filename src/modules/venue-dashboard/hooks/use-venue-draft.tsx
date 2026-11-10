@@ -121,7 +121,9 @@ export function VenueDraftProvider({ children }: { children: ReactNode }) {
       options: query.data,
       stats: query.data?.stats,
       profile,
-      errors: profile ? profileErrors(profile) : {},
+      // Only once the owner edits: a new venue has no address yet, and a red
+      // error on first opening the page looks like something broke.
+      errors: profile && isDirty ? profileErrors(profile) : {},
       isDirty,
       needsReview,
       isPublishing,
