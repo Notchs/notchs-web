@@ -2,11 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { adminConfig, isAdminHost } from "@/config/admin";
 import { env } from "@/config/env";
+import { isVenueHost, venueConfig, venueOrigin } from "@/config/venue";
 import { guardTeamAccess } from "@/shared/lib/team-access";
 
-const { appPath } = adminConfig;
+const { appPath: adminPath } = adminConfig;
+const { appPath: venuePath } = venueConfig;
 
-function isAdminAppPath(pathname: string) {
+function isUnder(appPath: string, pathname: string) {
   return pathname === appPath || pathname.startsWith(`${appPath}/`);
 }
 
@@ -19,16 +21,31 @@ function requestHost(request: NextRequest) {
   return host.split(",")[0].trim();
 }
 
+/** Redirects within the host the browser asked for, not the server's own. */
+function redirectOnHost(url: URL, host: string, pathname: string) {
+  const [hostname, port = ""] = host.split(":");
+  url.hostname = hostname;
+  url.port = port;
+  url.pathname = pathname;
+  return NextResponse.redirect(url);
+}
+
 /**
  * Runs before every page.
  *
  * 1. Team lock first: on test links, anyone without the team login is sent to
  *    /team-login (see src/shared/lib/team-access.ts). Keep this first.
- * 2. Team builds have no admin host, so the panel is simply served at /admin.
+ * 2. Team builds have no admin or venue host, so those are simply served at
+ *    /admin and /venue.
  * 3. On the live site, splits the site by host:
  *    - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
  *    - admin.notchs.com/admin/... redirects to the same page without "/admin".
  *    - notchs.com/admin/... is a 404, so the panel is only on its own host.
+ *    - venues.notchs.com/login shows src/app/venue/login (URL stays /login),
+ *      and the bare host shows the dashboard overview.
+ *    - venues.notchs.com/venue/... redirects to the same page without "/venue".
+ *    - notchs.com/venue/... redirects to the venue host, so links already sent
+ *      in emails keep working.
  */
 export async function proxy(request: NextRequest) {
   const locked = await guardTeamAccess(request);
@@ -36,27 +53,35 @@ export async function proxy(request: NextRequest) {
 
   if (env.siteAccess === "team") return NextResponse.next();
 
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
   const url = request.nextUrl.clone();
   const host = requestHost(request);
 
   if (isAdminHost(host)) {
-    if (isAdminAppPath(pathname)) {
-      // Keep the browser on the host it asked for, not the server's own.
-      const [hostname, port = ""] = host.split(":");
-      url.hostname = hostname;
-      url.port = port;
-      url.pathname = pathname.slice(appPath.length) || "/";
-      return NextResponse.redirect(url);
+    if (isUnder(adminPath, pathname)) {
+      return redirectOnHost(url, host, pathname.slice(adminPath.length) || "/");
     }
-    url.pathname = pathname === "/" ? appPath : `${appPath}${pathname}`;
+    url.pathname = pathname === "/" ? adminPath : `${adminPath}${pathname}`;
     return NextResponse.rewrite(url);
   }
 
-  if (isAdminAppPath(pathname)) {
+  if (isVenueHost(host)) {
+    if (isUnder(venuePath, pathname)) {
+      return redirectOnHost(url, host, pathname.slice(venuePath.length) || "/");
+    }
+    url.pathname = pathname === "/" ? venuePath : `${venuePath}${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
+  if (isUnder(adminPath, pathname)) {
     // No page lives here, so this renders the regular 404.
     url.pathname = "/404";
     return NextResponse.rewrite(url);
+  }
+
+  if (isUnder(venuePath, pathname)) {
+    const path = pathname.slice(venuePath.length) || "/";
+    return NextResponse.redirect(new URL(`${path}${search}`, venueOrigin));
   }
 
   return NextResponse.next();

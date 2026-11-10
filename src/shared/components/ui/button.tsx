@@ -6,7 +6,7 @@ import { cn } from "@/shared/lib/cn";
 
 /** The text and layout of the button; the glass behind it is the group's. */
 const baseStyles =
-  "group inline-flex w-full cursor-pointer items-center justify-center gap-2.5 leading-none font-semibold text-btn-fg focus-visible:outline-none";
+  "group inline-flex w-full cursor-pointer items-center disabled:cursor-default justify-center gap-2.5 leading-none font-semibold text-btn-fg focus-visible:outline-none";
 
 const sizeStyles = {
   default: "min-h-14 px-7",
@@ -33,7 +33,7 @@ function ButtonFrame({ className, children }: FrameProps) {
   return (
     <span
       className={cn(
-        "inline-block rounded-[10px] has-focus-visible:outline-2 has-focus-visible:outline-offset-4 has-focus-visible:outline-foreground",
+        "inline-block rounded-[10px] transition-opacity duration-150 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 has-focus-visible:outline-foreground has-disabled:opacity-45",
         className,
       )}
     >
