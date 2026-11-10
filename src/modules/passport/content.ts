@@ -134,6 +134,21 @@ export const leaderboardContent = {
   pointsLabel: "points",
 };
 
+export const deleteContent = {
+  open: "Delete my account",
+  title: "Delete your Notchs account?",
+  points: [
+    "Your number, name, Instagram, invites, Star Points and messages with Notchs are deleted. This can’t be undone.",
+    "The visits you made stay with the places, with nothing that says who you are, so their totals don’t change.",
+    "If you message Notchs again later, you start a new account from zero.",
+  ],
+  typeLabel: (word: string) => `Type ${word} to confirm`,
+  confirm: "Delete my account",
+  deleting: "Deleting…",
+  cancel: "Keep my account",
+  failed: "That didn’t work. Please try again.",
+};
+
 export const profileContent = {
   title: "Profile",
   name: "Name",
