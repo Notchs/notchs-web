@@ -8,10 +8,9 @@ import { ButtonLink, Button } from "@/shared/components/ui/button";
 import { ApiError } from "@/shared/lib/api-client";
 
 import { flowContent } from "../content";
-import { setVenuePassword, type VenueMember } from "../lib/api";
+import { setVenuePassword } from "../lib/api";
 import { errorMessage, fieldErrors } from "../lib/errors";
 import { PasswordField } from "./field";
-import { LoggedInPanel } from "./logged-in-panel";
 import { FormError, ScreenFrame, ScreenHeading } from "./venue-auth-shell";
 
 const copy = flowContent.setPassword;
@@ -27,16 +26,14 @@ function takeTokenFromUrl() {
   return token ?? "";
 }
 
-type State =
-  | { status: "form" }
-  | { status: "invalid" }
-  | { status: "done"; member: VenueMember | undefined };
+type State = { status: "form" } | { status: "invalid" };
 
 /**
  * Landing page for the emailed link (first password after approval, or a
- * reset). Setting the password also logs the owner in.
+ * reset). Setting the password also logs the owner in, so they go straight
+ * on to the dashboard, or to the login page's logged-in panel without it.
  */
-export function SetPasswordForm() {
+export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
   const [state, setState] = useState<State>({ status: "form" });
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -63,8 +60,9 @@ export function SetPasswordForm() {
 
     setBusy(true);
     try {
-      const response = await setVenuePassword(tokenRef.current ?? "", password);
-      setState({ status: "done", member: response.data });
+      await setVenuePassword(tokenRef.current ?? "", password);
+      // Replace, so Back doesn't return to the used link. Stays busy until it loads.
+      window.location.replace(dashboardHref ?? routes.venueLogin);
     } catch (error) {
       const fields = fieldErrors(error);
       if (
@@ -83,13 +81,7 @@ export function SetPasswordForm() {
   return (
     <>
       <ScreenFrame screenKey={state.status}>
-        {state.status === "done" ? (
-          <LoggedInPanel
-            stamp={flowContent.done.passwordStamp}
-            member={state.member}
-            onLoggedOut={() => window.location.assign(routes.venueLogin)}
-          />
-        ) : state.status === "invalid" ? (
+        {state.status === "invalid" ? (
           <>
             <ScreenHeading
               kicker={copy.kicker}
@@ -133,16 +125,14 @@ export function SetPasswordForm() {
             </form>
           </>
         )}
-        {state.status !== "done" && (
-          <p className="text-center">
-            <Link
-              href={routes.venueLogin}
-              className="inline-block py-3 font-semibold underline underline-offset-[3px] hover:text-muted"
-            >
-              {copy.backToLogin}
-            </Link>
-          </p>
-        )}
+        <p className="text-center">
+          <Link
+            href={routes.venueLogin}
+            className="inline-block py-3 font-semibold underline underline-offset-[3px] hover:text-muted"
+          >
+            {copy.backToLogin}
+          </Link>
+        </p>
       </ScreenFrame>
     </>
   );

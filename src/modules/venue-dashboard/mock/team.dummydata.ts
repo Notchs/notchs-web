@@ -1,0 +1,90 @@
+import type { TeamResponse } from "../types";
+
+export const teamDummyData: TeamResponse = {
+  enabled: true,
+  members: [
+    {
+      id: "m1",
+      name: "Riya Shah",
+      email: "owner@kahwahouse.example",
+      role: "Owner",
+      status: "Active",
+      lastActive: "Now",
+      isYou: true,
+    },
+    {
+      id: "m2",
+      name: "Karan Mehta",
+      email: "karan@kahwahouse.example",
+      role: "Manager",
+      status: "Invited",
+      lastActive: "Invite sent 28 Oct",
+      isYou: false,
+    },
+  ],
+  permissions: [
+    {
+      label: "See visits, guests, ratings",
+      owner: true,
+      manager: true,
+      employee: true,
+      support: true,
+    },
+    {
+      label: "Edit venue page and profile",
+      owner: true,
+      manager: true,
+      employee: false,
+      support: false,
+    },
+    {
+      label: "Reply to ratings",
+      owner: true,
+      manager: true,
+      employee: false,
+      support: true,
+    },
+    {
+      label: "Run campaigns",
+      owner: true,
+      manager: true,
+      employee: false,
+      support: false,
+    },
+    {
+      label: "Manage counter phone",
+      owner: true,
+      manager: true,
+      employee: true,
+      support: true,
+    },
+    {
+      label: "Export CSV",
+      owner: true,
+      manager: true,
+      employee: false,
+      support: false,
+    },
+    {
+      label: "Billing and plan",
+      owner: true,
+      manager: false,
+      employee: false,
+      support: false,
+    },
+    {
+      label: "Team and roles",
+      owner: true,
+      manager: false,
+      employee: false,
+      support: false,
+    },
+    {
+      label: "Delete venue",
+      owner: true,
+      manager: false,
+      employee: false,
+      support: false,
+    },
+  ],
+};

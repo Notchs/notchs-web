@@ -20,8 +20,9 @@ type LoggedInPanelProps = {
 };
 
 /**
- * End of a successful log in or password set. The venue dashboard is not on
- * the website yet, so this confirms the session and offers log out.
+ * End of a successful log in, and what a logged-in owner sees on the login
+ * page. The venue dashboard is not on the website yet, so this confirms the
+ * session and offers log out.
  */
 export function LoggedInPanel({
   stamp,
@@ -46,7 +47,7 @@ export function LoggedInPanel({
       title={venueName ? `${copy.loginTitle}, ${venueName}` : copy.loginTitle}
       body={who ? copy.loginBody(who) : undefined}
     >
-      <ButtonLink href={routes.home} className="w-full">
+      <ButtonLink href={routes.mainSite} className="w-full">
         {copy.home}
       </ButtonLink>
       <button

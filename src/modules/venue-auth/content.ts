@@ -4,7 +4,7 @@ export const venueLoginMetadata: Metadata = {
   title: "Venue log in",
   robots: { index: false, follow: false },
   description:
-    "Log in to your venue on Notchs, or sign up your venue for the Ahmedabad pilot.",
+    "Log in to your venue on Notchs, or apply to bring your venue to the Ahmedabad pilot.",
 };
 
 export const setPasswordMetadata: Metadata = {
@@ -31,13 +31,13 @@ export const showcaseContent = {
 export const flowContent = {
   forVenues: "For venues",
   swap: {
-    login: { question: "New to Notchs?", cta: "Sign up your venue" },
-    signup: { question: "Already have a venue?", cta: "Log in" },
+    login: { question: "New to Notchs?", cta: "Apply for your venue" },
+    apply: { question: "Already approved?", cta: "Log in" },
   },
   steps: ["Email", "Venue", "Done"],
   emailLabel: "Email",
   emailPlaceholder: "owner@kahwahouse.in",
-  checking: "Running a quick security check. Try again in a second.",
+  verifyHint: "Complete the check above to continue.",
   emailInvalid: "Enter a full email, like owner@kahwahouse.in.",
   login: {
     kicker: "Venue log in",
@@ -66,8 +66,9 @@ export const flowContent = {
   },
   apply: {
     kicker: "Step 1 of 3",
-    title: "Sign up your venue",
-    description: "We email you a 6-digit code to check the address is yours.",
+    title: "Apply for your venue",
+    description:
+      "Venues join Notchs by application. First, we email you a 6-digit code to check the address is yours.",
     hint: "Use the email the owner checks every day.",
     cta: "Email me a code",
     busy: "Sending…",
@@ -126,7 +127,6 @@ export const flowContent = {
     loginStamp: "Logged in",
     loginTitle: "Welcome back",
     loginBody: (who: string) => `You're logged in as ${who}.`,
-    passwordStamp: "Password set",
     appliedStamp: "Application sent",
     appliedTitle: (venue: string) => `Thanks, ${venue}`,
     appliedBody: (email: string) =>
@@ -152,6 +152,20 @@ export const flowContent = {
       "Each link works once. Ask for a new one and use it within the time in the email.",
     invalidCta: "Email me a new link",
     backToLogin: "Back to log in",
+  },
+  path: {
+    title: "How joining works",
+    steps: [
+      { title: "Apply", body: "Tell us about your venue." },
+      { title: "We review it", body: "The Notchs team checks every venue." },
+      {
+        title: "Set your password",
+        body: "Once you're approved, we email you a link.",
+      },
+      { title: "Log in", body: "Here, with your email and password." },
+    ],
+    done: "done",
+    current: "current step",
   },
   footer: {
     copyright: "© 2026 Notchs · Ahmedabad",
