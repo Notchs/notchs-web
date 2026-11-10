@@ -62,7 +62,7 @@ export function ContentScreen() {
 
 function ContentForm({ profile }: { profile: VenueProfile }) {
   const { update, errors } = useVenueDraft();
-  const completeness = profileCompleteness(profile);
+  const completeness = profileCompleteness(profile, VENUE_DATA_MODE === "mock");
   const count = profile.galleryCount;
 
   return (

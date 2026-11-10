@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { createRef, useState, type ReactNode, type RefObject } from "react";
 
 import { venueRoutes } from "@/config/routes";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
@@ -9,6 +9,7 @@ import { content, pageTitles } from "../../content";
 import { useAction } from "../../hooks/use-action";
 import { useToast } from "../../hooks/use-toast";
 import { downloadElementPng } from "../../lib/browser-actions";
+import { VENUE_DATA_MODE } from "../../services/config";
 import { VenuePage } from "../shell/venue-page";
 import { Button } from "../ui/button";
 import { Card, Grid } from "../ui/card";
@@ -53,10 +54,15 @@ const signArt: Record<string, ReactNode> = {
   ),
 };
 
-function SignCard({ sign }: { sign: (typeof copy.signs)[number] }) {
+function SignCard({
+  sign,
+  artRef,
+}: {
+  sign: (typeof copy.signs)[number];
+  artRef: RefObject<HTMLDivElement | null>;
+}) {
   const toast = useToast();
   const { run, isBusy } = useAction();
-  const artRef = useRef<HTMLDivElement>(null);
   return (
     <Card className="gap-4 p-4">
       <div ref={artRef} className="h-50">
@@ -68,9 +74,16 @@ function SignCard({ sign }: { sign: (typeof copy.signs)[number] }) {
         <span className="font-mono text-xs text-muted">{sign.size}</span>
       </div>
       <div className="flex gap-2">
-        <Button size="sm" icon="download" onClick={() => toast(copy.pdfQueued)}>
-          {copy.pdf}
-        </Button>
+        {/* Real venues: no print-ready PDF is emailed yet, so only the PNG. */}
+        {VENUE_DATA_MODE === "mock" && (
+          <Button
+            size="sm"
+            icon="download"
+            onClick={() => toast(copy.pdfQueued)}
+          >
+            {copy.pdf}
+          </Button>
+        )}
         <Button
           size="sm"
           icon="download"
@@ -95,6 +108,21 @@ function SignCard({ sign }: { sign: (typeof copy.signs)[number] }) {
 
 export function SignsScreen() {
   const toast = useToast();
+  const { run, isBusy } = useAction();
+  // One ref per sign, made once: "Download all" reads them on click.
+  const [refs] = useState(() =>
+    copy.signs.map(() => createRef<HTMLDivElement>()),
+  );
+
+  /** Every sign as a PNG, one after another (real venues). */
+  const downloadAll = () =>
+    run(async () => {
+      for (const [index, sign] of copy.signs.entries()) {
+        const element = refs[index].current;
+        if (element)
+          await downloadElementPng(element, `notchs-${sign.key}.png`);
+      }
+    }, copy.pngDone);
   return (
     <VenuePage title={pageTitles.counter} scenarioPage="counter">
       <CounterTabs current={venueRoutes.counterSigns} />
@@ -105,8 +133,8 @@ export function SignsScreen() {
         body={copy.signsNoticeBody}
       />
       <Grid columns={3}>
-        {copy.signs.map((sign) => (
-          <SignCard key={sign.key} sign={sign} />
+        {copy.signs.map((sign, index) => (
+          <SignCard key={sign.key} sign={sign} artRef={refs[index]} />
         ))}
       </Grid>
       <Card className="flex-row flex-wrap items-center gap-4 px-5 py-[18px]">
@@ -118,7 +146,10 @@ export function SignsScreen() {
         <Button
           variant="dark"
           icon="printer"
-          onClick={() => toast(copy.allQueued)}
+          disabled={isBusy}
+          onClick={() =>
+            VENUE_DATA_MODE === "mock" ? toast(copy.allQueued) : downloadAll()
+          }
         >
           {copy.downloadAll}
         </Button>
