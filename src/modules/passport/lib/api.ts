@@ -1,8 +1,5 @@
-import {
-  ApiError,
-  apiRequest,
-  type ApiRequestOptions,
-} from "@/shared/lib/api-client";
+import { ApiError, type ApiRequestOptions } from "@/shared/lib/api-client";
+import { endSession, sessionRequest } from "@/shared/lib/session";
 import type { ApiSuccess, Paginated } from "@/shared/types/api";
 
 export type PlaceRef = { id: string; name: string };
@@ -90,37 +87,11 @@ export type Reward = {
 
 export type Option = { value: string; label: string };
 
-let refreshing: Promise<boolean> | undefined;
+const request = sessionRequest("user");
 
-/** Swaps the refresh cookie for a new session; one request at a time. */
-function refreshSession() {
-  refreshing ??= apiRequest("/auth/customer/refresh", { method: "POST" })
-    .then(
-      () => true,
-      () => false,
-    )
-    .finally(() => {
-      refreshing = undefined;
-    });
-  return refreshing;
-}
-
-/**
- * Calls the API and returns `data`. The session is short-lived, so a 401 is
- * retried once after renewing it; a second 401 means the customer is logged out.
- */
+/** Calls the API and returns `data`, renewing the short-lived login when needed. */
 async function call<T>(path: string, options?: ApiRequestOptions) {
-  try {
-    return (await apiRequest<ApiSuccess<T>>(path, options)).data as T;
-  } catch (error) {
-    if (
-      !(error instanceof ApiError && error.status === 401) ||
-      !(await refreshSession())
-    ) {
-      throw error;
-    }
-    return (await apiRequest<ApiSuccess<T>>(path, options)).data as T;
-  }
+  return (await request<ApiSuccess<T>>(path, options)).data as T;
 }
 
 export const getMe = () => call<Me>("/me");
@@ -219,7 +190,7 @@ export const deleteAccount = () =>
 
 /** Ends the session; the backend clears its cookies. */
 export function logOut() {
-  return apiRequest("/auth/customer/logout", { method: "POST" });
+  return endSession("user");
 }
 
 /** True when the error means the customer isn't logged in. */

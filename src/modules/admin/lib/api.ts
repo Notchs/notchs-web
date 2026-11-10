@@ -1,5 +1,5 @@
 import { apiConfig } from "@/config/api";
-import { apiRequest } from "@/shared/lib/api-client";
+import { sessionRequest } from "@/shared/lib/session";
 import type { ApiSuccess } from "@/shared/types/api";
 
 /** The admin panel's calls (notchs-api `admin_panel`, `venue_applications`, `claims`, admin auth). */
@@ -111,18 +111,21 @@ export type Option = { value: string; label: string };
 
 type Query = Record<string, string | number | undefined>;
 
+// The admin's login lasts 15 minutes and renews quietly for 30 days.
+const request = sessionRequest("admin");
+
 async function get<T>(path: string, query?: Query) {
-  const response = await apiRequest<ApiSuccess<T>>(path, { query });
+  const response = await request<ApiSuccess<T>>(path, { query });
   if (response.data === undefined) throw new Error(`No data from ${path}`);
   return response.data;
 }
 
 async function send(path: string, method: string, body?: unknown) {
-  await apiRequest<ApiSuccess<unknown>>(path, { method, body });
+  await request<ApiSuccess<unknown>>(path, { method, body });
 }
 
 async function decide(path: string, body?: unknown) {
-  const response = await apiRequest<ApiSuccess<ClaimDecision>>(path, {
+  const response = await request<ApiSuccess<ClaimDecision>>(path, {
     method: "POST",
     body,
   });
