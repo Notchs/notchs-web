@@ -130,6 +130,12 @@ export const leaderboardContent = {
   pointsLabel: "points",
 };
 
+export const inactivityContent = {
+  title: "We’ve missed you",
+  body: (date: string) =>
+    `Your last Notch was on ${date}, over 3 months ago. Your account, Notchs and points are safe: Notchs never deletes an account for being quiet. Your rank points drop while you’re away, and your next Notch brings them back.`,
+};
+
 export const profileContent = {
   title: "Profile",
   name: "Name",
