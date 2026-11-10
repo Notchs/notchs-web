@@ -138,7 +138,9 @@ export const content = {
     "Not counted": "warn",
   } satisfies Record<VisitStatus, "ink" | "soft" | "line" | "warn">,
   overview: {
-    greeting: (name: string) => `Good evening, ${name}.`,
+    /** By the hour in India when the numbers were read. */
+    greeting: (name: string, hour: number) =>
+      `${hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"}, ${name}.`,
     shareCard: "Share Notch Card",
     editPage: "Edit venue page",
     metrics: {
@@ -173,7 +175,7 @@ export const content = {
     previousPeriod: "Previous period",
     visitsSeries: "Visits",
     previousSeries: "Previous",
-    chartNote: "Busiest: Saturdays, 7–9 PM. Hover a day for exact numbers.",
+    chartNote: "Hover a day for exact numbers.",
     counterTitle: "Counter phone",
     online: "Online",
     offline: "Offline",
@@ -182,7 +184,7 @@ export const content = {
     battery: "Battery",
     counterLink: "Counter & QR",
     nextStep: "Next step",
-    nextTitle: "Your October card is ready",
+    nextTitle: "Your Notch Card is ready",
     nextBody: "Share it on Instagram. Real numbers, made for you.",
     nextCta: "Open Notch Card",
     newVsReturning: "New vs returning",
@@ -194,7 +196,11 @@ export const content = {
     returningWeekly: "Returning rate, weekly",
     returningWeeklyTip:
       "Weekly share of guests with 2+ verified visits here, ever.",
-    returningNote: "Up 16 points in 8 weeks",
+    /** From the first to the last week shown. */
+    returningNote: (change: number, weeks: number) =>
+      change === 0
+        ? `No change in ${weeks} weeks`
+        : `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} points in ${weeks} weeks`,
     returningSeries: "Returning",
     discovery: "Discovery",
     discoveryRows: {
@@ -264,13 +270,13 @@ export const content = {
       },
       regulars: {
         label: "Regulars",
-        foot: "5+ visits this month",
-        tip: "Guests with 5 or more verified visits in the current calendar month.",
+        foot: "5+ visits ever",
+        tip: "Guests with 5 or more verified visits here.",
       },
       atRisk: {
         label: "At risk",
-        foot: "no visit in 21+ days",
-        tip: "Guests with 3+ visits ever whose last verified visit was more than 21 days ago.",
+        foot: "no visit in 30+ days",
+        tip: "Guests with 2 or more visits here whose last verified visit was more than 30 days ago.",
       },
     },
     search: "Search guest ID",
@@ -327,8 +333,7 @@ export const content = {
     cohortTip:
       "Guests grouped by the month of their first verified visit. Each cell: share of that group with a verified visit in a later month.",
     cohortColumns: ["First visit", "Guests", "Month 0", "Month 1", "Month 2"],
-    cohortNote:
-      '"—" means the month hasn\'t happened yet. Cohorts under 20 guests are hidden.',
+    cohortNote: '"—" means the month hasn\'t happened yet.',
   },
   visits: {
     tabs: { log: "Visit log", card: "Notch Card", founding: "Founding Venue" },

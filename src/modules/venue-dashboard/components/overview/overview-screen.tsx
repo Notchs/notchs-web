@@ -31,6 +31,16 @@ import { FirstDays } from "./first-days";
 
 const copy = content.overview;
 
+/** The hour in India (0–23) of an ISO moment. */
+const istHour = (iso: string) =>
+  Number(
+    new Date(iso).toLocaleString("en-GB", {
+      hour: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Kolkata",
+    }),
+  ) % 24;
+
 export function OverviewScreen() {
   const query = useOverview();
   return (
@@ -103,7 +113,7 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
             {dateLabel.replace(",", "")} · {session?.venueName}
           </Overline>
           <span className="font-display text-[26px] leading-[1.15] tracking-[-.02em]">
-            {session && copy.greeting(session.firstName)}
+            {session && copy.greeting(session.firstName, istHour(data.asOf))}
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -356,7 +366,15 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
               },
             ]}
           />
-          <span className="text-[13px] text-muted">{copy.returningNote}</span>
+          {data.returningWeekly.length > 1 && (
+            <span className="text-[13px] text-muted">
+              {copy.returningNote(
+                data.returningWeekly[data.returningWeekly.length - 1].value -
+                  data.returningWeekly[0].value,
+                data.returningWeekly.length,
+              )}
+            </span>
+          )}
         </Card>
         {available.discovery && (
           <Card>
