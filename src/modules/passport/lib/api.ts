@@ -213,6 +213,10 @@ export const getClaims = () => call<MyClaim[]>("/me/claims");
 export const getAreas = (cityId: string) =>
   call<Option[]>("/dropdowns/areas", { query: { city_id: cityId } });
 
+/** Deletes the account for good; the backend clears the login cookies. */
+export const deleteAccount = () =>
+  call<null>("/me/delete", { method: "POST", body: { confirm: "DELETE" } });
+
 /** Ends the session; the backend clears its cookies. */
 export function logOut() {
   return apiRequest("/auth/customer/logout", { method: "POST" });
