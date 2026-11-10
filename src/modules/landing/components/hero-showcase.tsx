@@ -5,7 +5,6 @@ import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import Image from "next/image";
 
 import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
-import { GlassGroup } from "@/shared/components/glass/glass-group";
 import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { heroContent, heroSlides, sampleProof, venueByKind } from "../content";
@@ -80,12 +79,9 @@ function DeckCard({
 }) {
   const slide = heroSlides[slideIndex];
   const venue = venueByKind(slide.kind);
-  const photoRef = useRef<HTMLImageElement>(null);
-
   return (
     <div className="absolute inset-0 overflow-hidden rounded-3xl border border-white/10 bg-ink shadow-[0_24px_60px_-24px_rgb(15_15_20/.45)]">
       <Image
-        ref={photoRef}
         src={slide.image.src}
         alt={front ? slide.image.alt : ""}
         aria-hidden={!front}
@@ -100,38 +96,12 @@ function DeckCard({
         aria-hidden="true"
         className="absolute inset-0 z-10 bg-ink opacity-(--dim) transition-opacity duration-(--deck-speed) ease-notch motion-reduce:transition-none"
       />
-      {/* On the front card the label and the proof are Ink glass bending
-          the photo, following the card as it glides in; the cards behind,
-          which are tilted, keep solid Ink. */}
-      <GlassGroup
-        self={front}
-        image={photoRef}
-        radius={999}
-        tintVar="--ink"
-        tintAmount={0.62}
-        margin={12}
-        fallback="own"
-        animateKey={front}
-        animateFor={SETTLE_MS}
-        className="absolute top-4 left-4 rounded-full px-3 py-1.5 text-sm font-semibold text-paper not-data-glass-ready:bg-ink/70"
-      >
+      {/* Solid Ink label and proof, readable over any photo. */}
+      <div className="absolute top-4 left-4 rounded-full bg-ink/70 px-3 py-1.5 text-sm font-semibold text-paper">
         {venue.label}
-      </GlassGroup>
+      </div>
       <div className="absolute inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-[19rem]">
-        <GlassGroup
-          self={front}
-          image={photoRef}
-          radius={16}
-          tintVar="--ink"
-          tintAmount={0.96}
-          rimShare={0.55}
-          frost={0.9}
-          margin={14}
-          fallback="own"
-          animateKey={front}
-          animateFor={SETTLE_MS}
-          className="rounded-2xl p-4 pt-6 text-paper notch notch-lg not-data-glass-ready:bg-ink"
-        >
+        <div className="rounded-2xl bg-ink p-4 pt-6 text-paper notch-lg">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <p className="flex items-center gap-2 font-display text-lg font-extrabold tracking-[-.02em] text-volt sm:text-xl">
               <VerifiedIcon className="size-5" />
@@ -144,7 +114,7 @@ function DeckCard({
           <p className="mt-2 font-mono text-sm text-paper/90">
             {venue.example} · {sampleProof.notch}
           </p>
-        </GlassGroup>
+        </div>
       </div>
     </div>
   );
