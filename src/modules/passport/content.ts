@@ -127,7 +127,11 @@ export const leaderboardContent = {
   empty: "Nobody is ranked here yet.",
   noCity: "Add your area in Profile to join your city’s leaderboard.",
   rules:
-    "Only real Notchs count. Equal points share a rank. People who keep their name hidden show as “A Notchs member”.",
+    "Only real Notchs count. Equal points share a rank. After 15 days without a Notch, rank points drop 10% a week until your next Notch brings them all back; your points never change. People who keep their name hidden show as “A Notchs member”.",
+  dropsOn: (day: string) =>
+    `Get a Notch before ${day} to keep all your rank points.`,
+  decaying: (percent: number, day: string | null) =>
+    `${percent === 0 ? "Your points don’t count for rank right now" : `Only ${percent}% of your points count for rank right now`}. Your next Notch brings them all back${day ? `; it drops again on ${day}` : ""}.`,
   pointsLabel: "points",
 };
 

@@ -5,7 +5,13 @@ import { useState } from "react";
 import { cn } from "@/shared/lib/cn";
 
 import { leaderboardContent as copy, shellContent } from "../content";
-import { getLeaderboard, getStanding, type Period } from "../lib/api";
+import {
+  getLeaderboard,
+  getStanding,
+  type Period,
+  type Standing,
+} from "../lib/api";
+import { dayMonth } from "../lib/format";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
 import { LoadError, Loading } from "./states";
@@ -98,11 +104,35 @@ export function LeaderboardScreen() {
             )}
           </div>
 
+          {standing.data && <DecayNote standing={standing.data} />}
+
           <Board cityId={me.city.id} period={period} />
         </>
       )}
 
       <p className="text-[.8125rem] leading-normal text-muted">{copy.rules}</p>
     </div>
+  );
+}
+
+/** Rank decay: how much of my points count for rank, and when that drops. */
+function DecayNote({ standing }: { standing: Standing }) {
+  const percent = standing.rank_points_percent;
+  const drops = standing.rank_drops_on;
+  // An API without rank decay sends neither field.
+  if (typeof percent !== "number" || (percent === 100 && !drops)) return null;
+  const day = drops ? dayMonth(drops) : null;
+  return (
+    <p
+      role="status"
+      className={cn(
+        "rounded-2xl border px-4 py-3 text-sm",
+        percent < 100
+          ? "border-[#ff5b35] text-foreground"
+          : "border-line text-muted",
+      )}
+    >
+      {percent < 100 ? copy.decaying(percent, day) : day && copy.dropsOn(day)}
+    </p>
   );
 }

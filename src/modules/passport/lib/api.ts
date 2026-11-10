@@ -44,6 +44,10 @@ export type Standing = {
   is_public: boolean;
   month: MyRank | null;
   all_time: MyRank | null;
+  /** Rank decay: the share of my points that counts for rank today (100 = all). */
+  rank_points_percent: number;
+  /** When it next drops unless I get a Notch first; null if it can't. */
+  rank_drops_on: string | null;
 };
 
 export type Period = "month" | "all";
