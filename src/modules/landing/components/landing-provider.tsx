@@ -10,8 +10,6 @@ import {
   type ReactNode,
 } from "react";
 
-import { hasFreshPageSnapshot } from "@/shared/lib/glass/page-snapshot";
-
 import { type VenueKind } from "../content";
 import { AccessDialog } from "./access-dialog";
 
@@ -20,7 +18,7 @@ type LandingState = {
   venue: VenueKind;
   selectVenue: (venue: VenueKind) => void;
   /** Opens the access card; `from` is the button its glass grows out of. */
-  openAccess: (from?: Element | null) => void;
+  openAccess: () => void;
 };
 
 const LandingContext = createContext<LandingState | null>(null);
@@ -38,13 +36,8 @@ export function LandingProvider({ children }: { children: ReactNode }) {
   // Bumped on every open so the QR animation plays again from the start.
   const [openCount, setOpenCount] = useState(0);
   const [open, setOpen] = useState(false);
-  // The opening button's box, when the glass can grow out of it right away.
-  const [origin, setOrigin] = useState<DOMRect | null>(null);
 
-  const openAccess = useCallback((from?: Element | null) => {
-    setOrigin(
-      from && hasFreshPageSnapshot() ? from.getBoundingClientRect() : null,
-    );
+  const openAccess = useCallback(() => {
     setOpenCount((count) => count + 1);
     setOpen(true);
     dialogRef.current?.showModal();
@@ -62,7 +55,6 @@ export function LandingProvider({ children }: { children: ReactNode }) {
         ref={dialogRef}
         open={open}
         openCount={openCount}
-        origin={origin}
         onClose={() => setOpen(false)}
       />
     </LandingContext>

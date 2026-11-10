@@ -22,7 +22,6 @@ export function SiteHeader({ children }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-40 px-gutter pt-3">
       <GlassGroup
-        floating
         radius={32}
         className="flex h-16 items-center justify-between gap-4 rounded-[32px] pr-2.5 pl-5"
       >

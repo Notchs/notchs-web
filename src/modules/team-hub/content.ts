@@ -39,6 +39,19 @@ export const hubSections: readonly HubSection[] = [
       { name: "Waitlist form", note: "Name, WhatsApp, city, area, consent" },
       { name: "Shared Notch Card page", code: "A12" },
       {
+        name: "Privacy",
+        code: "A10",
+        href: "/privacy",
+        note: "Draft copy, needs legal review",
+      },
+      {
+        name: "Terms",
+        code: "A11",
+        href: "/terms",
+        note: "Draft copy, needs legal review",
+      },
+      { name: "Not found", code: "A15", href: "/404" },
+      {
         name: "City and area pages",
         note: "e.g. /ahmedabad/cafes, once real verified-visit data exists",
       },
@@ -53,7 +66,12 @@ export const hubSections: readonly HubSection[] = [
         href: "/login/verify",
         note: "Normally opened from the link the WhatsApp bot sends",
       },
-      { name: "My Notchs (passport)", code: "C1–C4, C13" },
+      {
+        name: "My Notchs (passport)",
+        code: "C1–C4, C13",
+        href: "/passport",
+        note: "Needs a customer login (WhatsApp)",
+      },
       { name: "Notch Card reveal and past cards", code: "C9, C10" },
       {
         name: "WhatsApp bot replies",
@@ -66,7 +84,7 @@ export const hubSections: readonly HubSection[] = [
     title: "Venue",
     screens: [
       {
-        name: "Venue log in and sign-up",
+        name: "Venue log in and application",
         code: "E1, E2",
         href: "/venue/login",
       },
@@ -75,23 +93,78 @@ export const hubSections: readonly HubSection[] = [
         href: "/venue/set-password",
         note: "Normally opened from the email link",
       },
-      { name: "Counter setup", code: "E3" },
-      { name: "Counter screen with the QR", code: "E4" },
-      { name: "Venue dashboard", note: "Venue App mockup" },
+      {
+        name: "Counter setup",
+        code: "E3",
+        href: "/venue/counter",
+        note: "Pairing link and phone status, on real data",
+      },
+      {
+        name: "Counter screen with the QR",
+        code: "E4",
+        href: "/venue/display",
+        note: "Open the pairing link on the counter phone first",
+      },
+      {
+        name: "Venue dashboard",
+        href: "/venue",
+        note: "Real numbers on Overview, Visits, Guests and Counter. Analytics, Reviews, Discover and Rewards show labelled example data on test links (live: Opens soon)",
+      },
+      {
+        name: "Venue page and profile",
+        href: "/venue/profile",
+        note: "The owner edits their place on real data; photos come later",
+      },
+      {
+        name: "Venue billing",
+        href: "/venue/billing",
+        note: "₹0 for 3 months, then charges; founding discount on real data",
+      },
     ],
   },
   {
     title: "Notchs team",
     screens: [
       {
+        name: "Admin log in",
+        href: "/admin/login",
+        note: "Admins are created with the API's create-admin command",
+      },
+      {
         name: "Admin dashboard",
         href: "/admin",
-        note: "Screens only, not connected to real data yet",
+        note: "Real totals; needs an admin login",
       },
-      { name: "Admin: Venues", href: "/admin/venues" },
-      { name: "Admin: Customers", href: "/admin/customers" },
-      { name: "Admin: Notchs", href: "/admin/notchs" },
-      { name: "Admin: Settings", href: "/admin/settings" },
+      {
+        name: "Admin: Applications",
+        href: "/admin/applications",
+        note: "Approve or reject venues that registered",
+      },
+      {
+        name: "Admin: Claims",
+        href: "/admin/claims",
+        note: "Bill photos when a counter phone was down: approve or reject",
+      },
+      {
+        name: "Admin: Venues",
+        href: "/admin/venues",
+        note: "Pause, resume, close",
+      },
+      {
+        name: "Admin: Customers",
+        href: "/admin/customers",
+        note: "Block, unblock",
+      },
+      {
+        name: "Admin: Notchs",
+        href: "/admin/notchs",
+        note: "Remove fraudulent Notchs",
+      },
+      {
+        name: "Admin: Settings",
+        href: "/admin/settings",
+        note: "Add admins and reviewers, change roles, turn them off",
+      },
     ],
   },
 ];

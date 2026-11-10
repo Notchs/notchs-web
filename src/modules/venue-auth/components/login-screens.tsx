@@ -38,6 +38,15 @@ export function BackButton({
   );
 }
 
+/** Says why the send button is waiting while the bot check is open. */
+export function VerifyHint({ show }: { show: boolean }) {
+  return (
+    <p role="status" className="text-[.9375rem] text-muted empty:hidden">
+      {show ? flowContent.verifyHint : null}
+    </p>
+  );
+}
+
 type LoginFormProps = {
   email: string;
   onEmailChange: (email: string) => void;
@@ -148,9 +157,7 @@ export function ForgotForm({
     if (!isEmail(address)) return setError(flowContent.emailInvalid);
     setError(undefined);
 
-    if (!turnstile.token && !turnstile.disabled) {
-      return setFormError(flowContent.checking);
-    }
+    if (!turnstile.ready) return setFormError(flowContent.verifyHint);
 
     setBusy(true);
     try {
@@ -186,7 +193,8 @@ export function ForgotForm({
         />
         {turnstile.widget}
         <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
+        <VerifyHint show={!turnstile.ready} />
+        <Button type="submit" disabled={busy || !turnstile.ready}>
           {busy ? forgotCopy.busy : forgotCopy.cta}
         </Button>
       </form>

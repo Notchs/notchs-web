@@ -10,8 +10,6 @@ export const venueConfig = {
   hostPrefix: "venues.",
   /** Folder of the venue pages inside src/app. Never shown in venue URLs. */
   appPath: "/venue",
-  /** Where the bare host goes while the dashboard is not on the live site. */
-  homePath: "/login",
 } as const;
 
 /** True for venues.notchs.com, venues.localhost and the like. */

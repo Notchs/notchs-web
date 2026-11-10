@@ -6,7 +6,7 @@ import { LOGIN_MESSAGE } from "../content";
 const botNumber = env.whatsappNumber.replace(/\D/g, "");
 
 /**
- * Opens a chat with the bot, the "LOGIN" message ready to send.
+ * Opens a chat with the bot, the login message ready to send.
  * Null when the bot number is missing or invalid, so no broken link is built.
  */
 export const whatsappLoginUrl: string | null = /^[1-9]\d{7,14}$/.test(botNumber)

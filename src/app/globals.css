@@ -24,8 +24,7 @@
   /* Dark is the default theme; the light theme overrides it below. */
   @apply tone-ink;
 
-  /* Glass blur. Where real refraction runs (Level 3), <LiquidGlass> uses
-     its own lens filter instead. */
+  /* Glass blur. */
   --glass-blur: 24px;
   --glass-blur-clear: 14px;
 
@@ -57,6 +56,7 @@
   --color-unnotched: var(--unnotched);
   --color-block: var(--block);
   --color-card: var(--card);
+  --color-panel: var(--panel);
   --color-btn: var(--btn);
   --color-btn-fg: var(--btn-fg);
   --color-btn-hover: var(--btn-hover);
@@ -75,6 +75,8 @@
 
   /* Where the hero switches from stacked to two columns. */
   --breakpoint-split: 56.25rem;
+  /* Where the venue dashboard gets its full sidebar and widest grids. */
+  --breakpoint-wide: 68.75rem;
 
   --ease-notch: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* A soft spring with a small overshoot, for glass that changes shape. */
@@ -103,6 +105,33 @@
   --animate-stamp: stamp 0.5s var(--ease-notch) both;
   /* Story progress bar; the story moves on when it ends. */
   --animate-story: slide 4s linear both;
+  /* Venue dashboard: overlays and loading placeholders. */
+  --animate-panel: panel 0.26s var(--ease-notch) both;
+  --animate-pop: pop 0.16s var(--ease-notch) both;
+  --animate-skeleton: skeleton 1.4s var(--ease-notch) infinite alternate;
+
+  /* Important secondary text on Ink, where Stone is too faint. */
+  --color-stone-light: #b5b3ac;
+
+  @keyframes panel {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @keyframes skeleton {
+    from {
+      opacity: 0.55;
+    }
+  }
 
   @keyframes scan {
     from {
@@ -245,6 +274,8 @@
   --unnotched: #ff5b35;
   --block: #24242c;
   --card: #17171d;
+  /* Always-dark panels (e.g. passport totals): lifted off the Ink page. */
+  --panel: var(--graphite);
   --btn: var(--volt);
   --btn-fg: var(--ink);
   --btn-hover: #ddff6b;
@@ -274,6 +305,7 @@
   --unnotched: #c2381a;
   --block: #ebe8de;
   --card: #ffffff;
+  --panel: var(--ink);
   --btn: var(--ink);
   --btn-fg: var(--volt);
   --btn-hover: #24242c;
@@ -289,9 +321,8 @@
 }
 
 /* ---- CSS glass ------------------------------------------------------------
-   The fallback for the WebGL glass (<GlassGroup>): shown until it draws,
-   and where WebGL is unavailable. Frosted with a shine that follows the
-   pointer (--shine-x/y); solid with reduced transparency. */
+   Floating controls (<GlassGroup>). Frosted; solid with reduced
+   transparency. */
 @utility glass {
   background-color: var(--glass-solid);
   background-image: radial-gradient(
@@ -307,12 +338,6 @@
   @supports (backdrop-filter: blur(1px)) {
     background-color: var(--glass-fill);
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-
-    /* Where the rim really bends the content (Level 3), clearer glass lets
-       it show, like a thick clear slab. */
-    :root[data-glass-refraction] & {
-      background-color: color-mix(in oklab, var(--glass-fill) 75%, transparent);
-    }
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -329,15 +354,8 @@
   --glass-saturate: var(--glass-saturate-clear);
 }
 
-/* A <GlassGroup> shows CSS glass until its WebGL glass has drawn, and keeps
-   it where WebGL is unavailable. */
-[data-glass-self]:not([data-glass-ready]) {
-  @apply glass;
-}
-
-/* Depth for photo and Ink panels that are not glass (the map, the demo
-   phone), so they sit on the page softly. Everything else is WebGL glass
-   (<GlassGroup>). */
+/* Depth for photo and Ink panels (the map, the demo phone), so they sit on
+   the page softly. */
 @utility surface-ink {
   box-shadow: var(--surface-shadow-ink);
 }

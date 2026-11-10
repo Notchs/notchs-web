@@ -7,10 +7,10 @@ export const loginUnavailable =
 
 export const qrTitle = "Scan to login with WhatsApp";
 export const qrHint =
-  "Scan this QR code with your phone camera, then send LOGIN to the Notchs bot.";
+  "Scan this QR code with your phone camera, then press Send in WhatsApp.";
 
 /** The message WhatsApp pre-fills; the bot answers it with a login link. */
-export const LOGIN_MESSAGE = "LOGIN";
+export const LOGIN_MESSAGE = "Hey Notchs, I want to login";
 
 export const loginMetadata: Metadata = {
   title: "Log in",

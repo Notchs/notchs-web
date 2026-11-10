@@ -1,4 +1,5 @@
 import { apiRequest } from "@/shared/lib/api-client";
+import { sessionRequest } from "@/shared/lib/session";
 import type { ApiSuccess } from "@/shared/types/api";
 
 /**
@@ -37,7 +38,8 @@ export function loginVenue(email: string, password: string) {
 }
 
 export function getVenueMe() {
-  return apiRequest<ApiSuccess<VenueMember>>("/venue/me");
+  // Renews an expired 15-minute login first, so a returning owner stays logged in.
+  return sessionRequest("venue")<ApiSuccess<VenueMember>>("/venue/me");
 }
 
 export function logoutVenue() {
@@ -76,8 +78,9 @@ export function verifyApplicationCode(email: string, code: string) {
   );
 }
 
+/** Returns the application code, e.g. APP-7K3M9QX2. */
 export function submitApplication(application: VenueApplication) {
-  return apiRequest<ApiSuccess<{ code?: string; ref?: string; id?: string }>>(
+  return apiRequest<ApiSuccess<{ application_code: string }>>(
     "/venue-applications",
     { method: "POST", body: application },
   );

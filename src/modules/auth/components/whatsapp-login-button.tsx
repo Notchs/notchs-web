@@ -4,7 +4,7 @@ import { ButtonLink } from "@/shared/components/ui/button";
 import { loginLabel, loginUnavailable } from "../content";
 import { whatsappLoginUrl } from "../lib/whatsapp";
 
-/** Opens WhatsApp with "LOGIN" ready to send to the bot. */
+/** Opens WhatsApp with the login message ready to send to the bot. */
 export function WhatsAppLoginButton() {
   if (!whatsappLoginUrl) {
     return (

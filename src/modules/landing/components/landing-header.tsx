@@ -54,12 +54,10 @@ function useDismiss(
 }
 
 /**
- * The top bar as Liquid Glass: three capsules (brand, links, actions) that
- * float over the page and bend it as it scrolls beneath. Pieces that come
- * close melt together; a glass lens follows the pointer or keyboard focus
- * along the links and actions, stretching a neck as it moves. Over Ink
- * panels the glass turns dark so it stays readable. On phones and tablets
- * the links open in a glass panel that grows out of the Menu button.
+ * The top bar: three glass capsules (brand, links, actions) floating over the
+ * page. A soft highlight follows the pointer or keyboard focus along the links
+ * and actions. Over Ink panels the glass turns dark so it stays readable. On
+ * phones and tablets the links open in a glass panel below the Menu button.
  */
 export function LandingHeader() {
   const headerRef = useRef<HTMLElement>(null);
@@ -76,10 +74,6 @@ export function LandingHeader() {
       <div className="relative mx-auto max-w-[calc(1440px_-_2_*_var(--gutter))]">
         <GlassGroup
           self={false}
-          floating
-          merge={22}
-          tintAmount={0.62}
-          frost={0.85}
           className="flex h-16 items-center justify-between gap-2"
         >
           <GlassShape
@@ -130,7 +124,11 @@ export function LandingHeader() {
               <span className="max-sm:hidden" {...LENS_ITEM}>
                 <ThemeToggle />
               </span>
-              <a href={routes.login} className={linkStyles} {...LENS_ITEM}>
+              <a
+                href={routes.login}
+                className={cn(linkStyles, "max-sm:hidden")}
+                {...LENS_ITEM}
+              >
                 Login
               </a>
               <button
@@ -166,13 +164,7 @@ export function LandingHeader() {
           )}
         >
           {/* Heavier frost than the bar: the items must read over anything. */}
-          <GlassGroup
-            floating
-            radius={20}
-            tintAmount={0.9}
-            frost={1}
-            className="rounded-[20px] p-1.5"
-          >
+          <GlassGroup radius={20} className="rounded-[20px] p-1.5">
             <nav aria-label="Menu">
               <GlassLensTrack lensRadius={14} inset={1}>
                 <ul className="grid gap-0.5">
@@ -188,6 +180,16 @@ export function LandingHeader() {
                       </a>
                     </li>
                   ))}
+                  <li className="sm:hidden">
+                    <a
+                      href={routes.login}
+                      onClick={closeMenu}
+                      className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium"
+                      {...LENS_ITEM}
+                    >
+                      Login
+                    </a>
+                  </li>
                   <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">
                     <span className="text-base text-muted">Theme</span>
                     <ThemeToggle />
