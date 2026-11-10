@@ -107,6 +107,19 @@ export type AdminClaim = {
 
 export type ClaimDecision = { claim: AdminClaim; customer_notified: boolean };
 
+/** An admin account, in Settings (notchs-api `admin_users`). */
+export type AdminAccount = {
+  id: string;
+  admin_user_code: string;
+  name: string;
+  email: string;
+  role: "admin" | "reviewer";
+  is_active: boolean;
+  has_password: boolean;
+  last_login_at: string | null;
+  created_at: string;
+};
+
 export type Option = { value: string; label: string };
 
 type Query = Record<string, string | number | undefined>;
@@ -181,6 +194,13 @@ export const adminApi = {
   approveClaim: (code: string) => decide(`${claimPath(code)}/approve`),
   rejectClaim: (code: string, reason: string) =>
     decide(`${claimPath(code)}/reject`, { reason }),
+  admins: () => get<AdminAccount[]>("/admin/users"),
+  addAdmin: (name: string, email: string, role: string) =>
+    send("/admin/users", "POST", { name, email, role }),
+  updateAdmin: (code: string, change: { role?: string; is_active?: boolean }) =>
+    send(`/admin/users/${encodeURIComponent(code)}`, "PATCH", change),
+  sendAdminLink: (code: string) =>
+    send(`/admin/users/${encodeURIComponent(code)}/link`, "POST"),
   areas: (cityId: string) =>
     get<Option[]>("/dropdowns/areas", { city_id: cityId }),
 };

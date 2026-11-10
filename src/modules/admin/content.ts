@@ -59,7 +59,8 @@ export const adminSections: readonly AdminSection[] = [
     key: "settings",
     label: "Settings",
     href: adminRoutes.settings,
-    description: "Admin users and panel settings.",
+    description:
+      "The team’s admin accounts. Admins can do everything; reviewers can view and check bill-photo claims.",
   },
 ];
 
@@ -252,6 +253,36 @@ export const adminContent = {
     notified: "The customer was told on WhatsApp.",
     notNotified:
       "Saved. The customer sees it in their passport (WhatsApp only replies within 24 hours of their last message).",
+  },
+  settings: {
+    adminsOnly:
+      "Only admins can manage the team. Ask an admin to make changes.",
+    addTitle: "Add someone",
+    name: "Name",
+    email: "Email",
+    role: "Role",
+    roles: [
+      { value: "reviewer", label: "Reviewer" },
+      { value: "admin", label: "Admin" },
+    ],
+    roleLabel: { admin: "Admin", reviewer: "Reviewer" } as Record<
+      string,
+      string
+    >,
+    add: "Add and email a link",
+    added: (email: string) =>
+      `Added. ${email} will get a link to set a password.`,
+    head: ["Name", "Email", "Role", "Status", "Last login", ""],
+    you: "You",
+    active: "Active",
+    off: "Turned off",
+    noPassword: "Hasn’t set a password yet",
+    turnOff: "Turn off",
+    turnOn: "Turn on",
+    sendLink: "Send new link",
+    linkSent: "Sent a new link.",
+    confirmOff: (name: string) =>
+      `Turn off ${name}? They’re logged out straight away and can’t log in until turned back on.`,
   },
   auth: {
     loginTitle: "Log in",

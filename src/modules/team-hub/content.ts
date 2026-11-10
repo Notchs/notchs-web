@@ -140,7 +140,7 @@ export const hubSections: readonly HubSection[] = [
       {
         name: "Admin: Settings",
         href: "/admin/settings",
-        note: "Not connected yet",
+        note: "Add admins and reviewers, change roles, turn them off",
       },
     ],
   },
