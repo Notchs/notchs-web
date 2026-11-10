@@ -99,7 +99,8 @@ export const claimsContent = {
   open: "Open WhatsApp",
   noLink:
     "WhatsApp isn’t connected here yet. Send the message to the Notchs number.",
-  expires: (time: string) => `Send the photo before ${time} today.`,
+  // A claim always ends at midnight in India, which reads oddly as "00:00".
+  expires: "Send the photo today, before midnight.",
   yours: "Your claims",
   status: {
     awaiting_photo: "Waiting for your bill photo",

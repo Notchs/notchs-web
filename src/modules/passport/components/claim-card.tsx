@@ -19,13 +19,6 @@ const fieldStyles =
   "min-h-12 w-full rounded-xl border border-line bg-background px-3 text-[.9375rem] text-foreground";
 const SEARCH_DELAY_MS = 300;
 
-const timeOf = (iso: string) =>
-  new Date(iso).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Kolkata",
-  });
-
 /** A 4xx message from the API is written for customers; anything else isn't. */
 const messageOf = (error: unknown, fallback: string) =>
   error instanceof ApiError && error.status < 500 ? error.message : fallback;
@@ -105,9 +98,7 @@ export function ClaimCard() {
             <p className="text-sm text-muted">{copy.noLink}</p>
           )}
           <p className="font-semibold">{copy.step2}</p>
-          <p className="text-sm text-muted">
-            {copy.expires(timeOf(started.expires_at))}
-          </p>
+          <p className="text-sm text-muted">{copy.expires}</p>
           <button
             type="button"
             onClick={reset}
