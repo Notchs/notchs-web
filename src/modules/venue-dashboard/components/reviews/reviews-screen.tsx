@@ -23,7 +23,7 @@ const copy = content.reviews;
 export function ReviewsScreen() {
   const query = useReviews();
   return (
-    <VenuePage title={pageTitles.reviews} scenarioPage="reviews">
+    <VenuePage example title={pageTitles.reviews} scenarioPage="reviews">
       <QueryBoundary query={query}>
         {(data) =>
           data.total === 0 ? (

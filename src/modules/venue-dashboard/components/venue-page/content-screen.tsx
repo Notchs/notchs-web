@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/cn";
 
 import { content, pageTitles } from "../../content";
 import { useVenueDraft } from "../../hooks/use-venue-draft";
+import { VENUE_DATA_MODE } from "../../services/config";
 import {
   profileCompleteness,
   VENUE_PAGE_LIMITS,
@@ -85,115 +86,128 @@ function ContentForm({ profile }: { profile: VenueProfile }) {
         </div>
       </Card>
 
-      <Card className="gap-4">
-        <SectionHead title={copy.branding} />
-        <div className="relative h-37.5 overflow-hidden rounded-[14px] bg-graphite">
-          {profile.hasCover ? (
-            <span className="absolute inset-0 bg-[repeating-linear-gradient(120deg,#2a2a33_0_18px,#24242c_18px_36px)]" />
-          ) : (
-            <span className="absolute inset-0 grid place-items-center text-[13px] text-stone-light">
-              {copy.coverHint}
-            </span>
-          )}
-          <span className="absolute right-3 bottom-3">
-            <Button
-              variant="paper"
-              size="sm"
-              icon={profile.hasCover ? "trash" : "upload"}
-              onClick={() => update({ hasCover: !profile.hasCover })}
-            >
-              {profile.hasCover ? copy.removeCover : copy.uploadCover}
-            </Button>
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="grid size-18 flex-none place-items-center rounded-[18px] bg-ink font-display text-[26px] text-paper">
-            {profile.hasLogo ? (
-              (profile.name || "?")[0]
-            ) : (
-              <Icon name="camera" size={22} />
-            )}
-          </span>
-          <span className="flex flex-col items-start gap-2">
-            <Button
-              size="sm"
-              icon={profile.hasLogo ? "trash" : "upload"}
-              onClick={() => update({ hasLogo: !profile.hasLogo })}
-            >
-              {profile.hasLogo ? copy.removeLogo : copy.uploadLogo}
-            </Button>
-            <span className="text-[13px] text-muted">{copy.logoHint}</span>
-          </span>
-        </div>
-      </Card>
-
-      <Card className="gap-4">
-        <SectionHead title={copy.media}>
-          <span className="text-[13px] text-muted">
-            {copy.photoCount(count, VENUE_PAGE_LIMITS.gallery)}
-          </span>
-        </SectionHead>
-        <div className="grid max-w-105 grid-cols-3 gap-2">
-          {Array.from({ length: VENUE_PAGE_LIMITS.gallery }, (_, index) => {
-            if (index < count) {
-              return (
-                <span
-                  key={index}
-                  className={cn(
-                    "relative aspect-square rounded-[10px]",
-                    GALLERY_SHADES[index % 3],
-                  )}
-                >
-                  <button
-                    type="button"
-                    aria-label={copy.removePhoto(index + 1)}
-                    onClick={() => update({ galleryCount: count - 1 })}
-                    className="absolute top-1 right-1 grid size-7 cursor-pointer place-items-center rounded-lg bg-paper/90 text-ink"
-                  >
-                    <Icon name="x" size={14} />
-                  </button>
+      {/* Photos need file storage, which isn't connected yet: on real data the
+          buttons would only pretend to upload. */}
+      {VENUE_DATA_MODE === "mock" ? (
+        <>
+          <Card className="gap-4">
+            <SectionHead title={copy.branding} />
+            <div className="relative h-37.5 overflow-hidden rounded-[14px] bg-graphite">
+              {profile.hasCover ? (
+                <span className="absolute inset-0 bg-[repeating-linear-gradient(120deg,#2a2a33_0_18px,#24242c_18px_36px)]" />
+              ) : (
+                <span className="absolute inset-0 grid place-items-center text-[13px] text-stone-light">
+                  {copy.coverHint}
                 </span>
-              );
-            }
-            if (index === count) {
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  aria-label={copy.addPhoto}
-                  onClick={() => update({ galleryCount: count + 1 })}
-                  className="grid aspect-square cursor-pointer place-items-center rounded-[10px] border-[1.5px] border-dashed border-ink/16 text-muted hover:bg-ink/5"
+              )}
+              <span className="absolute right-3 bottom-3">
+                <Button
+                  variant="paper"
+                  size="sm"
+                  icon={profile.hasCover ? "trash" : "upload"}
+                  onClick={() => update({ hasCover: !profile.hasCover })}
                 >
-                  <Icon name="plus" />
-                </button>
-              );
-            }
-            return (
-              <span
-                key={index}
-                className="aspect-square rounded-[10px] border border-dashed border-line"
-              />
-            );
-          })}
-        </div>
-        <div className="flex flex-wrap items-center gap-3 rounded-xl bg-block p-3">
-          <Icon name="video" />
-          <span className="min-w-30 flex-1">
-            <b className="block text-sm">
-              {profile.hasVideo ? copy.videoReady : copy.videoTitle}
-            </b>
-            <span className="text-[13px] text-muted">
-              {profile.hasVideo ? copy.videoReadyHint : copy.videoHint}
-            </span>
-          </span>
-          <Button
-            size="sm"
-            onClick={() => update({ hasVideo: !profile.hasVideo })}
-          >
-            {profile.hasVideo ? copy.remove : copy.upload}
-          </Button>
-        </div>
-      </Card>
+                  {profile.hasCover ? copy.removeCover : copy.uploadCover}
+                </Button>
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="grid size-18 flex-none place-items-center rounded-[18px] bg-ink font-display text-[26px] text-paper">
+                {profile.hasLogo ? (
+                  (profile.name || "?")[0]
+                ) : (
+                  <Icon name="camera" size={22} />
+                )}
+              </span>
+              <span className="flex flex-col items-start gap-2">
+                <Button
+                  size="sm"
+                  icon={profile.hasLogo ? "trash" : "upload"}
+                  onClick={() => update({ hasLogo: !profile.hasLogo })}
+                >
+                  {profile.hasLogo ? copy.removeLogo : copy.uploadLogo}
+                </Button>
+                <span className="text-[13px] text-muted">{copy.logoHint}</span>
+              </span>
+            </div>
+          </Card>
+
+          <Card className="gap-4">
+            <SectionHead title={copy.media}>
+              <span className="text-[13px] text-muted">
+                {copy.photoCount(count, VENUE_PAGE_LIMITS.gallery)}
+              </span>
+            </SectionHead>
+            <div className="grid max-w-105 grid-cols-3 gap-2">
+              {Array.from({ length: VENUE_PAGE_LIMITS.gallery }, (_, index) => {
+                if (index < count) {
+                  return (
+                    <span
+                      key={index}
+                      className={cn(
+                        "relative aspect-square rounded-[10px]",
+                        GALLERY_SHADES[index % 3],
+                      )}
+                    >
+                      <button
+                        type="button"
+                        aria-label={copy.removePhoto(index + 1)}
+                        onClick={() => update({ galleryCount: count - 1 })}
+                        className="absolute top-1 right-1 grid size-7 cursor-pointer place-items-center rounded-lg bg-paper/90 text-ink"
+                      >
+                        <Icon name="x" size={14} />
+                      </button>
+                    </span>
+                  );
+                }
+                if (index === count) {
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={copy.addPhoto}
+                      onClick={() => update({ galleryCount: count + 1 })}
+                      className="grid aspect-square cursor-pointer place-items-center rounded-[10px] border-[1.5px] border-dashed border-ink/16 text-muted hover:bg-ink/5"
+                    >
+                      <Icon name="plus" />
+                    </button>
+                  );
+                }
+                return (
+                  <span
+                    key={index}
+                    className="aspect-square rounded-[10px] border border-dashed border-line"
+                  />
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 rounded-xl bg-block p-3">
+              <Icon name="video" />
+              <span className="min-w-30 flex-1">
+                <b className="block text-sm">
+                  {profile.hasVideo ? copy.videoReady : copy.videoTitle}
+                </b>
+                <span className="text-[13px] text-muted">
+                  {profile.hasVideo ? copy.videoReadyHint : copy.videoHint}
+                </span>
+              </span>
+              <Button
+                size="sm"
+                onClick={() => update({ hasVideo: !profile.hasVideo })}
+              >
+                {profile.hasVideo ? copy.remove : copy.upload}
+              </Button>
+            </div>
+          </Card>
+        </>
+      ) : (
+        <Card className="gap-2">
+          <SectionHead title={copy.media}>
+            <Badge tone="soft">{content.common.notLiveBadge}</Badge>
+          </SectionHead>
+          <span className="text-[15px] text-muted">{copy.mediaSoon}</span>
+        </Card>
+      )}
 
       <Card className="gap-4">
         <SectionHead title={copy.about} />

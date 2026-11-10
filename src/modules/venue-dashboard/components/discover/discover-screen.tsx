@@ -18,7 +18,7 @@ export function DiscoverScreen() {
   const query = useDiscover();
   const [tab, setTab] = useState<Tab>("map");
   return (
-    <VenuePage title={pageTitles.discover} scenarioPage="discover">
+    <VenuePage example title={pageTitles.discover} scenarioPage="discover">
       <div>
         <SegmentedTabs
           options={copy.tabs}

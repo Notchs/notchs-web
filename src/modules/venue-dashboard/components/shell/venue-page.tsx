@@ -6,7 +6,8 @@ import { cn } from "@/shared/lib/cn";
 
 import { content } from "../../content";
 import type { ScenarioPage } from "../../mock/scenario";
-import { VENUE_DATA_MODE } from "../../services/config";
+import { SHOWS_EXAMPLES, VENUE_DATA_MODE } from "../../services/config";
+import { Banner } from "../ui/states";
 import { Icon } from "../ui/icon";
 import { NavigationDrawerContext } from "./navigation-drawer";
 import { NotificationsMenu } from "./notifications-menu";
@@ -21,12 +22,15 @@ export function VenuePage({
   actions,
   children,
   bodyClassName,
+  example = false,
 }: {
   title: string;
   scenarioPage: ScenarioPage;
   actions?: ReactNode;
   children: ReactNode;
   bodyClassName?: string;
+  /** A screen the API can't serve yet: on test links it shows example data. */
+  example?: boolean;
 }) {
   const openNavigation = useContext(NavigationDrawerContext);
 
@@ -63,6 +67,14 @@ export function VenuePage({
           bodyClassName,
         )}
       >
+        {example && SHOWS_EXAMPLES && VENUE_DATA_MODE === "api" && (
+          <Banner
+            tone="info"
+            icon="info"
+            title={content.common.exampleTitle}
+            body={content.common.exampleBody}
+          />
+        )}
         {children}
       </div>
     </main>

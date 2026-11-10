@@ -95,7 +95,17 @@ export const hubSections: readonly HubSection[] = [
       {
         name: "Venue dashboard",
         href: "/venue",
-        note: "Real numbers on Overview, Visits, Guests and Counter; other pages say Opens soon",
+        note: "Real numbers on Overview, Visits, Guests and Counter. Analytics, Reviews, Discover and Rewards show labelled example data on test links (live: Opens soon)",
+      },
+      {
+        name: "Venue page and profile",
+        href: "/venue/profile",
+        note: "The owner edits their place on real data; photos come later",
+      },
+      {
+        name: "Venue billing",
+        href: "/venue/billing",
+        note: "₹0 for 3 months, then charges; founding discount on real data",
       },
     ],
   },

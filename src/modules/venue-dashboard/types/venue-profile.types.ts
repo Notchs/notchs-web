@@ -36,4 +36,8 @@ export type VenueProfileResponse = {
   stats: PublicStats;
   categories: string[];
   amenityOptions: string[];
+  /** Areas of the venue's city, for the area picker. */
+  areaOptions: string[];
+  /** False when the kind of place can only be changed by the Notchs team. */
+  categoryEditable: boolean;
 };

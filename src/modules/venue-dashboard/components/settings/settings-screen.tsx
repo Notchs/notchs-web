@@ -97,6 +97,7 @@ function SettingsBody({ data }: { data: SettingsResponse }) {
     key: keyof NotificationPreferences,
     value: boolean,
   ) => {
+    if (!preferences) return;
     const previous = preferences;
     const next = { ...preferences, [key]: value };
     setPreferences(next);
@@ -140,21 +141,23 @@ function SettingsBody({ data }: { data: SettingsResponse }) {
           </Row>
         </SectionCard>
 
-        <SectionCard title={copy.notifications}>
-          {TOGGLE_KEYS.map((key) => (
-            <Row
-              key={key}
-              label={copy.toggles[key].label}
-              note={copy.toggles[key].note}
-            >
-              <Toggle
+        {preferences && (
+          <SectionCard title={copy.notifications}>
+            {TOGGLE_KEYS.map((key) => (
+              <Row
+                key={key}
                 label={copy.toggles[key].label}
-                checked={preferences[key]}
-                onChange={(value) => setPreference(key, value)}
-              />
-            </Row>
-          ))}
-        </SectionCard>
+                note={copy.toggles[key].note}
+              >
+                <Toggle
+                  label={copy.toggles[key].label}
+                  checked={preferences[key]}
+                  onChange={(value) => setPreference(key, value)}
+                />
+              </Row>
+            ))}
+          </SectionCard>
+        )}
 
         <SectionCard title={copy.data}>
           <Row label={copy.exportVisits}>
@@ -200,31 +203,35 @@ function SettingsBody({ data }: { data: SettingsResponse }) {
               {content.common.open}
             </ButtonLink>
           </Row>
-          <Row label={copy.whatsapp} note={data.supportHours}>
-            <Button
-              variant="text"
-              size="sm"
-              icon="chat"
-              onClick={() => toast(copy.chatToast)}
-            >
-              {copy.chat}
-            </Button>
-          </Row>
-          <Row label={copy.emailSupport} note={data.supportEmail}>
-            <Button
-              variant="text"
-              size="sm"
-              icon="copy"
-              onClick={async () => {
-                const copied = await copyText(data.supportEmail);
-                toast(
-                  copied ? content.common.copied : content.common.copyFailed,
-                );
-              }}
-            >
-              {copy.copy}
-            </Button>
-          </Row>
+          {data.supportHours && (
+            <Row label={copy.whatsapp} note={data.supportHours}>
+              <Button
+                variant="text"
+                size="sm"
+                icon="chat"
+                onClick={() => toast(copy.chatToast)}
+              >
+                {copy.chat}
+              </Button>
+            </Row>
+          )}
+          {data.supportEmail && (
+            <Row label={copy.emailSupport} note={data.supportEmail}>
+              <Button
+                variant="text"
+                size="sm"
+                icon="copy"
+                onClick={async () => {
+                  const copied = await copyText(data.supportEmail);
+                  toast(
+                    copied ? content.common.copied : content.common.copyFailed,
+                  );
+                }}
+              >
+                {copy.copy}
+              </Button>
+            </Row>
+          )}
           <Row
             label={
               <span className="flex items-center gap-2">

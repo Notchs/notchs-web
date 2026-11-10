@@ -33,6 +33,7 @@ export function AnalyticsScreen() {
   const [tab, setTab] = useState<Tab>("visits");
   return (
     <VenuePage
+      example
       title={pageTitles.analytics}
       scenarioPage="analytics"
       actions={<RangePicker />}

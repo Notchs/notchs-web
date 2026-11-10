@@ -36,7 +36,9 @@ export function profileErrors(profile: VenueProfile) {
     found.websiteUrl = errors.url;
   if (profile.instagram && !/^[a-z0-9._]{1,30}$/i.test(profile.instagram))
     found.instagram = errors.instagram;
-  if (!/^\d{5}\s?\d{5}$/.test(profile.phone.trim())) found.phone = errors.phone;
+  // Optional; the place's own number as it likes to write it (a landline is fine).
+  if (profile.phone.trim() && !/^[0-9+() -]{6,20}$/.test(profile.phone.trim()))
+    found.phone = errors.phone;
   if (!profile.address.trim()) found.address = errors.address;
   return found;
 }

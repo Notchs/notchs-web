@@ -2,20 +2,43 @@ import { ApiError, apiRequest } from "@/shared/lib/api-client";
 import type { ApiSuccess } from "@/shared/types/api";
 
 import {
+  toBilling,
   toCounter,
   toCustomers,
   toPairingLink,
   toOverview,
   toSession,
+  toSettings,
+  toTeam,
+  toVenueProfile,
+  toVenueProfileBody,
   toVisits,
   type ApiCounter,
   type ApiGuests,
   type ApiOverview,
   type ApiScans,
+  type ApiVenueBilling,
   type ApiVenueMe,
+  type ApiVenueProfile,
 } from "./api-mappers";
+import { SHOWS_EXAMPLES } from "./config";
+import { mockProvider } from "./mock.provider";
 import { notLive } from "./not-live";
 import type { VenueDataProvider } from "./venue-data.provider";
+
+/**
+ * A screen the API can't serve yet: on team test links and local dev it shows
+ * the example data (each screen labels it "Example"); on the live site a real
+ * venue sees "Opens soon". Example data never reaches a real venue.
+ */
+const exampleOr = <K extends keyof VenueDataProvider>(
+  key: K,
+  what: string,
+): VenueDataProvider[K] =>
+  (SHOWS_EXAMPLES ? mockProvider[key] : notLive(what)) as VenueDataProvider[K];
+
+/** The areas offered by the last profile load, to turn a picked name into its id. */
+let areaOptions: { id: string; name: string }[] = [];
 
 /**
  * Real backend, used when VENUE_DATA_MODE is "api". Screens the API can't
@@ -51,22 +74,22 @@ export const apiProvider: VenueDataProvider = {
   getVisits: async (range) =>
     toVisits(await get<ApiScans>("/venue/insights/scans", { range })),
   reportVisit: notLive("Reporting a visit"),
-  getNotchCard: notLive("The Notch Card"),
-  getFoundingVenue: notLive("Founding venue"),
-  getAnalytics: notLive("Analytics"),
-  getRevenue: notLive("Revenue"),
+  getNotchCard: exampleOr("getNotchCard", "The Notch Card"),
+  getFoundingVenue: exampleOr("getFoundingVenue", "Founding venue"),
+  getAnalytics: exampleOr("getAnalytics", "Analytics"),
+  getRevenue: exampleOr("getRevenue", "Revenue"),
   requestPosIntegration: notLive("POS integration"),
 
-  getReviews: notLive("Reviews"),
-  replyToReview: notLive("Replying to reviews"),
+  getReviews: exampleOr("getReviews", "Reviews"),
+  replyToReview: exampleOr("replyToReview", "Replying to reviews"),
 
-  getDiscover: notLive("Discover"),
+  getDiscover: exampleOr("getDiscover", "Discover"),
 
-  getRewards: notLive("Rewards"),
-  saveCampaign: notLive("Campaigns"),
-  deleteCampaign: notLive("Campaigns"),
-  endCampaign: notLive("Campaigns"),
-  requestRewardsAccess: notLive("Rewards"),
+  getRewards: exampleOr("getRewards", "Rewards"),
+  saveCampaign: exampleOr("saveCampaign", "Campaigns"),
+  deleteCampaign: exampleOr("deleteCampaign", "Campaigns"),
+  endCampaign: exampleOr("endCampaign", "Campaigns"),
+  requestRewardsAccess: exampleOr("requestRewardsAccess", "Rewards"),
 
   getCounter: async () => {
     const [counter, overview] = await Promise.all([
@@ -88,23 +111,38 @@ export const apiProvider: VenueDataProvider = {
     ),
   removeCounter: () => send("/venue/counter", "DELETE"),
 
-  getVenueProfile: notLive("The venue page"),
-  saveVenueProfile: notLive("The venue page"),
+  getVenueProfile: async () => {
+    const [profile, billing] = await Promise.all([
+      get<ApiVenueProfile>("/venue/profile"),
+      get<ApiVenueBilling>("/venue/billing").catch(() => null),
+    ]);
+    areaOptions = profile.area_options;
+    return toVenueProfile(profile, billing);
+  },
+  saveVenueProfile: (profile) =>
+    send("/venue/profile", "PATCH", toVenueProfileBody(profile, areaOptions)),
 
-  getTeam: notLive("Team"),
+  // One login per place (team decision): no invites.
+  getTeam: async () => toTeam(await get<ApiVenueMe>("/venue/me")),
   inviteMember: notLive("Team"),
   removeMember: notLive("Team"),
 
-  getBilling: notLive("Billing"),
+  getBilling: async () =>
+    toBilling(await get<ApiVenueBilling>("/venue/billing")),
 
-  getSettings: notLive("Settings"),
+  getSettings: async () => toSettings(await get<ApiVenueMe>("/venue/me")),
   saveNotificationPreferences: notLive("Settings"),
   changePassword: (current, next) =>
     send("/venue/auth/change-password", "POST", {
       current_password: current,
       new_password: next,
     }),
-  requestEmailChange: notLive("Changing the email"),
-  confirmEmailChange: notLive("Changing the email"),
+  requestEmailChange: (email, password) =>
+    send("/venue/me/email/send-code", "POST", {
+      new_email: email,
+      current_password: password,
+    }),
+  confirmEmailChange: (code) =>
+    send("/venue/me/email/verify", "POST", { code }),
   requestVenueDeletion: notLive("Deleting the venue"),
 };

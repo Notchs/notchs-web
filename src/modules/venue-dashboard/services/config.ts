@@ -1,3 +1,5 @@
+import { env } from "@/config/env";
+
 export type VenueDataMode = "mock" | "api";
 
 /**
@@ -12,3 +14,10 @@ export const VENUE_DATA_MODE = "api" as VenueDataMode;
  * the team agrees to open it; team builds show it either way.
  */
 export const VENUE_DASHBOARD_LIVE = false as boolean;
+
+/**
+ * Team test links and local dev fill the screens the API can't serve yet with
+ * example data, labelled "Example". The live site never does.
+ */
+export const SHOWS_EXAMPLES =
+  env.siteAccess === "team" || !env.isProductionBuild;

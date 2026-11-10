@@ -33,7 +33,7 @@ type Dialog =
 export function RewardsScreen() {
   const query = useRewards();
   return (
-    <VenuePage title={pageTitles.rewards} scenarioPage="rewards">
+    <VenuePage example title={pageTitles.rewards} scenarioPage="rewards">
       <QueryBoundary query={query}>
         {(data) =>
           data.enabled ? (

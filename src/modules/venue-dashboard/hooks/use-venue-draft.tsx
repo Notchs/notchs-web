@@ -65,9 +65,8 @@ export function VenueDraftProvider({ children }: { children: ReactNode }) {
   const profile = draft ?? saved;
   const isDirty =
     draft !== null && JSON.stringify(draft) !== JSON.stringify(saved);
-  const needsReview =
-    isDirty &&
-    (draft.name !== saved?.name || draft.category !== saved?.category);
+  // Only a change of kind of place waits for the Notchs team; names save at once.
+  const needsReview = isDirty && draft.category !== saved?.category;
 
   const update = useCallback(
     (changes: Partial<VenueProfile>) => {

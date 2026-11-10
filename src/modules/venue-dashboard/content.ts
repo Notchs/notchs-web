@@ -62,6 +62,14 @@ export const venuePageMetadata = (page: VenuePageKey): Metadata => ({
   robots: { index: false, follow: false },
 });
 
+/** "café" -> "cafés": how the founding offer names a kind of place. */
+const PLURALS: Record<string, string> = {
+  café: "cafés",
+  "turf or gym": "turfs, box grounds and gyms",
+  place: "places",
+};
+const placesOf = (niche: string) => PLURALS[niche] ?? `${niche}s`;
+
 export const content = {
   common: {
     example: "Example",
@@ -76,6 +84,9 @@ export const content = {
     errorBody:
       "Your visits are safe. This is a connection problem on our side or yours.",
     actionFailed: "That didn't go through. Please try again.",
+    exampleTitle: "Example data",
+    exampleBody:
+      "This page isn't connected to real numbers yet, so test links show an example. Places on the live site see “Opens soon” here.",
     notLiveBadge: "Opens soon",
     notLiveTitle: "This page isn't switched on yet.",
     notLiveBody:
@@ -838,7 +849,7 @@ export const content = {
       description: "Keep it under 280 characters.",
       url: "Start with https://, like https://example.com/menu",
       instagram: "Letters, numbers, dots and underscores only.",
-      phone: "Enter a 10-digit number.",
+      phone: "Use digits, spaces, + and brackets (6 to 20).",
       address: "Add the street address.",
     },
     completeness: {
@@ -883,6 +894,8 @@ export const content = {
       placeholderName: "Venue name",
     },
     contentEditor: {
+      mediaSoon:
+        "Your logo, cover, photos and video come next. Everything else on this page saves now.",
       viewPublic: "View public page",
       completeness: "Page completeness",
       complete: "Complete. Guests see everything.",
@@ -915,6 +928,8 @@ export const content = {
     },
     profileEditor: {
       identity: "Identity",
+      categoryLocked:
+        "The kind of place sets the daily Notch rules. Ask the Notchs team to change it.",
       reviewed: "Name & category reviewed",
       name: "Venue name",
       category: "Category",
@@ -984,14 +999,25 @@ export const content = {
     removed: "Removed.",
     allowed: "Allowed",
     notAllowed: "Not allowed",
-    unavailableBadge: "Coming after the pilot",
-    unavailableTitle: "One login per venue for now.",
+    unavailableBadge: "One login per place",
+    unavailableTitle: "One login runs your place.",
     unavailableBody:
-      "The owner is the only account. Managers, employees and support come with team roles. Counter staff never need a login.",
+      "Only one person needs access: the owner, the manager or whoever runs the counter. Change its email or password in Settings. Counter staff never need a login.",
   },
   billing: {
     currentPlan: "Current plan · Founding Venue",
+    currentPlanPlain: "Current plan",
     freeUntil: (date: string) => `Free until ${date}`,
+    freeMonths: (months: number) => `Free for your first ${months} months`,
+    zero: "₹0",
+    chargesApply: (months: number) =>
+      `After ${months} months, the subscription charges apply.`,
+    foundingYes: (no: number, spots: number, niche: string, percent: number) =>
+      `Founding place #${no} of the first ${spots} ${placesOf(niche)}: ${percent}% off your subscription for life.`,
+    foundingNo: (spots: number, niche: string) =>
+      `The first ${spots} ${placesOf(niche)} were founding places.`,
+    firstInvoiceLater: (months: number) =>
+      `Nothing to pay until your ${months} free months end. We'll tell you before anything is charged.`,
     visitsCycle: "verified visits this cycle",
     after: "After the free months",
     perOutlet: "/month + GST · per outlet",

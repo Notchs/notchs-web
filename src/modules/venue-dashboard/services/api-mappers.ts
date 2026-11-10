@@ -1,14 +1,20 @@
 import type {
+  BillingResponse,
   CohortRow,
   CounterResponse,
   Customer,
   CustomerSegment,
   CustomersResponse,
   DateRangeOption,
+  DayHours,
   OverviewResponse,
   PairingLink,
   SessionResponse,
+  SettingsResponse,
   ShareStat,
+  TeamResponse,
+  VenueProfile,
+  VenueProfileResponse,
   VisitRecord,
   VisitStatus,
   VisitsResponse,
@@ -421,5 +427,183 @@ export function toCounter(
     ],
     exampleCodes: ["000000"],
     rotationSeconds: counter?.code_interval_s ?? 30,
+  };
+}
+
+/* ---------- The owner's own place (notchs-api `venues/profile.py`) ---------- */
+
+export type ApiVenueProfile = {
+  venue_code: string;
+  name: string;
+  category: string;
+  niche: string;
+  scan_code: string;
+  status: string;
+  city: string;
+  area_id: string | null;
+  area: string | null;
+  address: string | null;
+  landmark: string | null;
+  /** The one-line tagline. */
+  description: string | null;
+  about: string | null;
+  menu_url: string | null;
+  website_url: string | null;
+  instagram_handle: string | null;
+  contact_phone: string | null;
+  amenities: string[];
+  visible_on_discover: boolean;
+  opening_hours: Record<string, [string, string][]> | null;
+  area_options: { id: string; name: string }[];
+  amenity_options: string[];
+};
+
+export type ApiVenueBilling = {
+  amount_due_paise: number;
+  free_months: number;
+  founding_no: number | null;
+  founding_spots: number;
+  founding_spots_left: number;
+  founding_discount_percent: number;
+  niche: string;
+};
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  cafe: "Cafe",
+  restaurant: "Restaurant",
+  bar: "Bar",
+  hotel: "Hotel",
+  turf_gym: "Turf / Box ground / Gym",
+  theatre: "Theatre",
+  other: "Other",
+};
+
+/** Monday first, as the screens show the week. */
+const WEEK = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const DEFAULT_OPENS = "09:00";
+const DEFAULT_CLOSES = "23:00";
+
+export function toVenueProfile(
+  api: ApiVenueProfile,
+  billing: ApiVenueBilling | null,
+): VenueProfileResponse {
+  const hours: DayHours[] = WEEK.map((day) => {
+    const first = api.opening_hours?.[day]?.[0];
+    return first
+      ? { opens: first[0], closes: first[1], closed: false }
+      : { opens: DEFAULT_OPENS, closes: DEFAULT_CLOSES, closed: true };
+  });
+  return {
+    profile: {
+      name: api.name,
+      category: CATEGORY_LABELS[api.category] ?? api.category,
+      tagline: api.description ?? "",
+      description: api.about ?? "",
+      menuUrl: api.menu_url ?? "",
+      websiteUrl: api.website_url ?? "",
+      instagram: api.instagram_handle ?? "",
+      address: api.address ?? "",
+      area: api.area ?? "",
+      city: api.city,
+      phone: api.contact_phone ?? "",
+      amenities: api.amenities,
+      visibleOnDiscover: api.visible_on_discover,
+      // Photos and video wait for file storage.
+      hasLogo: false,
+      hasCover: false,
+      galleryCount: 0,
+      hasVideo: false,
+      hours,
+    },
+    // Only what is real: no made-up visits, ratings or ranks on the preview.
+    stats: {
+      visitsLabel: "—",
+      ratingLabel: "—",
+      rankLabel: "—",
+      foundingBadge: billing?.founding_no
+        ? `Founding #${billing.founding_no}`
+        : "",
+      coordinates: "",
+    },
+    categories: [CATEGORY_LABELS[api.category] ?? api.category],
+    amenityOptions: api.amenity_options,
+    areaOptions: api.area_options.map((area) => area.name),
+    categoryEditable: false,
+  };
+}
+
+/** The PATCH /venue/profile body. `areas` maps the picked area name to its id. */
+export function toVenueProfileBody(
+  profile: VenueProfile,
+  areas: { id: string; name: string }[],
+) {
+  const opening_hours: Record<string, [string, string][]> = {};
+  profile.hours.forEach((day, index) => {
+    if (!day.closed) opening_hours[WEEK[index]] = [[day.opens, day.closes]];
+  });
+  const blank = (value: string) => value.trim() || null;
+  return {
+    name: profile.name.trim(),
+    description: blank(profile.tagline),
+    about: blank(profile.description),
+    menu_url: blank(profile.menuUrl),
+    website_url: blank(profile.websiteUrl),
+    instagram_handle: blank(profile.instagram),
+    contact_phone: blank(profile.phone),
+    address: blank(profile.address),
+    area_id: areas.find((area) => area.name === profile.area)?.id ?? null,
+    amenities: profile.amenities,
+    visible_on_discover: profile.visibleOnDiscover,
+    opening_hours,
+  };
+}
+
+export function toBilling(api: ApiVenueBilling): BillingResponse {
+  return {
+    state: "free",
+    freeUntil: "",
+    freeMonths: api.free_months,
+    founding: {
+      number: api.founding_no,
+      spots: api.founding_spots,
+      spotsLeft: api.founding_spots_left,
+      discountPercent: api.founding_discount_percent,
+      niche: api.niche,
+    },
+    visitsThisCycle: 0,
+    // The amount isn't decided; the screen says charges apply after the free months.
+    priceLabel: "",
+    autopayHandle: "",
+    nextCharge: "",
+    failedOn: "",
+    invoices: [],
+  };
+}
+
+/** One login per place (team decision): the team is just that login. */
+export function toTeam(me: ApiVenueMe): TeamResponse {
+  return {
+    enabled: false,
+    members: [
+      {
+        id: "me",
+        name: me.name,
+        email: me.email,
+        role: me.role === "owner" ? "Owner" : "Manager",
+        status: "Active",
+        lastActive: "",
+        isYou: true,
+      },
+    ],
+    permissions: [],
+  };
+}
+
+export function toSettings(me: ApiVenueMe): SettingsResponse {
+  return {
+    email: me.email,
+    supportEmail: "",
+    supportHours: "",
+    preferences: null,
   };
 }
