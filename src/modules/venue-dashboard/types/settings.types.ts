@@ -8,7 +8,9 @@ export type NotificationPreferences = {
 
 export type SettingsResponse = {
   email: string;
+  /** Empty hides the row. */
   supportEmail: string;
   supportHours: string;
-  preferences: NotificationPreferences;
+  /** Null while notification settings aren't connected. */
+  preferences: NotificationPreferences | null;
 };

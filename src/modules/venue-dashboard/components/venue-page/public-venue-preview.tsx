@@ -49,17 +49,21 @@ export function PublicVenuePreview({
               <Icon name="camera" />
             )}
           </span>
-          <Badge tone="ink" className="ml-auto">
-            <Icon name="award" size={12} />
-            {stats.foundingBadge}
-          </Badge>
+          {stats.foundingBadge && (
+            <Badge tone="ink" className="ml-auto">
+              <Icon name="award" size={12} />
+              {stats.foundingBadge}
+            </Badge>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <b className="font-display text-xl leading-[1.15]">
             {profile.name || copy.placeholderName}
           </b>
           <span className="text-[13px] text-muted">
-            {profile.category} · {profile.area} · {openLabel}
+            {[profile.category, profile.area, openLabel]
+              .filter(Boolean)
+              .join(" · ")}
           </span>
         </div>
         {profile.tagline && (

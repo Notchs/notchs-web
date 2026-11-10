@@ -16,7 +16,7 @@ const copy = content.visits.founding;
 export function FoundingVenueScreen() {
   const query = useFoundingVenue();
   return (
-    <VenuePage title={pageTitles.visits} scenarioPage="visits">
+    <VenuePage example title={pageTitles.visits} scenarioPage="visits">
       <VisitsTabs current={venueRoutes.foundingVenue} />
       <QueryBoundary query={query}>
         {(venue) => (

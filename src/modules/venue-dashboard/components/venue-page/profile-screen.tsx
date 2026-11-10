@@ -34,6 +34,8 @@ export function ProfileScreen() {
               profile={profile}
               stats={stats}
               categories={options.categories}
+              categoryEditable={options.categoryEditable}
+              areaOptions={options.areaOptions}
               amenityOptions={options.amenityOptions}
             />
             <div className="flex min-w-0 flex-col gap-3 self-start wide:sticky wide:top-0">
@@ -62,11 +64,15 @@ function ProfileForm({
   profile,
   stats,
   categories,
+  categoryEditable,
+  areaOptions,
   amenityOptions,
 }: {
   profile: VenueProfile;
   stats: PublicStats;
   categories: string[];
+  categoryEditable: boolean;
+  areaOptions: string[];
   amenityOptions: string[];
 }) {
   const { update, errors } = useVenueDraft();
@@ -102,6 +108,8 @@ function ProfileForm({
             label={copy.category}
             options={categories}
             value={profile.category}
+            disabled={!categoryEditable}
+            title={categoryEditable ? undefined : copy.categoryLocked}
             onChange={(event) => update({ category: event.target.value })}
           />
         </Grid>
@@ -116,8 +124,9 @@ function ProfileForm({
           onChange={(event) => update({ address: event.target.value })}
         />
         <Grid columns={2}>
-          <TextField
+          <SelectField
             label={copy.area}
+            options={["", ...areaOptions]}
             value={profile.area}
             onChange={(event) => update({ area: event.target.value })}
           />

@@ -62,6 +62,14 @@ export const venuePageMetadata = (page: VenuePageKey): Metadata => ({
   robots: { index: false, follow: false },
 });
 
+/** "café" -> "cafés": how the founding offer names a kind of place. */
+const PLURALS: Record<string, string> = {
+  café: "cafés",
+  "turf or gym": "turfs, box grounds and gyms",
+  place: "places",
+};
+const placesOf = (niche: string) => PLURALS[niche] ?? `${niche}s`;
+
 export const content = {
   common: {
     example: "Example",
@@ -76,6 +84,10 @@ export const content = {
     errorBody:
       "Your visits are safe. This is a connection problem on our side or yours.",
     actionFailed: "That didn't go through. Please try again.",
+    exampleTitle: "Example data",
+    exampleBody:
+      "This page isn't connected to real numbers yet, so test links show an example. Places on the live site see “Opens soon” here.",
+    never: "—",
     notLiveBadge: "Opens soon",
     notLiveTitle: "This page isn't switched on yet.",
     notLiveBody:
@@ -126,7 +138,9 @@ export const content = {
     "Not counted": "warn",
   } satisfies Record<VisitStatus, "ink" | "soft" | "line" | "warn">,
   overview: {
-    greeting: (name: string) => `Good evening, ${name}.`,
+    /** By the hour in India when the numbers were read. */
+    greeting: (name: string, hour: number) =>
+      `${hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"}, ${name}.`,
     shareCard: "Share Notch Card",
     editPage: "Edit venue page",
     metrics: {
@@ -161,7 +175,7 @@ export const content = {
     previousPeriod: "Previous period",
     visitsSeries: "Visits",
     previousSeries: "Previous",
-    chartNote: "Busiest: Saturdays, 7–9 PM. Hover a day for exact numbers.",
+    chartNote: "Hover a day for exact numbers.",
     counterTitle: "Counter phone",
     online: "Online",
     offline: "Offline",
@@ -170,7 +184,7 @@ export const content = {
     battery: "Battery",
     counterLink: "Counter & QR",
     nextStep: "Next step",
-    nextTitle: "Your October card is ready",
+    nextTitle: "Your Notch Card is ready",
     nextBody: "Share it on Instagram. Real numbers, made for you.",
     nextCta: "Open Notch Card",
     newVsReturning: "New vs returning",
@@ -182,7 +196,11 @@ export const content = {
     returningWeekly: "Returning rate, weekly",
     returningWeeklyTip:
       "Weekly share of guests with 2+ verified visits here, ever.",
-    returningNote: "Up 16 points in 8 weeks",
+    /** From the first to the last week shown. */
+    returningNote: (change: number, weeks: number) =>
+      change === 0
+        ? `No change in ${weeks} weeks`
+        : `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} points in ${weeks} weeks`,
     returningSeries: "Returning",
     discovery: "Discovery",
     discoveryRows: {
@@ -202,11 +220,11 @@ export const content = {
     allRatings: "All ratings",
     ratingOnly: "Rating only",
     counterOffTitle: "Counter phone is off.",
-    counterOffBody:
-      "No heartbeat since 17:40. Guests can't notch until it's back. Check it's plugged in and the Notchs screen is open.",
+    counterOffBody: (time: string) =>
+      `No heartbeat since ${time}. Guests can't notch until it's back. Check it's plugged in and the Notchs screen is open.`,
     troubleshoot: "Troubleshoot",
     firstDays: {
-      overline: (venue: string) => `${venue} · Day 2`,
+      overline: (venue: string) => `${venue} · First days`,
       title: "Your first guests are on their way.",
       body: "Charts open after 10 verified visits, so the numbers mean something. So far:",
       of: (target: number) => `of ${target}`,
@@ -252,13 +270,13 @@ export const content = {
       },
       regulars: {
         label: "Regulars",
-        foot: "5+ visits this month",
-        tip: "Guests with 5 or more verified visits in the current calendar month.",
+        foot: "5+ visits ever",
+        tip: "Guests with 5 or more verified visits here.",
       },
       atRisk: {
         label: "At risk",
-        foot: "no visit in 21+ days",
-        tip: "Guests with 3+ visits ever whose last verified visit was more than 21 days ago.",
+        foot: "no visit in 30+ days",
+        tip: "Guests with 2 or more visits here whose last verified visit was more than 30 days ago.",
       },
     },
     search: "Search guest ID",
@@ -315,8 +333,7 @@ export const content = {
     cohortTip:
       "Guests grouped by the month of their first verified visit. Each cell: share of that group with a verified visit in a later month.",
     cohortColumns: ["First visit", "Guests", "Month 0", "Month 1", "Month 2"],
-    cohortNote:
-      '"—" means the month hasn\'t happened yet. Cohorts under 20 guests are hidden.',
+    cohortNote: '"—" means the month hasn\'t happened yet.',
   },
   visits: {
     tabs: { log: "Visit log", card: "Notch Card", founding: "Founding Venue" },
@@ -838,7 +855,7 @@ export const content = {
       description: "Keep it under 280 characters.",
       url: "Start with https://, like https://example.com/menu",
       instagram: "Letters, numbers, dots and underscores only.",
-      phone: "Enter a 10-digit number.",
+      phone: "Use digits, spaces, + and brackets (6 to 20).",
       address: "Add the street address.",
     },
     completeness: {
@@ -859,7 +876,7 @@ export const content = {
     keepEditing: "Keep editing",
     discardLeave: "Discard and leave",
     toastReview: "Sent to Notchs review. Everything else is live.",
-    toastPublished: "Published. Guests see it now.",
+    toastPublished: "Saved. Your venue page is up to date.",
     saveBar: {
       region: "Unsaved changes",
       title: "Unsaved changes.",
@@ -875,14 +892,16 @@ export const content = {
       noCover: "No cover photo yet",
       open: (time: string) => `Open till ${time}`,
       closed: "Closed today",
-      visits: "visits · Oct",
-      rating: "rating (38)",
-      rank: "cafés · city",
+      visits: "visits",
+      rating: "rating",
+      rank: "rank in city",
       directions: "Directions",
       menu: "Menu",
       placeholderName: "Venue name",
     },
     contentEditor: {
+      mediaSoon:
+        "Your logo, cover, photos and video come next. Everything else on this page saves now.",
       viewPublic: "View public page",
       completeness: "Page completeness",
       complete: "Complete. Guests see everything.",
@@ -915,6 +934,8 @@ export const content = {
     },
     profileEditor: {
       identity: "Identity",
+      categoryLocked:
+        "The kind of place sets the daily Notch rules. Ask the Notchs team to change it.",
       reviewed: "Name & category reviewed",
       name: "Venue name",
       category: "Category",
@@ -984,18 +1005,29 @@ export const content = {
     removed: "Removed.",
     allowed: "Allowed",
     notAllowed: "Not allowed",
-    unavailableBadge: "Coming after the pilot",
-    unavailableTitle: "One login per venue for now.",
+    unavailableBadge: "One login per place",
+    unavailableTitle: "One login runs your place.",
     unavailableBody:
-      "The owner is the only account. Managers, employees and support come with team roles. Counter staff never need a login.",
+      "Only one person needs access: the owner, the manager or whoever runs the counter. Change its email or password in Settings. Counter staff never need a login.",
   },
   billing: {
     currentPlan: "Current plan · Founding Venue",
+    currentPlanPlain: "Current plan",
     freeUntil: (date: string) => `Free until ${date}`,
+    freeMonths: (months: number) => `Free for your first ${months} months`,
+    zero: "₹0",
+    chargesApply: (months: number) =>
+      `After ${months} months, the subscription charges apply.`,
+    foundingYes: (no: number, spots: number, niche: string, percent: number) =>
+      `Founding place #${no} of the first ${spots} ${placesOf(niche)}: ${percent}% off your subscription for life.`,
+    foundingNo: (spots: number, niche: string) =>
+      `The first ${spots} ${placesOf(niche)} were founding places.`,
+    firstInvoiceLater: (months: number) =>
+      `Nothing to pay until your ${months} free months end. We'll tell you before anything is charged.`,
     visitsCycle: "verified visits this cycle",
     after: "After the free months",
     perOutlet: "/month + GST · per outlet",
-    cancelAnyTime: "Cancel any time from here. No contract.",
+    cancelAnyTime: "No contract: you can stop any time.",
     setupAutopay: "Set up UPI AutoPay",
     invoices: "Invoices",
     noInvoices: "No invoices yet.",
@@ -1073,6 +1105,10 @@ export const content = {
     pilot: "Pilot",
     book: "Book",
     bookToast: "Noted. The Notchs team will call you to book a visit.",
+    /** Real venues: requests go to the team by email until there's a form for them. */
+    bookSubject: (venue: string) => `Setup visit for ${venue}`,
+    closeSubject: (venue: string) => `Close ${venue} on Notchs`,
+    closeVenue: "Close venue",
     logOut: "Log out",
     deleteVenue: "Delete venue",
     passwordModal: {

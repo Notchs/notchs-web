@@ -34,47 +34,87 @@ export function BillingScreen() {
 
 function FreeMonths({ data }: { data: BillingResponse }) {
   const toast = useToast();
+  // Real data has no price or end date yet: charges apply after the free months.
+  const priced = Boolean(data.priceLabel);
   return (
     <>
       <Grid columns={2}>
         <InkCard className="gap-4">
-          <Overline className="text-stone-light">{copy.currentPlan}</Overline>
+          <Overline className="text-stone-light">
+            {data.founding?.number ? copy.currentPlan : copy.currentPlanPlain}
+          </Overline>
           <span className="font-display text-[26px]">
-            {copy.freeUntil(data.freeUntil)}
+            {data.freeUntil
+              ? copy.freeUntil(data.freeUntil)
+              : copy.freeMonths(data.freeMonths)}
           </span>
-          <div className="flex items-baseline gap-3">
+          {data.freeUntil ? (
+            <div className="flex items-baseline gap-3">
+              <span className="font-display text-[44px] text-volt">
+                {formatNumber(data.visitsThisCycle)}
+              </span>
+              <span className="text-stone-light">{copy.visitsCycle}</span>
+            </div>
+          ) : (
             <span className="font-display text-[44px] text-volt">
-              {formatNumber(data.visitsThisCycle)}
+              {copy.zero}
             </span>
-            <span className="text-stone-light">{copy.visitsCycle}</span>
-          </div>
+          )}
         </InkCard>
         <Card className="gap-4">
           <Overline>{copy.after}</Overline>
-          <div className="flex flex-wrap items-baseline gap-2">
-            <span className="font-display text-2xl">{data.priceLabel}</span>
-            <span className="text-muted">{copy.perOutlet}</span>
-          </div>
+          {priced ? (
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className="font-display text-2xl">{data.priceLabel}</span>
+              <span className="text-muted">{copy.perOutlet}</span>
+            </div>
+          ) : (
+            <b className="text-lg">{copy.chargesApply(data.freeMonths)}</b>
+          )}
+          {data.founding && <FoundingLine founding={data.founding} />}
           <span className="text-[15px] text-muted">{copy.cancelAnyTime}</span>
-          <Button
-            variant="dark"
-            size="lg"
-            icon="zap"
-            className="self-start"
-            onClick={() => toast(copy.autopayToast)}
-          >
-            {copy.setupAutopay}
-          </Button>
+          {priced && (
+            <Button
+              variant="dark"
+              size="lg"
+              icon="zap"
+              className="self-start"
+              onClick={() => toast(copy.autopayToast)}
+            >
+              {copy.setupAutopay}
+            </Button>
+          )}
         </Card>
       </Grid>
       <Card className="gap-2">
         <Overline>{copy.invoices}</Overline>
         <b>{copy.noInvoices}</b>
         <span className="text-[15px] text-muted">
-          {copy.firstInvoice(data.freeUntil)}
+          {data.freeUntil
+            ? copy.firstInvoice(data.freeUntil)
+            : copy.firstInvoiceLater(data.freeMonths)}
         </span>
       </Card>
     </>
+  );
+}
+
+function FoundingLine({
+  founding,
+}: {
+  founding: NonNullable<BillingResponse["founding"]>;
+}) {
+  return (
+    <span className="rounded-xl bg-block p-3 text-[15px]">
+      {founding.number
+        ? copy.foundingYes(
+            founding.number,
+            founding.spots,
+            founding.niche,
+            founding.discountPercent,
+          )
+        : copy.foundingNo(founding.spots, founding.niche)}
+    </span>
   );
 }
 

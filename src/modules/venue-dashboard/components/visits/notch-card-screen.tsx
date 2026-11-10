@@ -17,7 +17,7 @@ const copy = content.visits.card;
 export function NotchCardScreen() {
   const query = useNotchCard();
   return (
-    <VenuePage title={pageTitles.visits} scenarioPage="visits">
+    <VenuePage example title={pageTitles.visits} scenarioPage="visits">
       <VisitsTabs current={venueRoutes.notchCard} />
       <QueryBoundary query={query}>
         {(card) =>

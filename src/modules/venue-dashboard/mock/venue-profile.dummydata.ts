@@ -34,7 +34,17 @@ export const venueProfileDummyData: VenueProfileResponse = {
     foundingBadge: "Founding #7",
     coordinates: "23.0258° N, 72.5603° E",
   },
-  categories: ["Cafe", "Restaurant", "Bar", "Hotel", "Turf / Gym", "Other"],
+  categories: [
+    "Cafe",
+    "Restaurant",
+    "Bar",
+    "Hotel",
+    "Turf / Box ground / Gym",
+    "Theatre",
+    "Other",
+  ],
+  areaOptions: ["Navrangpura", "Bodakdev", "Satellite", "Prahlad Nagar"],
+  categoryEditable: true,
   amenityOptions: [
     "Wi-Fi",
     "Late night",

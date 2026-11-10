@@ -26,9 +26,20 @@ import {
 import { MetricCard } from "../ui/metric-card";
 import { QueryBoundary } from "../ui/query-boundary";
 import { Banner } from "../ui/states";
+import { SHOWS_EXAMPLES, VENUE_DATA_MODE } from "../../services/config";
 import { FirstDays } from "./first-days";
 
 const copy = content.overview;
+
+/** The hour in India (0–23) of an ISO moment. */
+const istHour = (iso: string) =>
+  Number(
+    new Date(iso).toLocaleString("en-GB", {
+      hour: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Kolkata",
+    }),
+  ) % 24;
 
 export function OverviewScreen() {
   const query = useOverview();
@@ -48,7 +59,11 @@ export function OverviewScreen() {
                 <Banner
                   icon="wifiOff"
                   title={copy.counterOffTitle}
-                  body={copy.counterOffBody}
+                  body={copy.counterOffBody(
+                    data.counter.lastHeartbeat
+                      ? formatTime(data.counter.lastHeartbeat)
+                      : content.common.never,
+                  )}
                 >
                   <ButtonLink variant="dark" href={venueRoutes.counter}>
                     {copy.troubleshoot}
@@ -98,7 +113,7 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
             {dateLabel.replace(",", "")} · {session?.venueName}
           </Overline>
           <span className="font-display text-[26px] leading-[1.15] tracking-[-.02em]">
-            {session && copy.greeting(session.firstName)}
+            {session && copy.greeting(session.firstName, istHour(data.asOf))}
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -284,19 +299,22 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
               {copy.counterLink}
             </ButtonLink>
           </Card>
-          <Card className="p-5">
-            <Overline>{copy.nextStep}</Overline>
-            <b className="text-base leading-[1.3]">{copy.nextTitle}</b>
-            <span className="text-sm text-muted">{copy.nextBody}</span>
-            <ButtonLink
-              size="sm"
-              iconRight="arrowR"
-              href={venueRoutes.notchCard}
-              className="self-start"
-            >
-              {copy.nextCta}
-            </ButtonLink>
-          </Card>
+          {/* The Notch Card isn't on real data yet: no "next step" pointing at it. */}
+          {(VENUE_DATA_MODE === "mock" || SHOWS_EXAMPLES) && (
+            <Card className="p-5">
+              <Overline>{copy.nextStep}</Overline>
+              <b className="text-base leading-[1.3]">{copy.nextTitle}</b>
+              <span className="text-sm text-muted">{copy.nextBody}</span>
+              <ButtonLink
+                size="sm"
+                iconRight="arrowR"
+                href={venueRoutes.notchCard}
+                className="self-start"
+              >
+                {copy.nextCta}
+              </ButtonLink>
+            </Card>
+          )}
         </div>
       </SideGrid>
 
@@ -348,7 +366,15 @@ function OverviewBody({ data }: { data: OverviewResponse }) {
               },
             ]}
           />
-          <span className="text-[13px] text-muted">{copy.returningNote}</span>
+          {data.returningWeekly.length > 1 && (
+            <span className="text-[13px] text-muted">
+              {copy.returningNote(
+                data.returningWeekly[data.returningWeekly.length - 1].value -
+                  data.returningWeekly[0].value,
+                data.returningWeekly.length,
+              )}
+            </span>
+          )}
         </Card>
         {available.discovery && (
           <Card>
