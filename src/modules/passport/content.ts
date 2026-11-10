@@ -136,6 +136,21 @@ export const inactivityContent = {
     `Your last Notch was on ${date}, over 3 months ago. Your account, Notchs and points are safe: Notchs never deletes an account for being quiet. Your rank points drop while you’re away, and your next Notch brings them back.`,
 };
 
+export const deleteContent = {
+  open: "Delete my account",
+  title: "Delete your Notchs account?",
+  points: [
+    "Your number, name, Instagram, invites, Star Points and messages with Notchs are deleted. This can’t be undone.",
+    "The visits you made stay with the places, with nothing that says who you are, so their totals don’t change.",
+    "If you message Notchs again later, you start a new account from zero.",
+  ],
+  typeLabel: (word: string) => `Type ${word} to confirm`,
+  confirm: "Delete my account",
+  deleting: "Deleting…",
+  cancel: "Keep my account",
+  failed: "That didn’t work. Please try again.",
+};
+
 export const profileContent = {
   title: "Profile",
   name: "Name",

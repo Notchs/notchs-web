@@ -9,6 +9,7 @@ import { profileContent as copy, shellContent } from "../content";
 import { getAreas, logOut, updateMe } from "../lib/api";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
+import { DeleteAccountCard } from "./delete-account";
 import { InactivityNote } from "./inactivity-note";
 import { InviteCard } from "./invite-card";
 import { PhoneChangeCard } from "./phone-change";
@@ -159,6 +160,8 @@ export function ProfileScreen() {
       >
         {leaving ? shellContent.loggingOut : shellContent.logOut}
       </button>
+
+      <DeleteAccountCard />
     </div>
   );
 }
