@@ -25,9 +25,9 @@ export const navLinks = [
   { label: "FAQ", href: `#${sectionIds.faq}` },
 ] as const;
 
-export const accessLabel = "Get your access";
+export const accessLabel = "Get your passport";
 /** Header label on phones, where the full one crowds the logo. */
-export const accessLabelShort = "Get access";
+export const accessLabelShort = "Get started";
 
 export type VenueKind =
   | "cafe"
@@ -224,7 +224,7 @@ export const heroSlides: readonly HeroSlide[] = [
 ];
 
 export const heroContent = {
-  kicker: "Ahmedabad · Pilot from November",
+  kicker: "Ahmedabad · Now live",
   titleLines: ["Every real visit", "counts."],
   description:
     "Scan the QR at the counter, send one WhatsApp message, get Notched. Your city, ranked by where you actually go.",
@@ -437,7 +437,7 @@ export const venuesContent = {
   points: [
     "First-timers and regulars, every week",
     "Totals only. Never names or phone numbers",
-    "A monthly Notch Card for your venue",
+    "Free for your first 3 months",
   ],
   cta: "Bring Notchs to your venue",
   image: photo(
@@ -467,14 +467,14 @@ export const faqContent = {
       a: "The code on the counter phone changes every 30 seconds. You have to be there to scan it.",
     },
     {
-      q: "When does it start?",
-      a: "The Ahmedabad pilot starts in November 2026 with our first venues.",
+      q: "Where can I use it?",
+      a: "In Ahmedabad, at places with a Notchs counter phone. Look for the QR at the counter.",
     },
   ],
 } as const;
 
 export const closingContent = {
-  title: "Ahmedabad is about to get ranked.",
+  title: "Ahmedabad is getting ranked.",
   description: "Don't stay unnotched.",
 } as const;
 
@@ -482,9 +482,9 @@ export const accessDialogContent = {
   title: "Scan to Notch",
   description:
     "This is what you'll see at every Notchs counter. Scan, send, done.",
-  note: "Preview only. Live codes arrive with the pilot.",
+  note: "Example code. The real one is on the counter phone at each place.",
   close: "Close",
-  notify: "Tell me when it's live",
+  start: "Get your passport",
 } as const;
 
 const title = `${siteConfig.name} · Ahmedabad's real-life leaderboard`;

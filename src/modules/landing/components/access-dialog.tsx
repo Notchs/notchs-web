@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import type { MouseEvent, Ref } from "react";
 
-import { siteConfig } from "@/config/site";
+import { routes } from "@/config/routes";
 import { GlassGroup } from "@/shared/components/glass/glass-group";
 import { CloseIcon } from "@/shared/components/icons";
 
@@ -76,12 +77,12 @@ export function AccessDialog({
             </p>
 
             <GlassGroup radius={12} className="w-full rounded-xl">
-              <a
-                href={`mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent("Notchs access")}`}
+              <Link
+                href={routes.login}
                 className="inline-flex min-h-12 w-full items-center justify-center px-5 font-semibold"
               >
-                {accessDialogContent.notify}
-              </a>
+                {accessDialogContent.start}
+              </Link>
             </GlassGroup>
           </div>
         </div>
