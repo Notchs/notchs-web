@@ -4,7 +4,7 @@ export const venueLoginMetadata: Metadata = {
   title: "Venue log in",
   robots: { index: false, follow: false },
   description:
-    "Log in to your venue on Notchs, or apply to bring your venue to the Ahmedabad pilot.",
+    "Log in to your venue on Notchs, or apply to bring your venue to Notchs in Ahmedabad.",
 };
 
 export const setPasswordMetadata: Metadata = {
@@ -24,7 +24,7 @@ export const showcaseContent = {
     /** Bar heights in percent, Monday to Sunday; Saturday is highlighted. */
     bars: [38, 52, 46, 61, 74, 100, 88],
     highlight: 5,
-    caption: "Sample dashboard · Ahmedabad pilot · Nov–Dec 2026",
+    caption: "Sample dashboard · Ahmedabad",
   },
 } as const;
 
@@ -96,7 +96,7 @@ export const flowContent = {
     type: "Type",
     typeMissing: "Pick the closest type.",
     city: "City",
-    cityHint: "Ahmedabad only during the pilot.",
+    cityHint: "Ahmedabad only for now.",
     maps: {
       label: "Google Maps link",
       placeholder: "https://maps.app.goo.gl/…",
