@@ -290,6 +290,14 @@ export const adminContent = {
     password: "Password",
     login: "Log in",
     loginHelp: "New admins get a link by email from the Notchs team.",
+    forgot: "Forgot password?",
+    forgotTitle: "Reset your password",
+    forgotHelp:
+      "Enter your admin email. We'll email you a link to set a new password.",
+    forgotSend: "Email me a link",
+    forgotSent:
+      "If that email belongs to an admin, a link is on its way. Not there in a minute? Check spam.",
+    backToLogin: "Back to log in",
     setTitle: "Set your password",
     newPassword: "New password (10 or more characters)",
     confirm: "Type it again",

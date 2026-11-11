@@ -6,6 +6,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { adminRoutes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import { useTurnstile } from "@/shared/components/turnstile";
 import { ApiError } from "@/shared/lib/api-client";
 
 import { adminContent } from "../content";
@@ -80,6 +81,7 @@ export function AdminLogin() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [forgot, setForgot] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -98,6 +100,8 @@ export function AdminLogin() {
       setBusy(false);
     }
   }
+
+  if (forgot) return <AdminForgotPassword onBack={() => setForgot(false)} />;
 
   return (
     <AuthFrame title={copy.loginTitle}>
@@ -125,7 +129,73 @@ export function AdminLogin() {
         )}
         <Submit busy={busy}>{copy.login}</Submit>
       </form>
+      <button
+        type="button"
+        onClick={() => setForgot(true)}
+        className="cursor-pointer justify-self-start text-sm font-semibold underline"
+      >
+        {copy.forgot}
+      </button>
       <p className="text-sm text-muted">{copy.loginHelp}</p>
+    </AuthFrame>
+  );
+}
+
+/** Emails a set-password link (the API sends the same answer for any email). */
+function AdminForgotPassword({ onBack }: { onBack: () => void }) {
+  const turnstile = useTurnstile();
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy || !turnstile.ready) return;
+    const email = String(new FormData(event.currentTarget).get("email"));
+    setBusy(true);
+    setError(null);
+    try {
+      await adminApi.forgotPassword(email, turnstile.token);
+      setSent(true);
+    } catch (caught) {
+      setError(messageOf(caught));
+    } finally {
+      turnstile.reset();
+      setBusy(false);
+    }
+  }
+
+  return (
+    <AuthFrame title={copy.forgotTitle}>
+      {sent ? (
+        <p role="status">{copy.forgotSent}</p>
+      ) : (
+        <form onSubmit={submit} className="grid gap-4">
+          <p className="text-sm text-muted">{copy.forgotHelp}</p>
+          <Field
+            label={copy.email}
+            name="email"
+            type="email"
+            autoComplete="username"
+            required
+            maxLength={120}
+          />
+          {turnstile.widget}
+          {error && (
+            <p role="alert" className="text-sm font-semibold">
+              {error}
+            </p>
+          )}
+          <Submit busy={busy || !turnstile.ready}>{copy.forgotSend}</Submit>
+        </form>
+      )}
+      <button
+        type="button"
+        onClick={onBack}
+        className="cursor-pointer justify-self-start text-sm font-semibold underline"
+      >
+        {copy.backToLogin}
+      </button>
     </AuthFrame>
   );
 }

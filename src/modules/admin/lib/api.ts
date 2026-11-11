@@ -155,6 +155,12 @@ export const adminApi = {
   setPassword: (token: string, password: string) =>
     send("/admin/auth/set-password", "POST", { token, password }),
   logout: () => send("/auth/admin/logout", "POST"),
+  /** Same answer whether or not the email is an admin's. */
+  forgotPassword: (email: string, turnstileToken: string) =>
+    send("/admin/auth/forgot-password", "POST", {
+      email,
+      turnstile_token: turnstileToken,
+    }),
 
   overview: () => get<Overview>("/admin/overview"),
   venues: (query: Query) => get<Paginated<AdminVenue>>("/admin/venues", query),
