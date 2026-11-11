@@ -1,27 +1,18 @@
-"use client";
-
+import { routes } from "@/config/routes";
 import { ArrowRightIcon } from "@/shared/components/icons";
-import { Button } from "@/shared/components/ui/button";
+import { ButtonLink } from "@/shared/components/ui/button";
 
 import { accessLabel, accessLabelShort } from "../content";
-import { useLanding } from "./landing-provider";
 
 type AccessButtonProps = {
   size?: "default" | "sm";
   className?: string;
 };
 
-/** Opens the access dialog with the animated QR. */
+/** Opens the WhatsApp login: a newcomer's first message makes their passport. */
 export function AccessButton({ size, className }: AccessButtonProps) {
-  const { openAccess } = useLanding();
-
   return (
-    <Button
-      size={size}
-      className={className}
-      aria-haspopup="dialog"
-      onClick={openAccess}
-    >
+    <ButtonLink href={routes.login} size={size} className={className}>
       {size === "sm" ? (
         <>
           <span className="sm:hidden">{accessLabelShort}</span>
@@ -33,6 +24,6 @@ export function AccessButton({ size, className }: AccessButtonProps) {
           <ArrowRightIcon className="size-4.5 transition-transform duration-150 group-hover:translate-x-0.5" />
         </>
       )}
-    </Button>
+    </ButtonLink>
   );
 }
