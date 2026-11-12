@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import {
   InstagramIcon,
@@ -57,8 +60,22 @@ export function SiteFooter() {
           </ul>
         </GlassLensTrack>
       </GlassGroup>
-      <span className="text-[.8125rem] text-muted">
-        © {siteConfig.copyrightYear} {siteConfig.name}™
+      <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[.8125rem] text-muted">
+        <Link
+          href={routes.privacy}
+          className="inline-flex min-h-12 items-center underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Privacy
+        </Link>
+        <Link
+          href={routes.terms}
+          className="inline-flex min-h-12 items-center underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Terms
+        </Link>
+        <span>
+          © {siteConfig.copyrightYear} {siteConfig.name}™
+        </span>
       </span>
     </footer>
   );

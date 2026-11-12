@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 
+import { legalRoutes } from "@/config/routes";
 import {
   ArrowRightIcon,
   GiftIcon,
@@ -453,7 +454,26 @@ export function VenueForm({
                 aria-invalid={errors.agree ? true : undefined}
                 className="size-5 flex-none cursor-pointer accent-foreground"
               />
-              {venueCopy.agree}
+              <span>
+                {venueCopy.agreeTo}{" "}
+                <a
+                  href={legalRoutes.terms}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {venueCopy.agreeTerms}
+                </a>{" "}
+                {venueCopy.agreeAnd}{" "}
+                <a
+                  href={legalRoutes.privacy}
+                  target="_blank"
+                  rel="noopener"
+                  className="underline"
+                >
+                  {venueCopy.agreePrivacy}
+                </a>
+              </span>
             </label>
             {errors.agree && (
               <p role="alert" className="text-[.9375rem] text-unnotched">

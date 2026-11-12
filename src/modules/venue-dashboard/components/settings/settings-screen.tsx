@@ -36,7 +36,7 @@ const TOGGLE_KEYS = Object.keys(
 ) as (keyof NotificationPreferences)[];
 
 const mailto = (subject: string) =>
-  `mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent(subject)}`;
+  `mailto:${siteConfig.supportEmail}?subject=${encodeURIComponent(subject)}`;
 
 export function SettingsScreen() {
   const query = useSettings();

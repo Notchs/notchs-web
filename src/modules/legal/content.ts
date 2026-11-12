@@ -11,7 +11,7 @@ export type LegalContent = {
   updated: string;
 };
 
-const UPDATED = "Last updated 10 Nov 2026";
+const UPDATED = "Last updated 12 Nov 2026";
 
 /**
  * The business behind Notchs (Harsh, 10 Nov 2026): no registered company,
@@ -24,9 +24,24 @@ export const legalDetails = {
   basedIn: "Ahmedabad, Gujarat, India",
   /** Courts for disputes. */
   jurisdiction: "Ahmedabad, Gujarat",
+  /**
+   * The person who handles complaints. India's IT Rules, 2021 expect the
+   * Grievance Officer to be named: add the name here once the team picks one.
+   */
+  grievanceOfficer: "",
 };
 
-const contactEmail = siteConfig.contactEmail;
+/** "our Grievance Officer" or "our Grievance Officer, <name>,". */
+const officer = legalDetails.grievanceOfficer
+  ? `our Grievance Officer, ${legalDetails.grievanceOfficer},`
+  : "our Grievance Officer";
+
+/** The same promise on both pages (IT Rules, 2021: 24 hours and 15 days). */
+const complaintPromise =
+  "We acknowledge every complaint within 24 hours and resolve it within 15 days.";
+
+/** Every complaint and data request goes to the Grievance Officer's inbox. */
+const contactEmail = siteConfig.grievanceEmail;
 
 function legalMetadata(
   title: string,
@@ -72,7 +87,7 @@ export const privacyContent: LegalContent = {
   sections: [
     {
       q: "Who we are",
-      a: `${legalDetails.name} is based in ${legalDetails.basedIn}. Under India's Digital Personal Data Protection Act, 2023 (DPDP Act) we are the Data Fiduciary for your personal data. For any question, request or complaint about your data, write to the Notchs team at ${contactEmail}. We handle every request ourselves and reply within 30 days.`,
+      a: `${legalDetails.name} is based in ${legalDetails.basedIn}. Under India's Digital Personal Data Protection Act, 2023 (DPDP Act) we are the Data Fiduciary for your personal data. For any question, request or complaint about your data, write to ${officer} at ${contactEmail}. ${complaintPromise}`,
     },
     {
       q: "What we collect",
@@ -108,7 +123,7 @@ export const privacyContent: LegalContent = {
     },
     {
       q: "Your rights",
-      a: `Under the DPDP Act you can ask what data we have about you and how we use it, correct or update it (most of it you can change yourself in Profile), have it erased, nominate someone to act for you if you die or can't act yourself, and complain to us. Write to the Notchs team at ${contactEmail}; we reply within 30 days. If you're not satisfied, you can complain to the Data Protection Board of India.`,
+      a: `Under the DPDP Act you can ask what data we have about you and how we use it, correct or update it (most of it you can change yourself in Profile), have it erased, withdraw your consent (deleting your account does this), nominate someone to act for you if you die or can't act yourself, and complain to us. Write to ${officer} at ${contactEmail}. ${complaintPromise} If you're not satisfied, you can complain to the Data Protection Board of India.`,
     },
     {
       q: "Children",
@@ -120,7 +135,7 @@ export const privacyContent: LegalContent = {
     },
     {
       q: "Keeping your data safe",
-      a: "Your data travels encrypted, logins work once and expire, and only the people who run Notchs can reach it, and only for the purposes above. If a breach ever affects you, we will tell you and the Data Protection Board as the law requires.",
+      a: "Your data travels encrypted, login links work once and expire, and only the people who run Notchs can reach it, and only for the purposes above. If a breach ever affects you, we will tell you and the Data Protection Board as the law requires.",
     },
     {
       q: "Changes to this notice",
@@ -159,7 +174,7 @@ export const termsContent: LegalContent = {
     },
     {
       q: "Fair use",
-      a: "Don't share or forward counter codes, notch for someone else, use fake numbers, or try to trick the system. If we find fake Notchs we can remove them, along with their points, and block the account.",
+      a: "Don't share or forward counter codes, notch for someone else, use fake numbers, or try to trick the system. If we find fake Notchs we can remove them, along with their points, and block the account. The name, handle and Instagram username you add must be your own and must not be offensive, misleading or against the law; we can change or remove one that is.",
     },
     {
       q: "Rankings are not for sale",
@@ -182,8 +197,8 @@ export const termsContent: LegalContent = {
       a: `These terms are governed by the laws of India. Disputes go to the courts of ${legalDetails.jurisdiction}. If we change these terms we update this page; using Notchs after that means you accept them.`,
     },
     {
-      q: "Contact",
-      a: `Questions about these terms: ${contactEmail}.`,
+      q: "Complaints and contact",
+      a: `Questions or complaints about Notchs, these terms or anything on it: write to ${officer} at ${contactEmail}. ${complaintPromise}`,
     },
   ],
   updated: UPDATED,

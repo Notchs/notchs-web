@@ -115,7 +115,10 @@ export const flowContent = {
     offerTitle: "Your first 3 months are free",
     offerBody:
       "Then the subscription charges apply, and we tell you the amount first. The first 100 places of each kind get 25% off for life.",
-    agree: "I agree to the Terms and Privacy policy",
+    agreeTo: "I agree to the",
+    agreeTerms: "Terms",
+    agreeAnd: "and",
+    agreePrivacy: "Privacy notice",
     agreeMissing: "Tick the box to continue.",
     cta: "Send application",
     busy: "Sending…",
