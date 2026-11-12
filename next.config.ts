@@ -22,6 +22,21 @@ function siteAccess() {
 
 const SITE_ACCESS = siteAccess();
 
+/**
+ * On every response. No other site may show Notchs inside a frame (stops
+ * click-tricking on login and admin pages), other sites never get a full Notchs
+ * address (login links carry a token), and the site asks for no device features.
+ */
+const SECURITY = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), payment=()",
+  },
+];
+
 /** Team builds tell search engines to skip every response, files included. */
 const NO_INDEX = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
@@ -39,6 +54,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      { source: "/:path*", headers: SECURITY },
       { source: "/favicon.ico", headers: WEEK_CACHE },
       { source: "/:path(.*\\.png)", headers: WEEK_CACHE },
       ...(SITE_ACCESS === "public"

@@ -120,6 +120,21 @@ export type AdminAccount = {
   created_at: string;
 };
 
+/** GET /admin/system: on/off states of the API's outside services, never keys. */
+export type SystemStatus = {
+  environment: string;
+  version: string;
+  email: "sending" | "dry_run" | "local_smtp" | "not_configured";
+  email_from: string;
+  whatsapp: "sending" | "dry_run" | "not_configured";
+  whatsapp_webhook_ready: boolean;
+  whatsapp_number_set: boolean;
+  bot_check: "on" | "off" | "not_configured";
+  customer_app_url: string;
+  venue_app_url: string;
+  admin_app_url: string;
+};
+
 export type Option = { value: string; label: string };
 
 type Query = Record<string, string | number | undefined>;
@@ -200,6 +215,19 @@ export const adminApi = {
   approveClaim: (code: string) => decide(`${claimPath(code)}/approve`),
   rejectClaim: (code: string, reason: string) =>
     decide(`${claimPath(code)}/reject`, { reason }),
+  system: () => get<SystemStatus>("/admin/system"),
+  /** Resolves to the API's message; a refusal throws with the provider's reason. */
+  sendTestEmail: async () =>
+    (
+      await request<ApiSuccess<unknown>>("/admin/system/test-email", {
+        method: "POST",
+      })
+    ).message,
+  changePassword: (current: string, next: string) =>
+    send("/admin/auth/change-password", "POST", {
+      current_password: current,
+      new_password: next,
+    }),
   admins: () => get<AdminAccount[]>("/admin/users"),
   addAdmin: (name: string, email: string, role: string) =>
     send("/admin/users", "POST", { name, email, role }),

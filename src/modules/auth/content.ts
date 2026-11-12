@@ -12,6 +12,16 @@ export const qrHint =
 /** The message WhatsApp pre-fills; the bot answers it with a login link. */
 export const LOGIN_MESSAGE = "Hey Notchs, I want to login";
 
+/** Shown under the login button: logging in is the customer's agreement. */
+export const loginConsent = {
+  before:
+    "Notchs is for people aged 18 or older. By logging in you agree to our",
+  terms: "Terms",
+  and: "and",
+  privacy: "Privacy notice",
+  after: ".",
+} as const;
+
 export const loginMetadata: Metadata = {
   title: "Log in",
   robots: { index: false, follow: false },
