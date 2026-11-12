@@ -41,9 +41,9 @@ function redirectOnHost(url: URL, host: string, pathname: string) {
  *    - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
  *    - admin.notchs.com/admin/... redirects to the same page without "/admin".
  *    - notchs.com/admin/... is a 404, so the panel is only on its own host.
- *    - venue.notchs.com/login shows src/app/venue/login (URL stays /login),
+ *    - venues.notchs.com/login shows src/app/venue/login (URL stays /login),
  *      and the bare host shows the dashboard overview.
- *    - venue.notchs.com/venue/... redirects to the same page without "/venue".
+ *    - venues.notchs.com/venue/... redirects to the same page without "/venue".
  *    - notchs.com/venue/... redirects to the venue host, so links already sent
  *      in emails keep working.
  */
