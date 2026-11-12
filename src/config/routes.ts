@@ -3,7 +3,7 @@ import { env } from "./env";
 import { venueConfig, venueOrigin } from "./venue";
 
 /**
- * The venue pages are on their own host (venue.notchs.com) on the live site,
+ * The venue pages are on their own host (venues.notchs.com) on the live site,
  * so links to them from anywhere include it. Team builds (Netlify test links)
  * have no venue host, so there the pages live under /venue.
  */
@@ -50,7 +50,7 @@ export const routes = {
 
 /**
  * Venue dashboard paths, used only inside the dashboard. On the live site they
- * are as seen on the venue host (venue.notchs.com/customers). Private: never
+ * are as seen on the venue host (venues.notchs.com/customers). Private: never
  * link them from public pages.
  */
 const dashboardBase = env.siteAccess === "team" ? venueConfig.appPath : "";
