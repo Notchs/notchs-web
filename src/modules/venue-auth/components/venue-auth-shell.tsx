@@ -34,7 +34,7 @@ export function VenueAuthShell({ children }: { children: ReactNode }) {
         <footer className="mt-10 flex flex-wrap justify-between gap-x-4 gap-y-2 text-sm text-muted">
           <span>{flowContent.footer.copyright}</span>
           <a
-            href={`mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent("Venue login help")}`}
+            href={`mailto:${siteConfig.supportEmail}?subject=${encodeURIComponent("Venue login help")}`}
             className="underline underline-offset-[3px] hover:text-foreground"
           >
             {flowContent.footer.help}
