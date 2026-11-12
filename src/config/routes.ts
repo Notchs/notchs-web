@@ -9,6 +9,19 @@ import { venueConfig, venueOrigin } from "./venue";
  */
 const venueBase = env.siteAccess === "team" ? venueConfig.appPath : venueOrigin;
 
+/**
+ * A main-site page as a link that also works from the venue and admin hosts
+ * (where "/privacy" would be a venue or admin path).
+ */
+const onMainSite = (path: string) =>
+  env.siteAccess === "team" ? path : `${env.appUrl}${path}`;
+
+/** Privacy and Terms, linkable from any host. */
+export const legalRoutes = {
+  privacy: onMainSite("/privacy"),
+  terms: onMainSite("/terms"),
+} as const;
+
 /** Application route paths. Reference these instead of hard-coding strings. */
 export const routes = {
   home: "/",

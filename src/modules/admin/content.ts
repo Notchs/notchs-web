@@ -254,6 +254,52 @@ export const adminContent = {
     notNotified:
       "Saved. The customer sees it in their passport (WhatsApp only replies within 24 hours of their last message).",
   },
+  system: {
+    title: "System",
+    intro:
+      "Whether the API can really send messages. A “dry run” only writes them to the server log, so nobody receives anything.",
+    email: "Email",
+    whatsapp: "WhatsApp",
+    botCheck: "Bot check on forms",
+    links: "Links in messages open",
+    emailState: {
+      sending: "Sending",
+      dry_run: "Dry run: emails are not sent",
+      local_smtp: "Local test inbox: emails are not sent",
+      not_configured: "Not set up: emails fail",
+    } as Record<string, string>,
+    emailFix:
+      "On the API (Render → Environment) set EMAIL_DRY_RUN=false and RESEND_API_KEY, and verify the sending domain in Resend.",
+    whatsappState: {
+      sending: "Sending",
+      dry_run: "Dry run: replies are not sent",
+      not_configured: "Not set up: replies fail",
+    } as Record<string, string>,
+    whatsappFix:
+      "On the API set WHATSAPP_DRY_RUN=false, WHATSAPP_ACCESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID.",
+    webhookMissing:
+      "Meta can't reach the bot yet: set WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN, then add the webhook in Meta.",
+    numberMissing:
+      "WHATSAPP_PUBLIC_NUMBER isn't set, so counter phones can't show a scan QR.",
+    botState: {
+      on: "On",
+      off: "Off",
+      not_configured: "Not set up: forms are refused",
+    } as Record<string, string>,
+    botFix: "On the API set TURNSTILE_SECRET (from Cloudflare Turnstile).",
+    testEmail: "Send me a test email",
+    testing: "Sending…",
+    from: (address: string) => `From ${address}`,
+    environment: (name: string, version: string) =>
+      `API: ${name} · v${version}`,
+  },
+  password: {
+    title: "Change my password",
+    current: "Current password",
+    next: "New password (10 or more characters)",
+    save: "Change password",
+    done: "Password changed. Other devices were logged out.",
+  },
   settings: {
     adminsOnly:
       "Only admins can manage the team. Ask an admin to make changes.",

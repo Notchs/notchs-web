@@ -7,6 +7,7 @@ import { adminApi, type AdminAccount } from "../lib/api";
 import { useAdminQuery } from "../lib/use-admin-query";
 import { useAdmin } from "./admin-gate";
 import { AdminPageHeader } from "./admin-page-header";
+import { AdminSystem, ChangeMyPassword } from "./admin-system";
 import {
   AdminButton,
   LoadState,
@@ -31,11 +32,15 @@ export function AdminSettings() {
   return (
     <>
       <AdminPageHeader title={label} description={description} />
-      {me.role === "admin" ? (
-        <Team myId={me.id} />
-      ) : (
-        <p className="py-10 text-center text-muted">{copy.adminsOnly}</p>
-      )}
+      <div className="grid gap-6">
+        <AdminSystem canTest={me.role === "admin"} />
+        {me.role === "admin" ? (
+          <Team myId={me.id} />
+        ) : (
+          <p className="py-4 text-center text-muted">{copy.adminsOnly}</p>
+        )}
+        <ChangeMyPassword />
+      </div>
     </>
   );
 }
