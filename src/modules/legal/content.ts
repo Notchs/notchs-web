@@ -40,7 +40,8 @@ const officer = legalDetails.grievanceOfficer
 const complaintPromise =
   "We acknowledge every complaint within 24 hours and resolve it within 15 days.";
 
-const contactEmail = siteConfig.contactEmail;
+/** Every complaint and data request goes to the Grievance Officer's inbox. */
+const contactEmail = siteConfig.grievanceEmail;
 
 function legalMetadata(
   title: string,
