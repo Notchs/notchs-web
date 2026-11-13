@@ -36,7 +36,7 @@ conflicts with `CLAUDE.md`, `CLAUDE.md` wins, and you should say so in your PR.
 | Icons and manifest | `icon.svg`, `apple-icon.png`, `app/manifest.ts`. Use existing brand files; never draw a new logo. | Done |
 | Structured data | Homepage only: schema.org `Organization` (name, url, logo, email, `sameAs` Instagram, YouTube, LinkedIn) + `WebSite`. Never `SearchAction`, a founder `Person`, `aggregateRating` or `Review`. | Done (PR #17) |
 | robots.txt | `app/robots.ts`: allow `/`, disallow `/api/`, list the sitemap. Private pages use **`noindex`, not Disallow**, so crawlers can actually read the noindex. | Done |
-| sitemap.xml | `app/sitemap.ts`: only pages that are live for everyone and indexable. City, category and venue pages come from the API, only when it says `is_indexable`. | Done (homepage only for now) |
+| sitemap.xml | `app/sitemap.ts`: only pages that are live for everyone and indexable. City, category and venue pages come from the API, only when it says `is_indexable`. | Done (homepage, `/privacy`, `/terms` since launch, 13 Nov 2026) |
 | Default OG image | `app/opengraph-image.png` (1200×630). Keep text inside the centre 1000×500, because WhatsApp crops the edges. | Done (static image) |
 | Other hosts | Any app on its own host (e.g. `admin.`): `noindex` on every page. | Admin pages are noindex |
 
