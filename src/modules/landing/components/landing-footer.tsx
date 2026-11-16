@@ -7,7 +7,7 @@ import {
 } from "@/shared/components/glass/glass-lens-track";
 import { SiteFooter } from "@/shared/components/layout/site-footer";
 
-import { closingContent, navLinks } from "../content";
+import { closingContent, footerContent, navLinks } from "../content";
 import { AccessButton } from "./access-button";
 
 /** Closing call to action, page links, then the shared socials footer. */
@@ -37,7 +37,7 @@ export function LandingFooter() {
               {siteConfig.name}
             </span>
             <span className="w-full text-[.9375rem] text-muted sm:ml-2 sm:w-auto">
-              {siteConfig.description}
+              {siteConfig.description} · {footerContent.signOff}
             </span>
           </div>
           <nav aria-label="Footer">
