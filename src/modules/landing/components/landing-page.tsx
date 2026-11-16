@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/shared/lib/cn";
+import { CityProvider } from "@/modules/city";
 
 import {
   howItWorksContent,
@@ -47,58 +48,60 @@ function Section({ id, className, children }: SectionProps) {
 export function LandingPage() {
   return (
     <LandingProvider>
-      <StructuredData />
-      <LandingHeader />
-      <main data-smooth-scroll className={jetbrainsMono.variable}>
-        <Hero />
+      <CityProvider>
+        <StructuredData />
+        <LandingHeader />
+        <main data-smooth-scroll className={jetbrainsMono.variable}>
+          <Hero />
 
-        <Section id={sectionIds.howItWorks}>
-          <SectionHeading
-            kicker={howItWorksContent.kicker}
-            title={howItWorksContent.title}
-            description={howItWorksContent.description}
-            className="mb-12 reveal"
-          />
-          <NotchDemo />
-        </Section>
+          <Section id={sectionIds.howItWorks}>
+            <SectionHeading
+              kicker={howItWorksContent.kicker}
+              title={howItWorksContent.title}
+              description={howItWorksContent.description}
+              className="mb-12 reveal"
+            />
+            <NotchDemo />
+          </Section>
 
-        <Section id={sectionIds.map}>
-          <SectionHeading
-            kicker={saturdayContent.kicker}
-            title={saturdayContent.title}
-            description={saturdayContent.description}
-            className="mb-10 reveal"
-          />
-          <SaturdayMap />
-        </Section>
+          <Section id={sectionIds.map}>
+            <SectionHeading
+              kicker={saturdayContent.kicker}
+              title={saturdayContent.title}
+              description={saturdayContent.description}
+              className="mb-10 reveal"
+            />
+            <SaturdayMap />
+          </Section>
 
-        <Section id={sectionIds.places}>
-          <SectionHeading
-            kicker={placesContent.kicker}
-            title={placesContent.title}
-            description={placesContent.description}
-            className="mb-12 reveal"
-          />
-          <PlaceCards />
-        </Section>
+          <Section id={sectionIds.places}>
+            <SectionHeading
+              kicker={placesContent.kicker}
+              title={placesContent.title}
+              description={placesContent.description}
+              className="mb-12 reveal"
+            />
+            <PlaceCards />
+          </Section>
 
-        <Section id={sectionIds.moments}>
-          <Moments />
-        </Section>
+          <Section id={sectionIds.moments}>
+            <Moments />
+          </Section>
 
-        <Section>
-          <Collect />
-        </Section>
+          <Section>
+            <Collect />
+          </Section>
 
-        <Section id={sectionIds.venues}>
-          <ForVenues />
-        </Section>
+          <Section id={sectionIds.venues}>
+            <ForVenues />
+          </Section>
 
-        <Section id={sectionIds.faq}>
-          <Faq />
-        </Section>
-      </main>
-      <LandingFooter />
+          <Section id={sectionIds.faq}>
+            <Faq />
+          </Section>
+        </main>
+        <LandingFooter />
+      </CityProvider>
     </LandingProvider>
   );
 }
