@@ -4,11 +4,13 @@ import { useEffect, useId, useState, type FormEvent } from "react";
 
 import { legalRoutes } from "@/config/routes";
 import {
-  ArrowRightIcon,
-  GiftIcon,
-  MailIcon,
-  MapPinIcon,
-} from "@/shared/components/icons";
+  AuthBackButton,
+  AuthButton,
+  AuthError,
+  AuthHeader,
+  AuthInput,
+} from "@/shared/components/auth";
+import { GiftIcon, MailIcon, MapPinIcon } from "@/shared/components/icons";
 import { useTurnstile } from "@/shared/components/turnstile";
 import { Button } from "@/shared/components/ui/button";
 import { ApiError } from "@/shared/lib/api-client";
@@ -30,10 +32,8 @@ import {
   normaliseEmail,
 } from "../lib/validation";
 import { CodeInput } from "./code-input";
-import { Field } from "./field";
-import { BackButton, VerifyHint } from "./login-screens";
+import { VerifyHint } from "./login-screens";
 import { ApplicationPath } from "./application-path";
-import { FormError, ScreenHeading } from "./venue-auth-shell";
 
 const { apply: applyCopy, code: codeCopy, venue: venueCopy } = flowContent;
 
@@ -79,13 +79,13 @@ export function ApplyEmailForm({
 
   return (
     <>
-      <ScreenHeading
+      <AuthHeader
         kicker={applyCopy.kicker}
         title={applyCopy.title}
         description={applyCopy.description}
       />
       <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-        <Field
+        <AuthInput
           label={flowContent.emailLabel}
           icon={<MailIcon />}
           type="email"
@@ -98,12 +98,16 @@ export function ApplyEmailForm({
           hint={applyCopy.hint}
         />
         {turnstile.widget}
-        <FormError message={formError} />
+        <AuthError message={formError} />
         <VerifyHint show={!turnstile.ready} />
-        <Button type="submit" disabled={busy || !turnstile.ready}>
-          {busy ? applyCopy.busy : applyCopy.cta}
-          {!busy && <ArrowRightIcon className="size-4.5" />}
-        </Button>
+        <AuthButton
+          busy={busy}
+          busyLabel={applyCopy.busy}
+          disabled={!turnstile.ready}
+          arrow
+        >
+          {applyCopy.cta}
+        </AuthButton>
       </form>
       <ApplicationPath current={0} />
     </>
@@ -172,8 +176,8 @@ export function CodeForm({ email, onBack, onVerified }: CodeFormProps) {
 
   return (
     <>
-      <ScreenHeading
-        back={<BackButton label={codeCopy.back} onClick={onBack} />}
+      <AuthHeader
+        back={<AuthBackButton label={codeCopy.back} onClick={onBack} />}
         title={codeCopy.title}
         description={
           <>
@@ -211,9 +215,13 @@ export function CodeForm({ email, onBack, onVerified }: CodeFormProps) {
             {message}
           </p>
         </div>
-        <Button type="submit" disabled={code.length < 6 || busy}>
-          {busy ? codeCopy.busy : codeCopy.cta}
-        </Button>
+        <AuthButton
+          busy={busy}
+          busyLabel={codeCopy.busy}
+          disabled={code.length < 6}
+        >
+          {codeCopy.cta}
+        </AuthButton>
       </form>
       {turnstile.widget}
       <div className="flex flex-wrap items-center justify-between gap-x-4">
@@ -330,19 +338,19 @@ export function VenueForm({
 
   return (
     <>
-      <ScreenHeading
+      <AuthHeader
         kicker={venueCopy.kicker}
         title={venueCopy.title}
         description={venueCopy.description}
       />
       {options === "error" ? (
         <div className="flex flex-col gap-4">
-          <FormError message={venueCopy.loadError} />
+          <AuthError message={venueCopy.loadError} />
           <Button onClick={load}>{venueCopy.retry}</Button>
         </div>
       ) : (
         <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-          <Field
+          <AuthInput
             label={venueCopy.name.label}
             placeholder={venueCopy.name.placeholder}
             autoComplete="organization"
@@ -392,7 +400,7 @@ export function VenueForm({
             error={errors.city_id}
           />
 
-          <Field
+          <AuthInput
             label={venueCopy.maps.label}
             icon={<MapPinIcon />}
             type="url"
@@ -403,14 +411,14 @@ export function VenueForm({
             error={errors.google_maps_url}
             hint={venueCopy.maps.hint}
           />
-          <Field
+          <AuthInput
             label={venueCopy.landmark.label}
             placeholder={venueCopy.landmark.placeholder}
             value={landmark}
             onChange={(e) => setLandmark(e.target.value)}
             error={errors.landmark}
           />
-          <Field
+          <AuthInput
             label={venueCopy.owner.label}
             placeholder={venueCopy.owner.placeholder}
             autoComplete="name"
@@ -418,7 +426,7 @@ export function VenueForm({
             onChange={(e) => setContactName(e.target.value)}
             error={errors.contact_name}
           />
-          <Field
+          <AuthInput
             label={venueCopy.phone.label}
             prefix="+91"
             type="tel"
@@ -482,13 +490,17 @@ export function VenueForm({
             )}
           </div>
 
-          <FormError message={formError} />
+          <AuthError message={formError} />
           {tokenExpired && (
-            <BackButton label={codeCopy.back} onClick={onBack} />
+            <AuthBackButton label={codeCopy.back} onClick={onBack} />
           )}
-          <Button type="submit" disabled={busy || options === "loading"}>
-            {busy ? venueCopy.busy : venueCopy.cta}
-          </Button>
+          <AuthButton
+            busy={busy}
+            busyLabel={venueCopy.busy}
+            disabled={options === "loading"}
+          >
+            {venueCopy.cta}
+          </AuthButton>
         </form>
       )}
     </>

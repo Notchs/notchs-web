@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
  * Public pages Google should index. Add a page here only once it is live for
  * everyone; error pages and anything behind a login stay out.
  */
-const publicPaths = [routes.home];
+const publicPaths = [routes.home, routes.privacy, routes.terms];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return publicPaths.map((path) => ({

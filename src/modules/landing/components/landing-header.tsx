@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { routes } from "@/config/routes";
+import { CitySelector } from "@/modules/city";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
@@ -122,6 +123,9 @@ export function LandingHeader() {
               className="flex items-center gap-1"
             >
               <span className="max-sm:hidden" {...LENS_ITEM}>
+                <CitySelector />
+              </span>
+              <span className="max-sm:hidden" {...LENS_ITEM}>
                 <ThemeToggle />
               </span>
               <a
@@ -191,6 +195,10 @@ export function LandingHeader() {
                     </a>
                   </li>
                   <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">
+                    <span className="text-base text-muted">City</span>
+                    <CitySelector />
+                  </li>
+                  <li className="flex items-center justify-between pl-3 sm:hidden">
                     <span className="text-base text-muted">Theme</span>
                     <ThemeToggle />
                   </li>

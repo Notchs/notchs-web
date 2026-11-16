@@ -8,13 +8,18 @@ import { env } from "./env";
 export const venueConfig = {
   /** Any host starting with this is the venue platform. */
   hostPrefix: "venues.",
+  /** Also opens the venue platform (venue.notchs.com), if that address exists. */
+  alsoHostPrefix: "venue.",
   /** Folder of the venue pages inside src/app. Never shown in venue URLs. */
   appPath: "/venue",
 } as const;
 
 /** True for venues.notchs.com, venues.localhost and the like. */
 export function isVenueHost(hostname: string) {
-  return hostname.startsWith(venueConfig.hostPrefix);
+  return (
+    hostname.startsWith(venueConfig.hostPrefix) ||
+    hostname.startsWith(venueConfig.alsoHostPrefix)
+  );
 }
 
 /** The venue host's origin, worked out from the site address. */

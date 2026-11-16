@@ -209,3 +209,28 @@ export function MoreIcon(props: IconProps) {
     </OutlineIcon>
   );
 }
+
+export function SearchIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-4.4-4.4" />
+    </OutlineIcon>
+  );
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </OutlineIcon>
+  );
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2.25} strokeLinecap="round" {...props}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </OutlineIcon>
+  );
+}

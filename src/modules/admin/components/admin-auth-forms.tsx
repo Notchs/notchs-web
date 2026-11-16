@@ -1,11 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 
 import { adminRoutes } from "@/config/routes";
-import { siteConfig } from "@/config/site";
-import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import {
+  AuthBackButton,
+  AuthBrandPanel,
+  AuthButton,
+  AuthError,
+  AuthFormPanel,
+  AuthHeader,
+  AuthInput,
+  AuthLayout,
+  AuthPasswordInput,
+  AuthSuccess,
+  AuthTextButton,
+} from "@/shared/components/auth";
+import { MailIcon } from "@/shared/components/icons";
 import { useTurnstile } from "@/shared/components/turnstile";
 import { ApiError } from "@/shared/lib/api-client";
 
@@ -14,61 +26,18 @@ import { adminApi } from "../lib/api";
 
 const copy = adminContent.auth;
 
-function AuthFrame({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+/**
+ * Admin auth on the shared auth layout. There is no public admin sign-up:
+ * new admins are added by the team and set their password from an emailed link.
+ */
+function AdminAuthLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="row-span-full grid min-h-svh place-items-center px-gutter py-10">
-      <div className="grid w-full max-w-sm gap-6">
-        <span className="flex items-center gap-2.5">
-          <NotchGlyph className="size-6" />
-          <b className="font-display text-lg">
-            {siteConfig.name} {adminContent.badge}
-          </b>
-        </span>
-        <h1 className="font-display text-3xl font-extrabold tracking-[-.03em]">
-          {title}
-        </h1>
-        {children}
-      </div>
-    </main>
-  );
-}
-
-function Field({
-  label,
-  ...props
-}: { label: string } & React.ComponentProps<"input">) {
-  return (
-    <label className="grid gap-1 text-sm">
-      <span className="font-medium">{label}</span>
-      <input
-        className="min-h-11 rounded-xl border border-line bg-background px-3 text-base"
-        {...props}
-      />
-    </label>
-  );
-}
-
-function Submit({
-  busy,
-  children,
-}: {
-  busy: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="submit"
-      disabled={busy}
-      className="min-h-11 cursor-pointer rounded-full bg-ink font-semibold text-paper disabled:opacity-60"
+    <AuthLayout
+      brand={<AuthBrandPanel {...copy.brand} />}
+      helpSubject={copy.helpSubject}
     >
       {children}
-    </button>
+    </AuthLayout>
   );
 }
 
@@ -78,10 +47,23 @@ const messageOf = (error: unknown) =>
     : adminContent.actionFailed;
 
 export function AdminLogin() {
+  const [forgot, setForgot] = useState(false);
+
+  return (
+    <AdminAuthLayout>
+      {forgot ? (
+        <AdminForgotPassword onBack={() => setForgot(false)} />
+      ) : (
+        <AdminLoginForm onForgot={() => setForgot(true)} />
+      )}
+    </AdminAuthLayout>
+  );
+}
+
+function AdminLoginForm({ onForgot }: { onForgot: () => void }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [forgot, setForgot] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,43 +83,37 @@ export function AdminLogin() {
     }
   }
 
-  if (forgot) return <AdminForgotPassword onBack={() => setForgot(false)} />;
-
   return (
-    <AuthFrame title={copy.loginTitle}>
-      <form onSubmit={submit} className="grid gap-4">
-        <Field
+    <AuthFormPanel screenKey="login">
+      <AuthHeader title={copy.loginTitle} compact />
+      <form onSubmit={submit} className="flex flex-col gap-5">
+        <AuthInput
           label={copy.email}
+          icon={<MailIcon />}
           name="email"
           type="email"
+          inputMode="email"
           autoComplete="username"
           required
           maxLength={120}
         />
-        <Field
+        <AuthPasswordInput
           label={copy.password}
           name="password"
-          type="password"
           autoComplete="current-password"
           required
           maxLength={128}
+          labelAction={
+            <AuthTextButton onClick={onForgot}>{copy.forgot}</AuthTextButton>
+          }
         />
-        {error && (
-          <p role="alert" className="text-sm font-semibold">
-            {error}
-          </p>
-        )}
-        <Submit busy={busy}>{copy.login}</Submit>
+        <AuthError message={error} />
+        <AuthButton busy={busy} busyLabel={copy.loggingIn} arrow>
+          {copy.login}
+        </AuthButton>
       </form>
-      <button
-        type="button"
-        onClick={() => setForgot(true)}
-        className="cursor-pointer justify-self-start text-sm font-semibold underline"
-      >
-        {copy.forgot}
-      </button>
-      <p className="text-sm text-muted">{copy.loginHelp}</p>
-    </AuthFrame>
+      <p className="leading-relaxed text-muted">{copy.loginHelp}</p>
+    </AuthFormPanel>
   );
 }
 
@@ -165,38 +141,52 @@ function AdminForgotPassword({ onBack }: { onBack: () => void }) {
     }
   }
 
+  const back = <AuthBackButton label={copy.backToLogin} onClick={onBack} />;
+
+  if (sent) {
+    return (
+      <AuthFormPanel screenKey="sent">
+        <AuthSuccess
+          stamp={copy.forgotSentStamp}
+          title={copy.forgotSentTitle}
+          body={copy.forgotSent}
+        >
+          {back}
+        </AuthSuccess>
+      </AuthFormPanel>
+    );
+  }
+
   return (
-    <AuthFrame title={copy.forgotTitle}>
-      {sent ? (
-        <p role="status">{copy.forgotSent}</p>
-      ) : (
-        <form onSubmit={submit} className="grid gap-4">
-          <p className="text-sm text-muted">{copy.forgotHelp}</p>
-          <Field
-            label={copy.email}
-            name="email"
-            type="email"
-            autoComplete="username"
-            required
-            maxLength={120}
-          />
-          {turnstile.widget}
-          {error && (
-            <p role="alert" className="text-sm font-semibold">
-              {error}
-            </p>
-          )}
-          <Submit busy={busy || !turnstile.ready}>{copy.forgotSend}</Submit>
-        </form>
-      )}
-      <button
-        type="button"
-        onClick={onBack}
-        className="cursor-pointer justify-self-start text-sm font-semibold underline"
-      >
-        {copy.backToLogin}
-      </button>
-    </AuthFrame>
+    <AuthFormPanel screenKey="forgot">
+      <AuthHeader
+        back={back}
+        title={copy.forgotTitle}
+        description={copy.forgotHelp}
+      />
+      <form onSubmit={submit} className="flex flex-col gap-5">
+        <AuthInput
+          label={copy.email}
+          icon={<MailIcon />}
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="username"
+          required
+          maxLength={120}
+          autoFocus
+        />
+        {turnstile.widget}
+        <AuthError message={error} />
+        <AuthButton
+          busy={busy}
+          busyLabel={copy.sending}
+          disabled={!turnstile.ready}
+        >
+          {copy.forgotSend}
+        </AuthButton>
+      </form>
+    </AuthFormPanel>
   );
 }
 
@@ -244,37 +234,36 @@ export function AdminSetPassword() {
   }
 
   return (
-    <AuthFrame title={copy.setTitle}>
-      {token === undefined ? null : !token ? (
-        <p className="text-muted">{copy.noToken}</p>
-      ) : (
-        <form onSubmit={submit} className="grid gap-4">
-          <Field
-            label={copy.newPassword}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            maxLength={128}
-          />
-          <Field
-            label={copy.confirm}
-            name="confirm"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={10}
-            maxLength={128}
-          />
-          {error && (
-            <p role="alert" className="text-sm font-semibold">
-              {error}
-            </p>
-          )}
-          <Submit busy={busy}>{copy.save}</Submit>
-        </form>
-      )}
-    </AuthFrame>
+    <AdminAuthLayout>
+      <AuthFormPanel screenKey={token ? "form" : "wait"}>
+        <AuthHeader kicker={copy.kicker} title={copy.setTitle} />
+        {token === undefined ? null : !token ? (
+          <p className="leading-relaxed text-muted">{copy.noToken}</p>
+        ) : (
+          <form onSubmit={submit} className="flex flex-col gap-5">
+            <AuthPasswordInput
+              label={copy.newPassword}
+              name="password"
+              autoComplete="new-password"
+              required
+              minLength={10}
+              maxLength={128}
+            />
+            <AuthPasswordInput
+              label={copy.confirm}
+              name="confirm"
+              autoComplete="new-password"
+              required
+              minLength={10}
+              maxLength={128}
+            />
+            <AuthError message={error} />
+            <AuthButton busy={busy} busyLabel={copy.saving}>
+              {copy.save}
+            </AuthButton>
+          </form>
+        )}
+      </AuthFormPanel>
+    </AdminAuthLayout>
   );
 }

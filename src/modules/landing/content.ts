@@ -10,17 +10,19 @@ import { photoFiles, type PhotoFile } from "./photos";
 /** In-page sections the header links to. */
 export const sectionIds = {
   howItWorks: "how-it-works",
-  map: "ahmedabad",
-  places: "places",
+  map: "city-pulse",
+  places: "explore",
+  neighbourhoods: "neighbourhoods",
   moments: "moments",
+  cities: "cities",
   venues: "venues",
   faq: "faq",
 } as const;
 
 export const navLinks = [
   { label: "How it works", href: `#${sectionIds.howItWorks}` },
-  { label: "Ahmedabad", href: `#${sectionIds.map}` },
-  { label: "Places", href: `#${sectionIds.places}` },
+  { label: "City Pulse", href: `#${sectionIds.map}` },
+  { label: "Explore", href: `#${sectionIds.places}` },
   { label: "For venues", href: `#${sectionIds.venues}` },
   { label: "FAQ", href: `#${sectionIds.faq}` },
 ] as const;
@@ -274,10 +276,30 @@ export const sampleProof = {
 } as const;
 
 export const placesContent = {
-  kicker: "Places",
-  title: "Where you'll Notch.",
+  kicker: "Explore by vibe",
+  title: "Find your kind of place.",
   description:
-    "The spots you already go to. Each visit you prove adds to your Notch count.",
+    "Cafés, turfs, courts and game nights. The spots you already go to, where every visit you prove adds to your Notch count.",
+} as const;
+
+export const neighbourhoodsContent = {
+  kicker: "Neighbourhoods",
+  title: (city: string) => `${city}, area by area.`,
+  description:
+    "Every city is a set of neighbourhoods, each with its own spots. Pick yours and go.",
+  areaOf: (city: string) => `Area in ${city}`,
+} as const;
+
+export const communityContent = {
+  kicker: "Every city",
+  title: "One platform. Countless local stories.",
+  description:
+    "Notchs connects people with the places they love and the people they meet there. We're starting in Ahmedabad and growing one city at a time.",
+  live: "Live now",
+  next: "Not here yet",
+  ask: "Want Notchs in your city?",
+  askBody:
+    "Pick it from the list and ask. Every request tells us where to go next.",
 } as const;
 
 export const collectContent = {
@@ -290,7 +312,7 @@ export const collectContent = {
     },
     {
       title: "City rank",
-      body: "See where you stand in Ahmedabad from your 3rd Notch.",
+      body: "See where you stand in your city from your 3rd Notch.",
     },
     {
       title: "Badges",
@@ -312,7 +334,7 @@ export const builderContent = {
   countLabel: "Notchs",
   empty: "Add a place to start your card.",
   rankLocked: "City rank unlocks at your 3rd Notch",
-  rankOpen: "Ranked in Ahmedabad",
+  rankOpen: "Ranked in your city",
   mostly: "Mostly",
   reset: "Start over",
   add: "Add one",
@@ -330,10 +352,13 @@ export const builderBadges = [
 ] as const;
 
 export const saturdayContent = {
-  kicker: "One Saturday in Ahmedabad",
-  title: "Your city, one Notch at a time.",
+  kicker: "City Pulse",
+  title: "What's happening around your city?",
   description:
-    "Tap a stop to fly there. Every pin is a place where a real visit becomes a Notch.",
+    "One Saturday in Ahmedabad: tap a stop to fly there. Every pin is a place where a real visit becomes a Notch.",
+  noMapDescription:
+    "Pick your city to see what's happening there. More cities fill in as Notchs goes live.",
+  cityLabel: "Your city",
   credit: "© OpenStreetMap contributors",
   cta: "Notch it here",
   mapAlt:
@@ -420,7 +445,7 @@ export const momentsContent = {
     },
     {
       caption: "See who's ahead",
-      sticker: "#[N] in Ahmedabad",
+      sticker: "#[N] in your city",
       image: photo(
         "people-table-phones.jpg",
         "A group of friends at a table looking at their phones",
@@ -467,14 +492,22 @@ export const faqContent = {
       a: "The code on the counter phone changes every 30 seconds. You have to be there to scan it.",
     },
     {
-      q: "Where can I use it?",
-      a: "In Ahmedabad, at places with a Notchs counter phone. Look for the QR at the counter.",
+      q: "Which cities is Notchs in?",
+      a: "Ahmedabad, for now, at places with a Notchs counter phone. We're adding cities one at a time.",
+    },
+    {
+      q: "Can I ask for Notchs in my city?",
+      a: `Yes. Pick your city from the list at the top of the page and tap "Ask for Notchs", or email ${siteConfig.contactEmail}.`,
+    },
+    {
+      q: "How can a venue join?",
+      a: "Apply from the venue page. The Notchs team checks every venue, then emails a link to set your password. Your first 3 months are free.",
     },
   ],
 } as const;
 
 export const closingContent = {
-  title: "Ahmedabad is getting ranked.",
+  title: "Your city is getting ranked.",
   description: "Don't stay unnotched.",
 } as const;
 
@@ -498,3 +531,7 @@ export const landingMetadata: Metadata = {
   alternates: { canonical: routes.home },
   openGraph: { ...openGraphBase, url: routes.home, title, description },
 };
+
+export const footerContent = {
+  signOff: "Built for every city",
+} as const;

@@ -4,14 +4,19 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 
 import { routes } from "@/config/routes";
-import { ButtonLink, Button } from "@/shared/components/ui/button";
+import {
+  AuthButton,
+  AuthError,
+  AuthFormPanel,
+  AuthHeader,
+  AuthPasswordInput,
+} from "@/shared/components/auth";
+import { ButtonLink } from "@/shared/components/ui/button";
 import { ApiError } from "@/shared/lib/api-client";
 
 import { flowContent } from "../content";
 import { setVenuePassword } from "../lib/api";
 import { errorMessage, fieldErrors } from "../lib/errors";
-import { PasswordField } from "./field";
-import { FormError, ScreenFrame, ScreenHeading } from "./venue-auth-shell";
 
 const copy = flowContent.setPassword;
 
@@ -80,10 +85,10 @@ export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
 
   return (
     <>
-      <ScreenFrame screenKey={state.status}>
+      <AuthFormPanel screenKey={state.status}>
         {state.status === "invalid" ? (
           <>
-            <ScreenHeading
+            <AuthHeader
               kicker={copy.kicker}
               title={copy.invalidTitle}
               description={copy.invalidBody}
@@ -97,13 +102,13 @@ export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
           </>
         ) : (
           <>
-            <ScreenHeading
+            <AuthHeader
               kicker={copy.kicker}
               title={copy.title}
               description={copy.description}
             />
             <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-              <PasswordField
+              <AuthPasswordInput
                 label={copy.password}
                 autoComplete="new-password"
                 value={password}
@@ -111,17 +116,17 @@ export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
                 error={errors.password}
                 autoFocus
               />
-              <PasswordField
+              <AuthPasswordInput
                 label={copy.confirm}
                 autoComplete="new-password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 error={errors.confirm}
               />
-              <FormError message={formError} />
-              <Button type="submit" disabled={busy}>
-                {busy ? copy.busy : copy.cta}
-              </Button>
+              <AuthError message={formError} />
+              <AuthButton busy={busy} busyLabel={copy.busy}>
+                {copy.cta}
+              </AuthButton>
             </form>
           </>
         )}
@@ -133,7 +138,7 @@ export function SetPasswordForm({ dashboardHref }: { dashboardHref?: string }) {
             {copy.backToLogin}
           </Link>
         </p>
-      </ScreenFrame>
+      </AuthFormPanel>
     </>
   );
 }

@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { adminConfig, isAdminHost } from "@/config/admin";
+import { API_PROXY_PREFIX } from "@/config/api";
 import { env } from "@/config/env";
+import { serverEnv } from "@/config/server-env";
 import { isVenueHost, venueConfig, venueOrigin } from "@/config/venue";
 import { guardTeamAccess } from "@/shared/lib/team-access";
 
@@ -30,14 +32,42 @@ function redirectOnHost(url: URL, host: string, pathname: string) {
   return NextResponse.redirect(url);
 }
 
+/** Headers only this proxy may send to the API (notchs-api, app/common/http.py). */
+const PROXY_SECRET_HEADER = "x-notchs-proxy-secret";
+const PROXY_CLIENT_IP_HEADER = "x-notchs-client-ip";
+/** Set by Netlify to the address that connected to it; visitors can't change it. */
+const NETLIFY_CLIENT_IP_HEADER = "x-nf-client-connection-ip";
+
 /**
- * Runs before every page.
+ * Sends an API call on to the backend, with the visitor's address and the
+ * shared secret that lets the API believe it. The API's rate limits count per
+ * visitor with this; without it they can't tell visitors apart. Anything the
+ * browser sent under these names is dropped first.
+ */
+function proxyToApi(request: NextRequest) {
+  const headers = new Headers(request.headers);
+  headers.delete(PROXY_SECRET_HEADER);
+  headers.delete(PROXY_CLIENT_IP_HEADER);
+  const visitor = request.headers.get(NETLIFY_CLIENT_IP_HEADER);
+  if (serverEnv.apiProxySecret && visitor) {
+    headers.set(PROXY_SECRET_HEADER, serverEnv.apiProxySecret);
+    headers.set(PROXY_CLIENT_IP_HEADER, visitor);
+  }
+  const { pathname, search } = request.nextUrl;
+  return NextResponse.rewrite(new URL(`${pathname}${search}`, env.apiUrl), {
+    request: { headers },
+  });
+}
+
+/**
+ * Runs before every page and every API call.
  *
  * 1. Team lock first: on test links, anyone without the team login is sent to
  *    /team-login (see src/shared/lib/team-access.ts). Keep this first.
- * 2. Team builds have no admin or venue host, so those are simply served at
+ * 2. API calls (/api/...) go to the backend through `proxyToApi`.
+ * 3. Team builds have no admin or venue host, so those are simply served at
  *    /admin and /venue.
- * 3. On the live site, splits the site by host:
+ * 4. On the live site, splits the site by host:
  *    - admin.notchs.com/venues shows src/app/admin/venues (URL stays /venues).
  *    - admin.notchs.com/admin/... redirects to the same page without "/admin".
  *    - notchs.com/admin/... is a 404, so the panel is only on its own host.
@@ -51,9 +81,11 @@ export async function proxy(request: NextRequest) {
   const locked = await guardTeamAccess(request);
   if (locked) return locked;
 
+  const { pathname, search } = request.nextUrl;
+  if (isUnder(API_PROXY_PREFIX, pathname)) return proxyToApi(request);
+
   if (env.siteAccess === "team") return NextResponse.next();
 
-  const { pathname, search } = request.nextUrl;
   const url = request.nextUrl.clone();
   const host = requestHost(request);
 
@@ -88,6 +120,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Pages only: skip the API proxy, Next internals and files like icon.svg.
-  matcher: ["/((?!api/|_next/static|_next/image|.*\\..*).*)"],
+  // Pages and API calls; skip Next internals and files like icon.svg.
+  matcher: ["/((?!_next/static|_next/image|.*\\..*).*)", "/api/:path*"],
 };

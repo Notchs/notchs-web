@@ -8,4 +8,9 @@ export const serverEnv = {
   /** The shared team login for test links. Set in Netlify for branch deploys and deploy previews. */
   teamUsername: (process.env.TEAM_USERNAME ?? "").trim(),
   teamPassword: process.env.TEAM_PASSWORD ?? "",
+  /**
+   * Shared with the API only (its PROXY_SECRET). Sent with every proxied API
+   * call so the API can trust the visitor's address that comes with it.
+   */
+  apiProxySecret: (process.env.API_PROXY_SECRET ?? "").trim(),
 };

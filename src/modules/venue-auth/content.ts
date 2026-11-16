@@ -4,7 +4,7 @@ export const venueLoginMetadata: Metadata = {
   title: "Venue log in",
   robots: { index: false, follow: false },
   description:
-    "Log in to your venue on Notchs, or apply to bring your venue to Notchs in Ahmedabad.",
+    "Log in to your venue on Notchs, or apply to bring your venue to Notchs.",
 };
 
 export const setPasswordMetadata: Metadata = {
@@ -12,24 +12,28 @@ export const setPasswordMetadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const showcaseContent = {
-  badge: "For venues",
-  title: "Know who comes back.",
-  description:
-    "Every visit to your venue, verified at the counter. No staff work, no till connection.",
-  sample: {
-    label: "Kahwa House · This week",
-    total: 86,
-    detail: "customers · 31 new",
-    /** Bar heights in percent, Monday to Sunday; Saturday is highlighted. */
-    bars: [38, 52, 46, 61, 74, 100, 88],
-    highlight: 5,
-    caption: "Sample dashboard · Ahmedabad",
+/** The Ink brand panel, per mode. Facts only: no sample numbers. */
+export const brandContent = {
+  helpSubject: "Venue login help",
+  login: {
+    kicker: "Welcome back!",
+    title: "Log in to your venue",
+    description:
+      "Access your dashboard, see who comes back and grow your venue.",
+    preview: { label: "Total Visits", value: "12.5K", change: "+12%" },
+  },
+  apply: {
+    kicker: "New venue",
+    title: "Your venue deserves to be remembered.",
+    description:
+      "Apply once. The Notchs team checks every venue before it goes live.",
+    preview: { label: "Regulars", value: "1.2K", change: "+18%" },
   },
 } as const;
 
+export type VenueAuthMode = "login" | "apply";
+
 export const flowContent = {
-  forVenues: "For venues",
   swap: {
     login: { question: "New to Notchs?", cta: "Apply for your venue" },
     apply: { question: "Already approved?", cta: "Log in" },
@@ -40,16 +44,12 @@ export const flowContent = {
   verifyHint: "Complete the check above to continue.",
   emailInvalid: "Enter a full email, like owner@kahwahouse.in.",
   login: {
-    kicker: "Venue log in",
-    title: "Log in to your venue",
-    description: "Use the email and password from your Notchs welcome email.",
+    title: "Log in to your venue account",
     password: "Password",
     passwordMissing: "Enter your password.",
     forgot: "Forgot password?",
     cta: "Log in",
     busy: "Logging in…",
-    staffNote:
-      "Staff at the counter don't need to log in. The counter phone stays paired.",
   },
   forgot: {
     back: "Back to log in",
@@ -170,9 +170,5 @@ export const flowContent = {
     ],
     done: "done",
     current: "current step",
-  },
-  footer: {
-    copyright: "© 2026 Notchs · Ahmedabad",
-    help: "Help",
   },
 } as const;

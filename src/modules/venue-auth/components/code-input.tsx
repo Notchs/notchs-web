@@ -32,11 +32,11 @@ export function CodeInput({
           key={i}
           aria-hidden="true"
           className={cn(
-            "flex h-14 items-center justify-center rounded-[10px] border-2 bg-card font-display text-2xl transition-colors duration-150 sm:h-16 sm:text-[1.75rem]",
+            "flex h-14 items-center justify-center rounded-[10px] border-2 bg-card font-display text-2xl transition-[border-color,box-shadow] duration-150 sm:h-16 sm:text-[1.75rem]",
             invalid
               ? "border-unnotched"
               : i === active
-                ? "border-line group-focus-within:border-foreground"
+                ? "border-line group-focus-within:border-foreground group-focus-within:ring-4 group-focus-within:ring-foreground/12"
                 : "border-line",
           )}
         >

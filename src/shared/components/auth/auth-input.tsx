@@ -5,7 +5,7 @@ import { useId, useState, type ComponentProps, type ReactNode } from "react";
 import { EyeIcon, EyeOffIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/cn";
 
-type FieldProps = ComponentProps<"input"> & {
+type AuthInputProps = ComponentProps<"input"> & {
   label: string;
   hint?: string;
   error?: string;
@@ -19,7 +19,7 @@ type FieldProps = ComponentProps<"input"> & {
 };
 
 /** Labelled 52px text input with optional icon, prefix, hint and error. */
-export function Field({
+export function AuthInput({
   label,
   hint,
   error,
@@ -29,7 +29,7 @@ export function Field({
   labelAction,
   className,
   ...props
-}: FieldProps) {
+}: AuthInputProps) {
   const id = useId();
   const messageId = `${id}-message`;
   const message = error ?? hint;
@@ -44,8 +44,10 @@ export function Field({
       </div>
       <div
         className={cn(
-          "flex h-13 items-center rounded-[10px] border bg-card transition-colors duration-150 focus-within:border-foreground",
-          error ? "border-unnotched" : "border-line",
+          "flex h-13 items-center rounded-[10px] border bg-card transition-[border-color,box-shadow] duration-150 focus-within:border-foreground focus-within:ring-4 focus-within:ring-foreground/12",
+          error
+            ? "border-unnotched focus-within:border-unnotched focus-within:ring-unnotched/15"
+            : "border-line",
         )}
       >
         {icon && (
@@ -84,11 +86,13 @@ export function Field({
 }
 
 /** Password input with an eye button that shows or hides it. */
-export function PasswordField(props: Omit<FieldProps, "type" | "action">) {
+export function AuthPasswordInput(
+  props: Omit<AuthInputProps, "type" | "action">,
+) {
   const [visible, setVisible] = useState(false);
 
   return (
-    <Field
+    <AuthInput
       {...props}
       type={visible ? "text" : "password"}
       action={

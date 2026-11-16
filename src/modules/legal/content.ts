@@ -52,24 +52,34 @@ function legalMetadata(
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { ...openGraphBase, title, description, url: path },
+    // A page that sets its own Open Graph loses the site's share image, so it is
+    // named again here (the files in src/app).
+    openGraph: {
+      ...openGraphBase,
+      title,
+      description,
+      url: path,
+      images: ["/opengraph-image.png"],
+    },
+    twitter: { card: "summary_large_image", images: ["/twitter-image.png"] },
   };
 }
 
+// Titles and descriptions as written in SEO_PLAN.md §2.
 export const privacyMetadata = legalMetadata(
   "Privacy notice",
-  "What Notchs keeps and why, what places see (totals, never your number), your rights under the DPDP Act, and how to delete your account.",
+  "What Notchs keeps, what we never do, what venues can see (totals, never phone numbers), and how to delete everything.",
   routes.privacy,
 );
 
 export const termsMetadata = legalMetadata(
   "Terms",
-  "The rules for using Notchs: 18+, one Notch per place per day, fair use, rewards, rules for places, and rankings that are never for sale.",
+  "The rules for using Notchs: one Notch per place per day, fair use, and rankings that are never for sale.",
   routes.terms,
 );
 
 export const privacyContent: LegalContent = {
-  title: "Privacy",
+  title: "Privacy notice",
   summary: [
     {
       label: "What we keep",
