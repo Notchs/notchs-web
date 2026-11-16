@@ -14,6 +14,7 @@ export const sectionIds = {
   places: "explore",
   neighbourhoods: "neighbourhoods",
   moments: "moments",
+  rewards: "rewards",
   cities: "cities",
   venues: "venues",
   faq: "faq",
@@ -456,15 +457,16 @@ export const momentsContent = {
 
 export const venuesContent = {
   kicker: "For venues",
-  title: "Pay for customers, not clicks.",
+  title: "Know who comes back.",
   description:
-    "A spare phone at your counter shows the code. You see who comes back, without ever seeing their phone number.",
+    "A spare phone at your counter shows the code. You see first-timers and regulars, and reward the ones who keep coming back, without ever seeing a phone number.",
   points: [
     "First-timers and regulars, every week",
+    "A Notch Card that rewards your regulars",
     "Totals only. Never names or phone numbers",
     "Free for your first 3 months",
   ],
-  cta: "Bring Notchs to your venue",
+  cta: "Grow with Notchs",
   image: photo(
     "cafe-lights.jpg",
     "Woven bamboo pendant lights glowing over a café",
@@ -534,4 +536,49 @@ export const landingMetadata: Metadata = {
 
 export const footerContent = {
   signOff: "Built for every city",
+  columns: [
+    {
+      title: "Product",
+      links: [
+        { label: "How it works", href: `#${sectionIds.howItWorks}` },
+        { label: "City Pulse", href: `#${sectionIds.map}` },
+        { label: "Explore", href: `#${sectionIds.places}` },
+        { label: "Rewards", href: `#${sectionIds.rewards}` },
+      ],
+    },
+    {
+      title: "Community",
+      links: [
+        { label: "Real moments", href: `#${sectionIds.moments}` },
+        { label: "Neighbourhoods", href: `#${sectionIds.neighbourhoods}` },
+        { label: "Every city", href: `#${sectionIds.cities}` },
+      ],
+    },
+    {
+      title: "Business",
+      links: [
+        { label: "For venues", href: `#${sectionIds.venues}` },
+        { label: "Venue log in", href: routes.venueLogin },
+        {
+          label: "Apply for your venue",
+          href: `${routes.venueLogin}?view=apply`,
+        },
+      ],
+    },
+    {
+      title: "Cities",
+      links: [
+        { label: "Ahmedabad", href: `?city=ahmedabad#${sectionIds.map}` },
+        { label: "Ask for your city", href: `#${sectionIds.cities}` },
+      ],
+    },
+    {
+      title: "Support",
+      links: [
+        { label: "FAQ", href: `#${sectionIds.faq}` },
+        { label: "Help", href: `mailto:${siteConfig.supportEmail}` },
+        { label: "Contact", href: `mailto:${siteConfig.contactEmail}` },
+      ],
+    },
+  ],
 } as const;

@@ -1,13 +1,8 @@
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
-import { GlassGroup } from "@/shared/components/glass/glass-group";
-import {
-  GlassLensTrack,
-  LENS_ITEM,
-} from "@/shared/components/glass/glass-lens-track";
 import { SiteFooter } from "@/shared/components/layout/site-footer";
 
-import { closingContent, footerContent, navLinks } from "../content";
+import { closingContent, footerContent } from "../content";
 import { AccessButton } from "./access-button";
 
 /** Closing call to action, page links, then the shared socials footer. */
@@ -30,35 +25,42 @@ export function LandingFooter() {
       </section>
 
       <div className="border-t border-line">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-gutter py-10 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-            <NotchGlyph className="size-6" />
-            <span className="font-display text-[1.0625rem] font-extrabold">
-              {siteConfig.name}
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-gutter py-12 sm:py-16 lg:grid-cols-[1.2fr_3fr] lg:gap-16">
+          <div className="flex flex-col gap-3">
+            <span className="flex items-center gap-2.5">
+              <NotchGlyph className="size-6" />
+              <span className="font-display text-[1.0625rem] font-extrabold">
+                {siteConfig.name}
+              </span>
             </span>
-            <span className="w-full text-[.9375rem] text-muted sm:ml-2 sm:w-auto">
-              {siteConfig.description} · {footerContent.signOff}
-            </span>
+            <p className="max-w-[30ch] text-[.9375rem] leading-relaxed text-muted">
+              {siteConfig.description}
+            </p>
+            <p className="text-sm font-semibold">{footerContent.signOff}</p>
           </div>
-          <nav aria-label="Footer">
-            {/* A soft highlight follows the pointer along the links. */}
-            <GlassGroup self={false}>
-              <GlassLensTrack lensRadius={20} inset={2}>
-                <ul className="-ml-3 flex flex-wrap gap-x-1 sm:ml-0">
-                  {navLinks.map((link) => (
-                    <li key={link.href}>
+          <nav
+            aria-label="Footer"
+            className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5"
+          >
+            {footerContent.columns.map((column) => (
+              <div key={column.title} className="flex flex-col gap-2">
+                <h2 className="text-xs font-semibold tracking-[.14em] text-muted uppercase">
+                  {column.title}
+                </h2>
+                <ul className="flex flex-col">
+                  {column.links.map((link) => (
+                    <li key={link.label}>
                       <a
                         href={link.href}
-                        className="relative inline-flex min-h-12 items-center rounded-full px-3 text-[.9375rem] font-medium text-muted transition-colors duration-150 hover:text-foreground"
-                        {...LENS_ITEM}
+                        className="inline-flex min-h-11 items-center text-[.9375rem] font-medium transition-colors duration-150 hover:text-muted"
                       >
                         {link.label}
                       </a>
                     </li>
                   ))}
                 </ul>
-              </GlassLensTrack>
-            </GlassGroup>
+              </div>
+            ))}
           </nav>
         </div>
       </div>

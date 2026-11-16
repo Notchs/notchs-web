@@ -23,7 +23,11 @@ import { cn } from "@/shared/lib/cn";
 import { useInkGround } from "@/shared/lib/glass/use-ink-ground";
 
 import { navLinks } from "../content";
+import { useActiveSection } from "../lib/use-active-section";
 import { AccessButton } from "./access-button";
+
+/** Section ids the menu links point to, in page order. */
+const navSectionIds = navLinks.map((link) => link.href.slice(1));
 
 const linkStyles =
   "relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[.9375rem] font-medium text-muted transition-colors duration-150 hover:text-foreground focus-visible:text-foreground";
@@ -66,6 +70,8 @@ export function LandingHeader() {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   useDismiss(headerRef, menuOpen, closeMenu);
   const onInk = useInkGround(headerRef);
+  const activeSection = useActiveSection(navSectionIds);
+  const isActive = (href: string) => href.slice(1) === activeSection;
 
   return (
     <header
@@ -103,7 +109,17 @@ export function LandingHeader() {
                 <ul className="flex items-center gap-0.5">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a href={link.href} className={linkStyles} {...LENS_ITEM}>
+                      <a
+                        href={link.href}
+                        aria-current={
+                          isActive(link.href) ? "location" : undefined
+                        }
+                        className={cn(
+                          linkStyles,
+                          "after:absolute after:bottom-1.5 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-current after:opacity-0 after:transition-opacity after:duration-200 aria-[current=location]:text-foreground aria-[current=location]:after:opacity-100",
+                        )}
+                        {...LENS_ITEM}
+                      >
                         {link.label}
                       </a>
                     </li>
@@ -177,7 +193,10 @@ export function LandingHeader() {
                       <a
                         href={link.href}
                         onClick={closeMenu}
-                        className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium"
+                        aria-current={
+                          isActive(link.href) ? "location" : undefined
+                        }
+                        className="relative flex min-h-12 w-full items-center justify-between rounded-[14px] px-3 text-base font-medium after:size-1.5 after:rounded-full after:bg-current after:opacity-0 aria-[current=location]:after:opacity-100"
                         {...LENS_ITEM}
                       >
                         {link.label}

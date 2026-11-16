@@ -83,7 +83,7 @@ export function LandingPage() {
             <Moments />
           </Section>
 
-          <Section>
+          <Section id={sectionIds.rewards}>
             <Collect />
           </Section>
 
