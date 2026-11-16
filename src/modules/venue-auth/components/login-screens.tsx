@@ -3,40 +3,23 @@
 import { useState, type FormEvent } from "react";
 
 import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  MailIcon,
-} from "@/shared/components/icons";
+  AuthBackButton,
+  AuthButton,
+  AuthError,
+  AuthHeader,
+  AuthInput,
+  AuthPasswordInput,
+  AuthTextButton,
+} from "@/shared/components/auth";
+import { MailIcon } from "@/shared/components/icons";
 import { useTurnstile } from "@/shared/components/turnstile";
-import { Button } from "@/shared/components/ui/button";
 
 import { flowContent } from "../content";
 import { loginVenue, requestPasswordReset, type VenueMember } from "../lib/api";
 import { errorMessage, fieldErrors } from "../lib/errors";
 import { isEmail, normaliseEmail } from "../lib/validation";
-import { Field, PasswordField } from "./field";
-import { FormError, ScreenHeading } from "./venue-auth-shell";
 
 const { login: copy, forgot: forgotCopy } = flowContent;
-
-export function BackButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group -ml-1 flex h-12 cursor-pointer items-center gap-2 self-start rounded-md px-1 font-semibold"
-    >
-      <ArrowLeftIcon className="size-5 transition-transform duration-150 group-hover:-translate-x-0.5" />
-      {label}
-    </button>
-  );
-}
 
 /** Says why the send button is waiting while the bot check is open. */
 export function VerifyHint({ show }: { show: boolean }) {
@@ -67,6 +50,7 @@ export function LoginForm({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (busy) return;
     const address = normaliseEmail(email);
     const next: Record<string, string> = {};
     if (!isEmail(address)) next.email = flowContent.emailInvalid;
@@ -88,13 +72,9 @@ export function LoginForm({
 
   return (
     <>
-      <ScreenHeading
-        kicker={copy.kicker}
-        title={copy.title}
-        description={copy.description}
-      />
+      <AuthHeader title={copy.title} compact />
       <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-        <Field
+        <AuthInput
           label={flowContent.emailLabel}
           icon={<MailIcon />}
           type="email"
@@ -105,29 +85,21 @@ export function LoginForm({
           onChange={(e) => onEmailChange(e.target.value)}
           error={errors.email}
         />
-        <PasswordField
+        <AuthPasswordInput
           label={copy.password}
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={errors.password}
           labelAction={
-            <button
-              type="button"
-              onClick={onForgot}
-              className="cursor-pointer text-[.9375rem] font-semibold underline underline-offset-[3px] hover:text-muted"
-            >
-              {copy.forgot}
-            </button>
+            <AuthTextButton onClick={onForgot}>{copy.forgot}</AuthTextButton>
           }
         />
-        <FormError message={formError} />
-        <Button type="submit" disabled={busy}>
-          {busy ? copy.busy : copy.cta}
-          {!busy && <ArrowRightIcon className="size-4.5" />}
-        </Button>
+        <AuthError message={formError} />
+        <AuthButton busy={busy} busyLabel={copy.busy} arrow>
+          {copy.cta}
+        </AuthButton>
       </form>
-      <p className="leading-relaxed text-muted">{copy.staffNote}</p>
     </>
   );
 }
@@ -173,13 +145,13 @@ export function ForgotForm({
 
   return (
     <>
-      <ScreenHeading
-        back={<BackButton label={forgotCopy.back} onClick={onBack} />}
+      <AuthHeader
+        back={<AuthBackButton label={forgotCopy.back} onClick={onBack} />}
         title={forgotCopy.title}
         description={forgotCopy.description}
       />
       <form onSubmit={submit} noValidate className="flex flex-col gap-5">
-        <Field
+        <AuthInput
           label={flowContent.emailLabel}
           icon={<MailIcon />}
           type="email"
@@ -192,11 +164,15 @@ export function ForgotForm({
           autoFocus
         />
         {turnstile.widget}
-        <FormError message={formError} />
+        <AuthError message={formError} />
         <VerifyHint show={!turnstile.ready} />
-        <Button type="submit" disabled={busy || !turnstile.ready}>
-          {busy ? forgotCopy.busy : forgotCopy.cta}
-        </Button>
+        <AuthButton
+          busy={busy}
+          busyLabel={forgotCopy.busy}
+          disabled={!turnstile.ready}
+        >
+          {forgotCopy.cta}
+        </AuthButton>
       </form>
     </>
   );
