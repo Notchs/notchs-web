@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/shared/lib/cn";
+import { CityProvider } from "@/modules/city";
 
-import {
-  howItWorksContent,
-  placesContent,
-  saturdayContent,
-  sectionIds,
-} from "../content";
+import { howItWorksContent, placesContent, sectionIds } from "../content";
 import { jetbrainsMono } from "../fonts";
+import { CityCommunity } from "./city-community";
+import { CityPulse } from "./city-pulse";
 import { Collect } from "./collect";
 import { Faq } from "./faq";
 import { ForVenues } from "./for-venues";
@@ -17,9 +15,9 @@ import { LandingFooter } from "./landing-footer";
 import { LandingHeader } from "./landing-header";
 import { LandingProvider } from "./landing-provider";
 import { Moments } from "./moments";
+import { Neighbourhoods } from "./neighbourhoods";
 import { NotchDemo } from "./notch-demo";
 import { PlaceCards } from "./places";
-import { SaturdayMap } from "./saturday-map";
 import { SectionHeading } from "./section-heading";
 import { StructuredData } from "./structured-data";
 
@@ -47,58 +45,62 @@ function Section({ id, className, children }: SectionProps) {
 export function LandingPage() {
   return (
     <LandingProvider>
-      <StructuredData />
-      <LandingHeader />
-      <main data-smooth-scroll className={jetbrainsMono.variable}>
-        <Hero />
+      <CityProvider>
+        <StructuredData />
+        <LandingHeader />
+        <main data-smooth-scroll className={jetbrainsMono.variable}>
+          <Hero />
 
-        <Section id={sectionIds.howItWorks}>
-          <SectionHeading
-            kicker={howItWorksContent.kicker}
-            title={howItWorksContent.title}
-            description={howItWorksContent.description}
-            className="mb-12 reveal"
-          />
-          <NotchDemo />
-        </Section>
+          <Section id={sectionIds.howItWorks}>
+            <SectionHeading
+              kicker={howItWorksContent.kicker}
+              title={howItWorksContent.title}
+              description={howItWorksContent.description}
+              className="mb-12 reveal"
+            />
+            <NotchDemo />
+          </Section>
 
-        <Section id={sectionIds.map}>
-          <SectionHeading
-            kicker={saturdayContent.kicker}
-            title={saturdayContent.title}
-            description={saturdayContent.description}
-            className="mb-10 reveal"
-          />
-          <SaturdayMap />
-        </Section>
+          <Section id={sectionIds.map}>
+            <CityPulse />
+          </Section>
 
-        <Section id={sectionIds.places}>
-          <SectionHeading
-            kicker={placesContent.kicker}
-            title={placesContent.title}
-            description={placesContent.description}
-            className="mb-12 reveal"
-          />
-          <PlaceCards />
-        </Section>
+          <Section id={sectionIds.places}>
+            <SectionHeading
+              kicker={placesContent.kicker}
+              title={placesContent.title}
+              description={placesContent.description}
+              className="mb-12 reveal"
+            />
+            <PlaceCards />
+          </Section>
 
-        <Section id={sectionIds.moments}>
-          <Moments />
-        </Section>
+          <Section id={sectionIds.neighbourhoods}>
+            <Neighbourhoods />
+          </Section>
 
-        <Section>
-          <Collect />
-        </Section>
+          <Section id={sectionIds.moments}>
+            <Moments />
+          </Section>
 
-        <Section id={sectionIds.venues}>
-          <ForVenues />
-        </Section>
+          <Section>
+            <Collect />
+          </Section>
 
-        <Section id={sectionIds.faq}>
-          <Faq />
-        </Section>
-      </main>
-      <LandingFooter />
+          <Section id={sectionIds.cities}>
+            <CityCommunity />
+          </Section>
+
+          <Section id={sectionIds.venues}>
+            <ForVenues />
+          </Section>
+
+          <Section id={sectionIds.faq}>
+            <Faq />
+          </Section>
+        </main>
+        <LandingFooter />
+      </CityProvider>
     </LandingProvider>
   );
 }

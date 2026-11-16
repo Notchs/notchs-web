@@ -331,7 +331,19 @@ export const adminContent = {
       `Turn off ${name}? They’re logged out straight away and can’t log in until turned back on.`,
   },
   auth: {
-    loginTitle: "Log in",
+    brand: {
+      kicker: "Admin",
+      title: "Your platform. Your control.",
+      description:
+        "Review venues that apply, keep accounts in good standing and check every Notch.",
+      preview: { label: "Total Notchs", value: "12.5K", change: "+12%" },
+    },
+    helpSubject: "Admin login help",
+    kicker: "Admin log in",
+    loginTitle: "Log in to your admin account",
+    loggingIn: "Logging in…",
+    sending: "Sending…",
+    saving: "Saving…",
     email: "Email",
     password: "Password",
     login: "Log in",
@@ -341,6 +353,8 @@ export const adminContent = {
     forgotHelp:
       "Enter your admin email. We'll email you a link to set a new password.",
     forgotSend: "Email me a link",
+    forgotSentStamp: "Link sent",
+    forgotSentTitle: "Check your email",
     forgotSent:
       "If that email belongs to an admin, a link is on its way. Not there in a minute? Check spam.",
     backToLogin: "Back to log in",

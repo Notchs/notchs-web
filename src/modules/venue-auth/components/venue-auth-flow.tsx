@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { routes } from "@/config/routes";
+import { AuthFormPanel, AuthSuccess } from "@/shared/components/auth";
 import { ButtonLink } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/cn";
 
 import { flowContent } from "../content";
 import { getVenueMe, type VenueMember } from "../lib/api";
 import { ApplicationPath } from "./application-path";
-import { DonePanel } from "./done-panel";
 import { LoggedInPanel } from "./logged-in-panel";
 import { ForgotForm, LoginForm } from "./login-screens";
 import { ApplyEmailForm, CodeForm, VenueForm } from "./signup-screens";
-import { ScreenFrame } from "./venue-auth-shell";
+import { useVenueAuthMode } from "./venue-auth-shell";
 
 export type VenueAuthScreen =
   | "login"
@@ -64,6 +64,12 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
   /** The log in / apply switch sits under the form, not on end screens. */
   const showSwap = screen === "login" || (applying && screen !== "applied");
 
+  // The brand panel beside the form follows log in / apply.
+  const { setMode } = useVenueAuthMode();
+  useEffect(() => {
+    setMode(applying ? "apply" : "login");
+  }, [applying, setMode]);
+
   // Someone who is still logged in skips the form.
   useEffect(() => {
     let live = true;
@@ -111,7 +117,7 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
         );
       case "forgotSent":
         return (
-          <DonePanel
+          <AuthSuccess
             stamp={flowContent.forgot.sentStamp}
             title={flowContent.forgot.sentTitle}
             body={flowContent.forgot.sentBody(email.trim().toLowerCase())}
@@ -123,7 +129,7 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
             >
               {flowContent.forgot.sentCta}
             </button>
-          </DonePanel>
+          </AuthSuccess>
         );
       case "loggedIn":
         return (
@@ -169,7 +175,7 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
         );
       case "applied":
         return (
-          <DonePanel
+          <AuthSuccess
             stamp={flowContent.done.appliedStamp}
             title={flowContent.done.appliedTitle(application?.venueName ?? "")}
             body={flowContent.done.appliedBody(email.trim().toLowerCase())}
@@ -183,14 +189,14 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
             <ButtonLink href={routes.mainSite} className="w-full">
               {flowContent.done.home}
             </ButtonLink>
-          </DonePanel>
+          </AuthSuccess>
         );
     }
   }
 
   return (
     <>
-      <ScreenFrame screenKey={screen}>
+      <AuthFormPanel screenKey={screen}>
         {applying && (
           <ol aria-label="Application progress" className="flex gap-2">
             {flowContent.steps.map((step, i) => {
@@ -237,7 +243,7 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
             </button>
           </p>
         )}
-      </ScreenFrame>
+      </AuthFormPanel>
     </>
   );
 }

@@ -3,11 +3,11 @@
 import { useState } from "react";
 
 import { routes } from "@/config/routes";
+import { AuthSuccess } from "@/shared/components/auth";
 import { ButtonLink } from "@/shared/components/ui/button";
 
 import { flowContent } from "../content";
 import { logoutVenue, venueNameOf, type VenueMember } from "../lib/api";
-import { DonePanel } from "./done-panel";
 
 const copy = flowContent.done;
 
@@ -42,7 +42,7 @@ export function LoggedInPanel({
   }
 
   return (
-    <DonePanel
+    <AuthSuccess
       stamp={stamp}
       title={venueName ? `${copy.loginTitle}, ${venueName}` : copy.loginTitle}
       body={who ? copy.loginBody(who) : undefined}
@@ -58,6 +58,6 @@ export function LoggedInPanel({
       >
         {busy ? copy.loggingOut : copy.logout}
       </button>
-    </DonePanel>
+    </AuthSuccess>
   );
 }
