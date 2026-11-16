@@ -3,13 +3,10 @@ import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
 import { CityProvider } from "@/modules/city";
 
-import {
-  howItWorksContent,
-  placesContent,
-  saturdayContent,
-  sectionIds,
-} from "../content";
+import { howItWorksContent, placesContent, sectionIds } from "../content";
 import { jetbrainsMono } from "../fonts";
+import { CityCommunity } from "./city-community";
+import { CityPulse } from "./city-pulse";
 import { Collect } from "./collect";
 import { Faq } from "./faq";
 import { ForVenues } from "./for-venues";
@@ -18,9 +15,9 @@ import { LandingFooter } from "./landing-footer";
 import { LandingHeader } from "./landing-header";
 import { LandingProvider } from "./landing-provider";
 import { Moments } from "./moments";
+import { Neighbourhoods } from "./neighbourhoods";
 import { NotchDemo } from "./notch-demo";
 import { PlaceCards } from "./places";
-import { SaturdayMap } from "./saturday-map";
 import { SectionHeading } from "./section-heading";
 import { StructuredData } from "./structured-data";
 
@@ -65,13 +62,7 @@ export function LandingPage() {
           </Section>
 
           <Section id={sectionIds.map}>
-            <SectionHeading
-              kicker={saturdayContent.kicker}
-              title={saturdayContent.title}
-              description={saturdayContent.description}
-              className="mb-10 reveal"
-            />
-            <SaturdayMap />
+            <CityPulse />
           </Section>
 
           <Section id={sectionIds.places}>
@@ -84,12 +75,20 @@ export function LandingPage() {
             <PlaceCards />
           </Section>
 
+          <Section id={sectionIds.neighbourhoods}>
+            <Neighbourhoods />
+          </Section>
+
           <Section id={sectionIds.moments}>
             <Moments />
           </Section>
 
           <Section>
             <Collect />
+          </Section>
+
+          <Section id={sectionIds.cities}>
+            <CityCommunity />
           </Section>
 
           <Section id={sectionIds.venues}>
