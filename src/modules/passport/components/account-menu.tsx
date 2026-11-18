@@ -7,10 +7,17 @@ import { routes } from "@/config/routes";
 
 import { shellContent } from "../content";
 import { logOut } from "../lib/api";
-import { firstName, initials } from "../lib/format";
+import { firstName } from "../lib/format";
+import { Avatar } from "./avatar";
 
-/** The initials button with Profile and Log out. */
-export function AccountMenu({ name }: { name: string | null }) {
+/** The picture (or initials) button with Profile and Log out. */
+export function AccountMenu({
+  name,
+  photoUrl,
+}: {
+  name: string | null;
+  photoUrl: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -47,9 +54,11 @@ export function AccountMenu({ name }: { name: string | null }) {
         onClick={() => setOpen((value) => !value)}
         className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-foreground pr-1.5 pl-1.5 text-sm font-semibold text-background md:pr-4"
       >
-        <span className="grid size-8 place-items-center rounded-full bg-volt text-[.8125rem] font-bold text-ink">
-          {initials(name)}
-        </span>
+        <Avatar
+          name={name}
+          photoUrl={photoUrl}
+          className="size-8 text-[.8125rem]"
+        />
         <span className="hidden md:inline">{firstName(name)}</span>
       </button>
       {open && (

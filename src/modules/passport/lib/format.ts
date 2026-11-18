@@ -55,6 +55,22 @@ export const nicheLabel = (niche: string) =>
   NICHE_LABELS[niche] ??
   niche.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
+/** "+919876543210" → "+91 98765 43210"; other numbers stay as they are. */
+export function phoneNumber(phone: string) {
+  const india = /^\+91(\d{5})(\d{5})$/.exec(phone);
+  return india ? `+91 ${india[1]} ${india[2]}` : phone;
+}
+
+/** Today in India as "2026-11-18", for a date field's `max`. */
+export const todayInIndia = () =>
+  new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
+/** Milliseconds → "9:05". */
+export function minutesSeconds(ms: number) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
 /** A place's colour from the API, used only if it is a plain hex colour. */
 export const safeColour = (colour: string) =>
   /^#[0-9a-f]{6}$/i.test(colour) ? colour : "#5c5c66";
