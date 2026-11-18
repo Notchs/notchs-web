@@ -49,7 +49,8 @@ function syncThemeColor(theme: Theme) {
     );
 }
 
-function chooseTheme(theme: Theme) {
+/** Applies a theme and remembers it on this device, like the toggle. */
+export function chooseTheme(theme: Theme) {
   document.documentElement.setAttribute(THEME_ATTRIBUTE, theme);
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);

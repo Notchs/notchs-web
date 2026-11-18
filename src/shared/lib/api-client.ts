@@ -24,7 +24,7 @@ export class ApiError extends Error {
 type QueryValue = string | number | boolean | null | undefined;
 
 export type ApiRequestOptions = Omit<RequestInit, "body"> & {
-  /** Sent as JSON. */
+  /** Sent as JSON, or as multipart/form-data when it is a FormData. */
   body?: unknown;
   /** Appended as a query string; null and undefined values are skipped. */
   query?: Record<string, QueryValue>;
@@ -50,14 +50,16 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const requestHeaders = new Headers(headers);
   requestHeaders.set("Accept", "application/json");
-  if (body !== undefined) {
+  // The browser sets a FormData's Content-Type itself, with its boundary.
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !isForm) {
     requestHeaders.set("Content-Type", "application/json");
   }
 
   const response = await fetch(buildUrl(path, query), {
     ...init,
     headers: requestHeaders,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: isForm ? body : body === undefined ? undefined : JSON.stringify(body),
   });
 
   const payload: unknown = await response.json().catch(() => null);

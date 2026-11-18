@@ -15,6 +15,7 @@ import { dayMonth } from "../lib/format";
 import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
 import { LoadError, Loading } from "./states";
+import { Tabs } from "./ui";
 
 const periods: Period[] = ["month", "all"];
 
@@ -64,27 +65,12 @@ export function LeaderboardScreen() {
         <p className="text-muted">{copy.noCity}</p>
       ) : (
         <>
-          <div
-            role="tablist"
-            aria-label={copy.periods.label}
-            className="grid grid-cols-2 gap-1 rounded-full bg-block p-1"
-          >
-            {periods.map((p) => (
-              <button
-                key={p}
-                type="button"
-                role="tab"
-                aria-selected={period === p}
-                onClick={() => setPeriod(p)}
-                className={cn(
-                  "min-h-11 cursor-pointer rounded-full text-sm font-bold",
-                  period === p && "bg-card",
-                )}
-              >
-                {copy.periods[p]}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            label={copy.periods.label}
+            options={periods.map((p) => ({ value: p, label: copy.periods[p] }))}
+            value={period}
+            onChange={setPeriod}
+          />
 
           <div className="flex items-center gap-3.5 rounded-[20px] bg-panel p-4 text-paper">
             <span className="rounded-xl bg-volt px-3 py-2 font-display text-lg font-extrabold text-ink">

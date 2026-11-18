@@ -80,6 +80,24 @@ export const notchsContent = {
   points: "Points",
   more: "Show more",
   colours: "Each kind of place keeps its colour.",
+  views: {
+    label: "Show my Notchs",
+    all: "All",
+    places: "By place",
+    locations: "By location",
+  },
+  /** Places and locations have nothing until the first Notch. */
+  noPlaces: "No places yet. Scan a Notchs QR at a counter to start.",
+  kind: (label: string, places: string, visits: string) =>
+    `${label} · ${places} · ${visits}`,
+  visits: (n: number) => (n === 1 ? "1 visit" : `${n} visits`),
+  places: (n: number) => (n === 1 ? "1 place" : `${n} places`),
+  notchs: (n: number) => (n === 1 ? "1 Notch" : `${n} Notchs`),
+  firstLast: (first: string, last: string) =>
+    first === last ? `on ${first}` : `first ${first} · last ${last}`,
+  city: (name: string, notchs: string, places: string) =>
+    `${name} · ${notchs} · ${places}`,
+  otherAreas: "Other areas",
 };
 
 export const claimsContent = {
@@ -158,32 +176,88 @@ export const deleteContent = {
 
 export const profileContent = {
   title: "Profile",
+  kicker: "Your profile",
+  noName: "Your profile",
+  location: (city: string | null, area: string | null) =>
+    [area, city].filter(Boolean).join(", "),
+  memberSince: (month: string) => `Member since ${month}`,
+  foundingMember: (no: number) => `Founding member #${no}`,
+  edit: {
+    title: "Edit profile",
+    theme: "Theme",
+    themes: { light: "Light", dark: "Dark" },
+    nothingChanged: "Nothing to save yet.",
+  },
   name: "Name",
   area: (city: string | null) => (city ? `Area in ${city}` : "Area"),
   chooseArea: "Choose your area",
+  instagramTitle: "Instagram",
   instagram: "Instagram (optional)",
   instagramPlaceholder: "@yourname",
-  showInstagram: "Show my Instagram to places I visit",
+  instagramNone: "No Instagram added. Add it in Edit profile.",
+  showInstagram: "Show my Instagram to venues",
   showInstagramNote:
     "Off by default. Places never see your name or number, only this if you turn it on.",
-  phoneNote: "WhatsApp number: the one you log in with. Never shown to venues.",
+  showInstagramFailed: "Couldn’t change that. Try again.",
   save: "Save",
   saving: "Saving…",
   saved: "Saved.",
   saveFailed: "Couldn’t save. Try again.",
-  phoneTitle: "Changed your WhatsApp number?",
+  photo: {
+    alt: "Your profile picture",
+    add: "Add photo",
+    change: "Change photo",
+    remove: "Remove photo",
+    removeQuestion: "Remove your photo?",
+    removeYes: "Remove",
+    cancel: "Cancel",
+    previewAlt: "Your new photo, as it will show",
+    use: "Use this photo",
+    uploading: "Uploading…",
+    removing: "Removing…",
+    hint: "JPG, PNG or WebP, up to 5 MB. It shows as a circle.",
+    wrongType: "Choose a JPG, PNG or WebP picture.",
+    tooBig: "That picture is over 5 MB. Choose a smaller one.",
+    failed: "Couldn’t save your photo. Try again.",
+  },
+  phoneLabel: "WhatsApp number",
+  phoneNote:
+    "The number you log in with. Only you see it here; venues never do.",
+  phoneTitle: "Change your WhatsApp number",
   phoneBody:
-    "Move your Notchs, rank and passport to your new number. You’ll get a code to send from it.",
+    "Move your Notchs, rank and passport to your new number. You’ll get a message to send from it.",
   phoneStart: "Change number",
   phoneStarting: "Getting a code…",
-  phoneSend: (message: string) =>
-    `From your new number, send “${message}” to Notchs on WhatsApp.`,
+  phoneSend:
+    "Open WhatsApp on your new number and send this message within 10 minutes:",
+  phoneCopy: "Copy message",
+  phoneCopied: "Copied.",
+  phoneCopyFailed: "Couldn’t copy. Type the message instead.",
   phoneOpen: "Open WhatsApp",
-  phoneExpires: (time: string) =>
-    `The code works once, until ${time}. Notchs replies on the new number when it’s done.`,
+  phoneTimeLeft: (time: string) => `Time left: ${time}`,
+  phoneExpired: "This code has expired. Get a new one.",
+  phoneAgain: "Get a new code",
+  phoneAfter:
+    "After you send it, your login moves to the new number. Then refresh this page.",
+  phoneRefresh: "Refresh",
   phoneNoLink: "Notchs’ WhatsApp number isn’t set up yet. Try again later.",
-  phoneTooMany: "Too many codes. Please try again in 15 minutes.",
   phoneFailed: "Couldn’t get a code. Try again.",
+  birthday: {
+    title: "Birthday",
+    none: "You haven’t added your birthday.",
+    add: "Add your birthday",
+    label: "Date of birth",
+    range: (range: string) => `Age group ${range}`,
+    adult: (date: string) => `18+ confirmed on ${date}`,
+    edit: "Edit",
+    remove: "Remove",
+    removeQuestion: "Remove your birthday?",
+    removeYes: "Remove",
+    save: "Save birthday",
+    saving: "Saving…",
+    cancel: "Cancel",
+    failed: "Couldn’t save your birthday. Try again.",
+  },
   inviteTitle: "Invite friends",
   inviteBody:
     "Get 50 Star Points for each friend who joins with your code and gets their first Notch at a Notchs place.",

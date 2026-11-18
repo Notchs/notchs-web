@@ -6,10 +6,30 @@ export type PlaceRef = { id: string; name: string };
 
 export type Theme = "light" | "dark";
 
+/** GET /me → age: the birthday and the words they agree to when saving it. */
+export type Age = {
+  /** "1998-05-14"; null until they add it. */
+  birth_date: string | null;
+  /** "18-24", "25-34", "35-44" or "45+"; worked out from birth_date. */
+  age_range: string | null;
+  /** When they confirmed they are 18+ (on WhatsApp). */
+  adult_confirmed_at: string | null;
+  /** Shown word for word next to the date field; the API stores these words. */
+  consent_text: string;
+  consent_version: string;
+};
+
 /** GET /me: the logged-in customer. */
 export type Me = {
   name: string | null;
   handle: string;
+  /**
+   * Their own number, in full. Shown only on the profile page: never in shared
+   * components, links, logs or analytics.
+   */
+  phone: string | null;
+  /** A signed link that works for 15 minutes: never saved or cached. */
+  photo_url: string | null;
   city: PlaceRef | null;
   area: PlaceRef | null;
   is_public: boolean;
@@ -18,14 +38,49 @@ export type Me = {
   instagram_handle: string | null;
   show_instagram_to_venues: boolean;
   member_since: string;
+  age: Age;
   totals: { notches: number; places: number; points: number };
 };
 
+/** PATCH /me: only the fields sent change. */
 export type MeUpdate = {
-  name?: string | null;
-  area_id?: string | null;
+  name?: string;
+  area_id?: string;
+  theme?: Theme;
+  /** null removes it. */
   instagram_handle?: string | null;
   show_instagram_to_venues?: boolean;
+  /** "1998-05-14"; null removes it. */
+  birth_date?: string | null;
+};
+
+/** GET /me/places: one kind of place, the kind with most visits first. */
+export type PlaceKind = {
+  niche: string;
+  label: string;
+  colour: string;
+  places: number;
+  visits: number;
+  venues: VisitedPlace[];
+};
+
+export type VisitedPlace = {
+  venue_code: string;
+  venue_name: string;
+  area: string | null;
+  city: string;
+  visits: number;
+  first_visit: string;
+  last_visit: string;
+};
+
+/** GET /me/notches/by-location: one city, the busiest first. */
+export type CityNotchs = {
+  city: PlaceRef;
+  notchs: number;
+  places: number;
+  /** area is null for places with no area set. */
+  areas: { area: PlaceRef | null; notchs: number; places: number }[];
 };
 
 /** POST /me/phone-change: send `message` from the new number. */
@@ -102,6 +157,20 @@ export const getMe = () => call<Me>("/me");
 
 export const updateMe = (body: MeUpdate) =>
   call<Me>("/me", { method: "PATCH", body });
+
+/** Uploads or replaces the profile picture; answers with the whole profile. */
+export function uploadPhoto(photo: File) {
+  const form = new FormData();
+  form.append("photo", photo);
+  return call<Me>("/me/photo", { method: "PUT", body: form });
+}
+
+export const removePhoto = () => call<Me>("/me/photo", { method: "DELETE" });
+
+export const getPlaces = () => call<PlaceKind[]>("/me/places");
+
+export const getNotchsByLocation = () =>
+  call<CityNotchs[]>("/me/notches/by-location");
 
 export const getStanding = () => call<Standing>("/leaderboards/me");
 
@@ -200,3 +269,13 @@ export function logOut() {
 /** True when the error means the customer isn't logged in. */
 export const isLoggedOut = (error: unknown) =>
   error instanceof ApiError && error.status === 401;
+
+/** The API's code for an error, e.g. "passport.photo_invalid". */
+export const errorCode = (error: unknown) =>
+  error instanceof ApiError ? error.code : null;
+
+/** The API's own message for an error, else `fallback`. */
+export const errorMessage = (error: unknown, fallback: string) =>
+  error instanceof ApiError && error.code !== "http_error" && error.message
+    ? error.message
+    : fallback;

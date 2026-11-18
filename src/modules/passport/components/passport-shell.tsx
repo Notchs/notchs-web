@@ -94,7 +94,7 @@ export function PassportShell({ children }: { children: ReactNode }) {
                 <ThemeToggle />
               </span>
             </GlassLensTrack>
-            {data && <AccountMenu name={data.name} />}
+            {data && <AccountMenu name={data.name} photoUrl={data.photo_url} />}
           </div>
         </GlassGroup>
       </header>

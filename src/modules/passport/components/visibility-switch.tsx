@@ -7,6 +7,7 @@ import { cn } from "@/shared/lib/cn";
 import { visibilityContent as copy } from "../content";
 import { setNameShown } from "../lib/api";
 import { useMe } from "./me-context";
+import { Switch } from "./ui";
 
 /** "Show my name on the leaderboard". Private by default; the rank stays either way. */
 export function VisibilitySwitch({ className }: { className?: string }) {
@@ -45,25 +46,12 @@ export function VisibilitySwitch({ className }: { className?: string }) {
           {failed ? copy.failed : shown ? copy.on : copy.off}
         </p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={shown}
+      <Switch
+        checked={shown}
         aria-labelledby={titleId}
         onClick={toggle}
         disabled={busy}
-        className={cn(
-          "flex h-8 w-14 flex-none cursor-pointer rounded-full p-1 transition-colors disabled:cursor-default disabled:opacity-60",
-          shown ? "justify-end bg-foreground" : "justify-start bg-muted/40",
-        )}
-      >
-        <span
-          className={cn(
-            "size-6 rounded-full",
-            shown ? "bg-volt" : "bg-background",
-          )}
-        />
-      </button>
+      />
     </section>
   );
 }

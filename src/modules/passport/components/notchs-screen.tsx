@@ -16,10 +16,14 @@ import { ClaimCard } from "./claim-card";
 import { useMe } from "./me-context";
 import { NotchTile } from "./notch-tile";
 import { LoadError, Loading } from "./states";
+import { PillButton, Tabs } from "./ui";
+import { NotchsByLocation, PlacesByKind } from "./visit-groups";
 
+/** Notchs per page; "Show more" loads the next page. */
 const PAGE_SIZE = 20;
-/** The most the API returns in one page. */
-const MAX_SIZE = 100;
+
+type View = "all" | "places" | "locations";
+const views: View[] = ["all", "places", "locations"];
 
 function NotchCard({ notch }: { notch: Notch }) {
   const facts = [
@@ -59,10 +63,20 @@ function NotchCard({ notch }: { notch: Notch }) {
 }
 
 /** Every Notch, newest first, each in its place's colour. */
-export function NotchsScreen() {
-  const { me } = useMe();
-  const [size, setSize] = useState(PAGE_SIZE);
-  const notches = useLoad(() => getNotches(1, size), String(size));
+function AllNotchs() {
+  const [pageCount, setPageCount] = useState(1);
+  const notches = useLoad(
+    () =>
+      Promise.all(
+        Array.from({ length: pageCount }, (_, i) =>
+          getNotches(i + 1, PAGE_SIZE),
+        ),
+      ).then((pages) => ({
+        items: pages.flatMap((page) => page.items),
+        total: pages[0]?.total ?? 0,
+      })),
+    String(pageCount),
+  );
   const items = notches.data?.items ?? [];
   const total = notches.data?.total ?? 0;
 
@@ -72,16 +86,7 @@ export function NotchsScreen() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-display text-[2rem] font-extrabold tracking-[-.03em] md:text-5xl">
-          {copy.title}
-        </h1>
-        <p className="text-sm text-muted">
-          {copy.summary(me.totals.notches, me.totals.places)}
-        </p>
-      </div>
-
+    <>
       {kinds.length > 1 && (
         <ul aria-label={copy.colours} className="flex flex-wrap gap-2">
           {kinds.map(([niche, colour]) => (
@@ -116,16 +121,44 @@ export function NotchsScreen() {
         </ul>
       )}
 
-      {items.length < total && size < MAX_SIZE && (
-        <button
-          type="button"
-          onClick={() => setSize((n) => Math.min(n + PAGE_SIZE, MAX_SIZE))}
+      {items.length < total && (
+        <PillButton
+          onClick={() => setPageCount((n) => n + 1)}
           disabled={notches.loading}
-          className="min-h-12 cursor-pointer rounded-full border-[1.5px] border-foreground font-bold disabled:cursor-default disabled:opacity-60"
         >
           {copy.more}
-        </button>
+        </PillButton>
       )}
+    </>
+  );
+}
+
+/** My Notchs: every Notch, or my places by kind, or my Notchs by location. */
+export function NotchsScreen() {
+  const { me } = useMe();
+  const [view, setView] = useState<View>("all");
+
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <h1 className="font-display text-[2rem] font-extrabold tracking-[-.03em] md:text-5xl">
+          {copy.title}
+        </h1>
+        <p className="text-sm text-muted">
+          {copy.summary(me.totals.notches, me.totals.places)}
+        </p>
+      </div>
+
+      <Tabs
+        label={copy.views.label}
+        options={views.map((value) => ({ value, label: copy.views[value] }))}
+        value={view}
+        onChange={setView}
+      />
+
+      {view === "all" && <AllNotchs />}
+      {view === "places" && <PlacesByKind />}
+      {view === "locations" && <NotchsByLocation />}
 
       <ClaimCard />
     </div>

@@ -7,9 +7,7 @@ import { ApiError } from "@/shared/lib/api-client";
 import { profileContent as copy } from "../content";
 import { addInviter, getReferral } from "../lib/api";
 import { useLoad } from "../lib/use-load";
-
-const fieldStyles =
-  "min-h-12 min-w-0 flex-1 rounded-xl border border-line bg-background px-3 text-[.9375rem] text-foreground";
+import { fieldClass } from "./ui";
 
 /** My invite code and Star Points, and who invited me (once, early on). */
 export function InviteCard() {
@@ -95,7 +93,7 @@ export function InviteCard() {
                 autoCapitalize="none"
                 spellCheck={false}
                 maxLength={31}
-                className={fieldStyles}
+                className={`${fieldClass} flex-1`}
               />
               <button
                 type="submit"

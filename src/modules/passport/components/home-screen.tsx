@@ -20,6 +20,7 @@ import { useLoad } from "../lib/use-load";
 import { useMe } from "./me-context";
 import { NotchTile } from "./notch-tile";
 import { LoadError, Loading } from "./states";
+import { TotalsGrid } from "./totals-grid";
 import { VisibilitySwitch } from "./visibility-switch";
 
 const RECENT = 3;
@@ -29,34 +30,13 @@ function Totals() {
   const standing = useLoad(getStanding);
   const month = standing.data?.month;
   const city = me.city?.name;
-  const totals = [
-    { label: copy.totals.notchs, value: me.totals.notches },
-    { label: copy.totals.places, value: me.totals.places },
-    { label: copy.totals.points, value: me.totals.points, accent: true },
-  ];
 
   return (
     <section
       aria-label={copy.totals.label}
       className="flex flex-col gap-6 rounded-[28px] bg-panel px-6 pt-9 pb-6 text-paper notch notch-lg md:px-8"
     >
-      <dl className="grid grid-cols-3 gap-4">
-        {totals.map((item) => (
-          <div key={item.label} className="flex flex-col-reverse gap-1.5">
-            <dt className="text-sm text-paper/75 md:text-[.9375rem]">
-              {item.label}
-            </dt>
-            <dd
-              className={cn(
-                "font-display text-[2.125rem] leading-none font-extrabold md:text-[3.5rem]",
-                item.accent && "text-volt",
-              )}
-            >
-              {item.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <TotalsGrid totals={me.totals} />
       <div className="h-px bg-paper/15" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         {month && city ? (
