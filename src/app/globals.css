@@ -109,6 +109,8 @@
   --animate-panel: panel 0.26s var(--ease-notch) both;
   --animate-pop: pop 0.16s var(--ease-notch) both;
   --animate-skeleton: skeleton 1.4s var(--ease-notch) infinite alternate;
+  /* Landing: the place cards rail, scrolling one full set to the left. */
+  --animate-rail: rail 45s linear infinite;
 
   /* Important secondary text on Ink, where Stone is too faint. */
   --color-stone-light: #b5b3ac;
@@ -158,6 +160,12 @@
   @keyframes draw {
     from {
       stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes rail {
+    to {
+      transform: translateX(-50%);
     }
   }
 

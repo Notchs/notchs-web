@@ -28,7 +28,9 @@ export function LandingFooter() {
         <div className="mx-auto grid max-w-[1440px] gap-10 px-gutter py-12 sm:py-16 lg:grid-cols-[1.2fr_3fr] lg:gap-16">
           <div className="flex flex-col gap-3">
             <span className="flex items-center gap-2.5">
-              <NotchGlyph className="size-6" />
+              <span className="grid size-8 flex-none place-items-center rounded-lg bg-ink text-volt">
+                <NotchGlyph className="size-6" />
+              </span>
               <span className="font-display text-[1.0625rem] font-extrabold">
                 {siteConfig.name}
               </span>
@@ -44,9 +46,9 @@ export function LandingFooter() {
           >
             {footerContent.columns.map((column) => (
               <div key={column.title} className="flex flex-col gap-2">
-                <h2 className="text-xs font-semibold tracking-[.14em] text-muted uppercase">
+                <p className="text-xs font-semibold tracking-[.14em] text-muted uppercase">
                   {column.title}
-                </h2>
+                </p>
                 <ul className="flex flex-col">
                   {column.links.map((link) => (
                     <li key={link.label}>

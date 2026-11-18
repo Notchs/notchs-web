@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
 import { CityProvider } from "@/modules/city";
 
-import { howItWorksContent, placesContent, sectionIds } from "../content";
+import { placesContent, sectionIds } from "../content";
 import { jetbrainsMono } from "../fonts";
 import { CityCommunity } from "./city-community";
 import { CityPulse } from "./city-pulse";
@@ -15,7 +15,6 @@ import { LandingFooter } from "./landing-footer";
 import { LandingHeader } from "./landing-header";
 import { LandingProvider } from "./landing-provider";
 import { Moments } from "./moments";
-import { Neighbourhoods } from "./neighbourhoods";
 import { NotchDemo } from "./notch-demo";
 import { PlaceCards } from "./places";
 import { SectionHeading } from "./section-heading";
@@ -52,17 +51,11 @@ export function LandingPage() {
           <Hero />
 
           <Section id={sectionIds.howItWorks}>
-            <SectionHeading
-              kicker={howItWorksContent.kicker}
-              title={howItWorksContent.title}
-              description={howItWorksContent.description}
-              className="mb-12 reveal"
-            />
             <NotchDemo />
           </Section>
 
-          <Section id={sectionIds.map}>
-            <CityPulse />
+          <Section id={sectionIds.rewards}>
+            <Collect />
           </Section>
 
           <Section id={sectionIds.places}>
@@ -75,20 +68,12 @@ export function LandingPage() {
             <PlaceCards />
           </Section>
 
-          <Section id={sectionIds.neighbourhoods}>
-            <Neighbourhoods />
+          <Section id={sectionIds.map}>
+            <CityPulse />
           </Section>
 
           <Section id={sectionIds.moments}>
             <Moments />
-          </Section>
-
-          <Section id={sectionIds.rewards}>
-            <Collect />
-          </Section>
-
-          <Section id={sectionIds.cities}>
-            <CityCommunity />
           </Section>
 
           <Section id={sectionIds.venues}>
@@ -97,6 +82,11 @@ export function LandingPage() {
 
           <Section id={sectionIds.faq}>
             <Faq />
+          </Section>
+
+          {/* "Not in your city? Ask": sits right before the closing CTA. */}
+          <Section id={sectionIds.cities}>
+            <CityCommunity />
           </Section>
         </main>
         <LandingFooter />

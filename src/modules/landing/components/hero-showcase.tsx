@@ -87,7 +87,7 @@ function DeckCard({
         aria-hidden={!front}
         fill
         draggable={false}
-        sizes="(min-width: 1024px) 440px, 70vw"
+        sizes="(min-width: 1024px) 340px, 60vw"
         placeholder="blur"
         preload={slideIndex === 0}
         className="object-cover"
@@ -100,7 +100,7 @@ function DeckCard({
       <div className="absolute top-4 left-4 rounded-full bg-ink/70 px-3 py-1.5 text-sm font-semibold text-paper">
         {venue.label}
       </div>
-      <div className="absolute inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-[19rem]">
+      <div className="absolute inset-x-3 bottom-3">
         <div className="rounded-2xl bg-ink p-4 pt-6 text-paper notch-lg">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <p className="flex items-center gap-2 font-display text-lg font-extrabold tracking-[-.02em] text-volt sm:text-xl">
@@ -267,7 +267,7 @@ export function HeroShowcase() {
       aria-roledescription="carousel"
       aria-label="Places you can get Notched"
       tabIndex={0}
-      className="relative aspect-[4/3.6] animate-fade-in cursor-grab touch-pan-y rounded-3xl select-none [--deck-speed:700ms] [animation-delay:250ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/5.2]"
+      className="relative mx-auto aspect-square w-full max-w-115 cursor-grab touch-pan-y rounded-3xl select-none [--deck-speed:700ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-volt active:cursor-grabbing lg:aspect-[5/4.4] lg:max-w-none"
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onPointerDown={onPointerDown}
@@ -288,7 +288,7 @@ export function HeroShowcase() {
               };
             }}
             style={fanStyle(place - center)}
-            className="absolute inset-x-[17%] inset-y-0 origin-[50%_85%] transition-[translate,scale,rotate,opacity] duration-(--deck-speed) ease-notch will-change-[translate,scale,rotate,opacity] motion-reduce:transition-none lg:inset-x-[15%]"
+            className="absolute inset-x-[18.75%] inset-y-0 origin-[50%_85%] transition-[translate,scale,rotate,opacity] duration-(--deck-speed) ease-notch will-change-[translate,scale,rotate,opacity] motion-reduce:transition-none lg:inset-x-[22.5%]"
             onClick={() => {
               if (suppressClick.current) return;
               if (place !== center) goTo(place);

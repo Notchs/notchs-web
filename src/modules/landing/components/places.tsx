@@ -25,19 +25,19 @@ function PlaceCard({
     <button
       type="button"
       onClick={() => onPick(venue.kind)}
-      className="group relative block aspect-3/4 w-full cursor-pointer overflow-hidden rounded-2xl bg-block text-left sm:aspect-4/5"
+      className="group relative block aspect-[10/16] w-full cursor-pointer overflow-hidden rounded-2xl bg-block text-left"
     >
       <Image
         src={venue.image.src}
         alt={venue.image.alt}
         fill
-        sizes="(min-width: 1024px) 320px, 50vw"
+        sizes="(min-width: 1024px) 257px, 225px"
         placeholder="blur"
         className="object-cover transition-transform duration-700 ease-notch group-hover:scale-105 motion-reduce:transition-none"
       />
       <GlassGroup
-        radius={14}
-        className="absolute inset-x-2 bottom-2 flex flex-col gap-0.5 rounded-[14px] p-3 sm:gap-1 sm:p-4"
+        radius={12}
+        className="absolute inset-x-2 bottom-2 flex flex-col gap-0.5 rounded-xl p-3 sm:gap-1 sm:p-4"
       >
         <span className="font-display text-base font-extrabold tracking-[-.02em] sm:text-xl">
           {venue.label}
@@ -63,17 +63,33 @@ export function PlaceCards() {
     document.getElementById(sectionIds.howItWorks)?.scrollIntoView();
   };
 
-  return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      {venues.map((venue, index) => (
+  // Two copies side by side; the track slides left by one copy and loops.
+  // The second copy is inert, so keyboards and screen readers meet each
+  // place once. Hover or focus pauses it; reduced motion turns it into a
+  // plain row you can swipe.
+  const set = (copy: boolean) => (
+    <ul
+      inert={copy}
+      aria-hidden={copy || undefined}
+      className="flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4"
+    >
+      {venues.map((venue) => (
         <li
           key={venue.kind}
-          className="reveal"
-          style={{ animationRangeStart: `entry ${(index % 4) * 8}%` }}
+          className="w-[193px] flex-none sm:w-[225px] lg:w-[257px]"
         >
           <PlaceCard venue={venue} onPick={tryAt} />
         </li>
       ))}
     </ul>
+  );
+
+  return (
+    <div className="reveal overflow-hidden mask-x-from-92% mask-x-to-100% motion-reduce:overflow-x-auto">
+      <div className="flex w-max animate-rail focus-within:[animation-play-state:paused] hover:[animation-play-state:paused] motion-reduce:animate-none">
+        {set(false)}
+        <div className="motion-reduce:hidden">{set(true)}</div>
+      </div>
+    </div>
   );
 }

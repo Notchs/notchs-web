@@ -170,5 +170,6 @@ export const flowContent = {
     ],
     done: "done",
     current: "current step",
+    close: "Close",
   },
 } as const;

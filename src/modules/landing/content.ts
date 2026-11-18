@@ -12,7 +12,6 @@ export const sectionIds = {
   howItWorks: "how-it-works",
   map: "city-pulse",
   places: "explore",
-  neighbourhoods: "neighbourhoods",
   moments: "moments",
   rewards: "rewards",
   cities: "cities",
@@ -22,8 +21,8 @@ export const sectionIds = {
 
 export const navLinks = [
   { label: "How it works", href: `#${sectionIds.howItWorks}` },
-  { label: "City Pulse", href: `#${sectionIds.map}` },
   { label: "Explore", href: `#${sectionIds.places}` },
+  { label: "City Pulse", href: `#${sectionIds.map}` },
   { label: "For venues", href: `#${sectionIds.venues}` },
   { label: "FAQ", href: `#${sectionIds.faq}` },
 ] as const;
@@ -230,31 +229,32 @@ export const heroContent = {
   kicker: "Ahmedabad · Now live",
   titleLines: ["Every real visit", "counts."],
   description:
-    "Scan the QR at the counter, send one WhatsApp message, get Notched. Your city, ranked by where you actually go.",
+    "Discover places, collect visit memories, earn recognition and see your city's local stories come alive.",
   secondary: "See how it works",
   sampleNote: "Example",
 } as const;
 
 export const steps = [
   {
-    title: "Scan",
-    body: "Point your camera at the QR on the counter phone. No app to download.",
+    label: ["Scan", "QR code"],
+    body: "Point your camera at the QR on the counter phone. No app, no sign-up.",
   },
   {
-    title: "Send",
-    body: "WhatsApp opens with your message already typed. Just press send.",
+    label: ["Send", "message"],
+    body: "WhatsApp opens with your message already typed. Press send and you are checked in.",
   },
   {
-    title: "Notched",
-    body: "You get your proof back in seconds. That visit now counts.",
+    label: ["Get", "Notched"],
+    body: "Your proof comes back in seconds and the visit is saved to your passport.",
   },
 ] as const;
 
 export const howItWorksContent = {
   kicker: "How it works",
-  title: "One scan. One message. Notched.",
-  description: "No password, no forms. Your WhatsApp number is your login.",
-  replay: "Play again",
+  titleLines: ["Your visit,", " Just a message away."],
+  description:
+    "Scan the QR at the venue and send a quick message on WhatsApp to get your Notch.",
+  cta: "Try it now",
   pickPlace: "Try it at",
   tryIt: "Try it",
 } as const;
@@ -283,19 +283,11 @@ export const placesContent = {
     "Cafés, turfs, courts and game nights. The spots you already go to, where every visit you prove adds to your Notch count.",
 } as const;
 
-export const neighbourhoodsContent = {
-  kicker: "Neighbourhoods",
-  title: (city: string) => `${city}, area by area.`,
-  description:
-    "Every city is a set of neighbourhoods, each with its own spots. Pick yours and go.",
-  areaOf: (city: string) => `Area in ${city}`,
-} as const;
-
 export const communityContent = {
   kicker: "Every city",
-  title: "One platform. Countless local stories.",
+  title: "Starting in Ahmedabad. Your city next.",
   description:
-    "Notchs connects people with the places they love and the people they meet there. We're starting in Ahmedabad and growing one city at a time.",
+    "Notchs connects people with the places they love and the people they meet there. We're growing one city at a time.",
   live: "Live now",
   next: "Not here yet",
   ask: "Want Notchs in your city?",
@@ -306,51 +298,39 @@ export const communityContent = {
 export const collectContent = {
   kicker: "What you collect",
   title: "Status you earn, not buy.",
+  description:
+    "You already go out. Notchs turns every real visit into something you keep, show off and share.",
+  example: "Example",
   items: [
     {
+      kind: "count",
       title: "Notch count",
       body: "Every verified visit, counted month by month.",
+      why: "Proof of where you actually go",
     },
     {
+      kind: "rank",
       title: "City rank",
       body: "See where you stand in your city from your 3rd Notch.",
+      why: "Become a known regular in your city",
+      podium: [2, 1, 3],
     },
     {
+      kind: "badges",
       title: "Badges",
       body: "First Notch, Café Hopper, Night Owl, Regular and more.",
+      why: "Show the kind of person you are",
+      badges: ["First Notch", "Night Owl", "Café Hopper"],
     },
     {
+      kind: "card",
       title: "Notch Card",
       body: "Your month in one card, ready for your story.",
+      why: "A month worth posting",
+      month: "Your month",
     },
   ],
 } as const;
-
-/** "Build your month": a live Notch Card the visitor fills in themselves. */
-export const builderContent = {
-  title: "Build your month.",
-  description:
-    "Tap + for the places you'd go this month. Your Notch Card fills up as you go.",
-  month: "Your month",
-  countLabel: "Notchs",
-  empty: "Add a place to start your card.",
-  rankLocked: "City rank unlocks at your 3rd Notch",
-  rankOpen: "Ranked in your city",
-  mostly: "Mostly",
-  reset: "Start over",
-  add: "Add one",
-  remove: "Remove one",
-  preview: "Preview. Real cards use real Notchs.",
-} as const;
-
-/** Badges the builder can unlock, checked in order. */
-export const builderBadges = [
-  { name: "First Notch", rule: "Your first verified visit" },
-  { name: "Café Hopper", rule: "3 café Notchs in a month" },
-  { name: "Night Owl", rule: "2 snooker or bowling nights" },
-  { name: "Regular", rule: "5 Notchs at one kind of place" },
-  { name: "Explorer", rule: "4 different kinds of places" },
-] as const;
 
 export const saturdayContent = {
   kicker: "City Pulse",
@@ -466,7 +446,7 @@ export const venuesContent = {
     "Totals only. Never names or phone numbers",
     "Free for your first 3 months",
   ],
-  cta: "Grow with Notchs",
+  cta: "Apply for your venue",
   image: photo(
     "cafe-lights.jpg",
     "Woven bamboo pendant lights glowing over a café",
@@ -541,16 +521,15 @@ export const footerContent = {
       title: "Product",
       links: [
         { label: "How it works", href: `#${sectionIds.howItWorks}` },
-        { label: "City Pulse", href: `#${sectionIds.map}` },
-        { label: "Explore", href: `#${sectionIds.places}` },
         { label: "Rewards", href: `#${sectionIds.rewards}` },
+        { label: "Explore", href: `#${sectionIds.places}` },
+        { label: "City Pulse", href: `#${sectionIds.map}` },
       ],
     },
     {
       title: "Community",
       links: [
         { label: "Real moments", href: `#${sectionIds.moments}` },
-        { label: "Neighbourhoods", href: `#${sectionIds.neighbourhoods}` },
         { label: "Every city", href: `#${sectionIds.cities}` },
       ],
     },

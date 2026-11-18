@@ -12,14 +12,14 @@ export function Hero() {
         <p className="mb-6 flex animate-fade-in items-center gap-3.5 text-xs font-semibold tracking-[.14em] text-muted uppercase [animation-delay:50ms] before:h-px before:w-8 before:bg-current">
           {heroContent.kicker}
         </p>
-        <h1 className="animate-fade-in font-display text-[clamp(2.5rem,1.2rem+5.2vw,5.25rem)] leading-[.96] font-extrabold tracking-[-.035em] [animation-delay:150ms]">
+        <h1 className="font-display text-[clamp(2.5rem,1.2rem+5.2vw,5.25rem)] leading-[.96] font-extrabold tracking-[-.035em]">
           {heroContent.titleLines.map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h1>
-        <p className="mt-6 max-w-[34ch] animate-fade-in text-[1.0625rem] leading-relaxed text-muted [animation-delay:300ms] sm:text-xl">
+        <p className="mt-6 max-w-[34ch] text-[1.0625rem] leading-relaxed text-muted sm:text-xl">
           {heroContent.description}
         </p>
         <div className="mt-9 flex animate-fade-in flex-col gap-3 [animation-delay:450ms] sm:flex-row sm:items-center sm:gap-6">
