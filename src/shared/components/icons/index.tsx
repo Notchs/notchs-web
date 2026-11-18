@@ -234,3 +234,28 @@ export function CheckIcon(props: IconProps) {
     </OutlineIcon>
   );
 }
+
+export function HomeIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z" />
+    </OutlineIcon>
+  );
+}
+
+export function TrophyIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0zM7.5 6H4.5a3 3 0 0 0 3 4.5M16.5 6h3a3 3 0 0 1-3 4.5M12 13.5V17M8.5 20h7M9.5 17h5v3h-5z" />
+    </OutlineIcon>
+  );
+}
+
+export function UserIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <circle cx="12" cy="8.5" r="3.75" />
+      <path d="M4.5 20c.8-3.6 3.8-5.75 7.5-5.75s6.7 2.15 7.5 5.75" />
+    </OutlineIcon>
+  );
+}

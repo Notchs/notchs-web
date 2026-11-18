@@ -26,7 +26,7 @@ export function InactivityNote() {
   return (
     <section
       role="status"
-      className="flex flex-col gap-2 rounded-[20px] border border-line bg-card p-4 md:p-6"
+      className="flex flex-col gap-2 rounded-[20px] border border-line bg-card p-4 sm:p-6"
     >
       <h2 className="font-display text-lg font-extrabold">{copy.title}</h2>
       <p className="text-[.9375rem] text-muted">{copy.body(fullDate(last))}</p>

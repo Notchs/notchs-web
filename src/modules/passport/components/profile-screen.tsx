@@ -51,12 +51,12 @@ function ProfileHeader({ onExpired }: { onExpired: () => void }) {
         <p className="flex items-center gap-3.5 text-xs font-semibold tracking-[.18em] text-muted uppercase before:h-px before:w-8 before:bg-current">
           {copy.kicker}
         </p>
-        <h1 className="font-display text-[2rem] leading-[1.05] font-extrabold tracking-[-.03em] break-words md:text-5xl">
+        <h1 className="font-display text-[2rem] leading-[1.05] font-extrabold tracking-[-.03em] break-words sm:text-5xl">
           {me.name ?? copy.noName}
         </h1>
         <p className="text-[.9375rem] text-muted">{details.join(" · ")}</p>
       </div>
-      <div className="rounded-[24px] bg-panel px-5 py-5 text-paper md:px-6">
+      <div className="rounded-[24px] bg-panel px-5 py-5 text-paper sm:px-6">
         <TotalsGrid totals={me.totals} compact />
       </div>
     </section>

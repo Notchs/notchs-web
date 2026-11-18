@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
+import { HomeIcon, TrophyIcon, UserIcon } from "@/shared/components/icons";
 import { GlassGroup } from "@/shared/components/glass/glass-group";
 import {
   GlassLensTrack,
@@ -17,6 +18,7 @@ import { cn } from "@/shared/lib/cn";
 
 import { shellContent } from "../content";
 import { getMe, isLoggedOut } from "../lib/api";
+import { USES_MOCK } from "../lib/config";
 import { useLoad } from "../lib/use-load";
 import { AccountMenu } from "./account-menu";
 import { MeContext } from "./me-context";
@@ -25,15 +27,25 @@ import { LoadError, Loading } from "./states";
 const { nav } = shellContent;
 
 const tabs = [
-  { href: routes.passport, label: nav.home },
-  { href: routes.passportNotchs, label: nav.notchs },
-  { href: routes.passportLeaderboard, label: nav.leaderboard },
-  { href: routes.passportProfile, label: nav.profile },
+  { href: routes.passport, label: nav.home, Icon: HomeIcon },
+  { href: routes.passportNotchs, label: nav.notchs, Icon: NotchGlyph },
+  {
+    href: routes.passportLeaderboard,
+    label: nav.leaderboard,
+    Icon: TrophyIcon,
+  },
+  { href: routes.passportProfile, label: nav.profile, Icon: UserIcon },
 ];
 
+/** Home matches itself only; other tabs also cover their sub-pages. */
+const isCurrent = (pathname: string, href: string) =>
+  pathname === href ||
+  (href !== routes.passport && pathname.startsWith(`${href}/`));
+
 /**
- * Frame for every passport page: glass header with the account menu, and a
- * tab bar along the bottom on phones. Loads the customer once; someone who
+ * Frame for every passport page: on phones (under 640px) an app-style tab bar
+ * along the bottom and no header; from 640px a glass header with the nav and
+ * the account menu. Loads the customer once; someone who
  * isn't logged in goes to the login page.
  */
 export function PassportShell({ children }: { children: ReactNode }) {
@@ -54,7 +66,7 @@ export function PassportShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 px-gutter pt-3">
+      <header className="sticky top-0 z-40 hidden px-gutter pt-3 sm:block">
         <GlassGroup
           radius={32}
           className="flex h-16 items-center justify-between gap-4 rounded-[32px] pr-2.5 pl-5"
@@ -69,16 +81,18 @@ export function PassportShell({ children }: { children: ReactNode }) {
               {siteConfig.name}
             </span>
           </Link>
-          <nav aria-label={nav.label} className="hidden md:block">
+          <nav aria-label={nav.label} className="hidden sm:block">
             <ul className="flex items-center gap-1">
               {tabs.slice(0, 3).map((tab) => (
                 <li key={tab.href}>
                   <Link
                     href={tab.href}
-                    aria-current={pathname === tab.href ? "page" : undefined}
+                    aria-current={
+                      isCurrent(pathname, tab.href) ? "page" : undefined
+                    }
                     className={cn(
-                      "flex min-h-11 items-center rounded-full px-4 text-[.9375rem] font-medium text-muted hover:text-foreground",
-                      pathname === tab.href &&
+                      "flex min-h-11 items-center rounded-full px-3 text-[.9375rem] font-medium whitespace-nowrap text-muted hover:text-foreground lg:px-4",
+                      isCurrent(pathname, tab.href) &&
                         "bg-glass-tint font-bold text-foreground",
                     )}
                   >
@@ -99,8 +113,13 @@ export function PassportShell({ children }: { children: ReactNode }) {
         </GlassGroup>
       </header>
 
-      <main className="px-gutter pt-8 pb-14">
+      <main className="px-gutter pt-6 pb-10 sm:pt-8 sm:pb-14">
         <div className="mx-auto w-full max-w-[1180px]">
+          {USES_MOCK && (
+            <p className="mb-4 inline-flex rounded-full border border-dashed border-line px-2.5 py-1 text-[.6875rem] font-bold tracking-[.12em] text-muted uppercase">
+              {shellContent.mockData}
+            </p>
+          )}
           {context ? (
             <MeContext.Provider value={context}>{children}</MeContext.Provider>
           ) : me.error && !loggedOut ? (
@@ -113,28 +132,35 @@ export function PassportShell({ children }: { children: ReactNode }) {
 
       <nav
         aria-label={nav.label}
-        className="sticky bottom-0 z-40 border-t border-line bg-background px-4 pt-2.5 pb-[max(14px,env(safe-area-inset-bottom))] md:hidden"
+        className="sticky bottom-0 z-40 border-t border-line bg-background px-4 pt-2.5 pb-[max(14px,env(safe-area-inset-bottom))] sm:hidden"
       >
         <ul className="grid grid-cols-4 gap-1">
           {tabs.map((tab) => {
-            const current = pathname === tab.href;
+            const current = isCurrent(pathname, tab.href);
             return (
               <li key={tab.href}>
                 <Link
                   href={tab.href}
                   aria-current={current ? "page" : undefined}
                   className={cn(
-                    "flex min-h-13 flex-col items-center justify-center gap-1 text-xs font-medium text-muted",
+                    "flex min-h-14 flex-col items-center justify-center gap-1 text-[.6875rem] font-medium text-muted",
                     current && "font-bold text-foreground",
                   )}
                 >
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "h-1 w-6 rounded-full",
-                      current ? "bg-volt" : "bg-transparent",
+                      "grid h-8 w-14 place-items-center rounded-full transition-colors",
+                      current && "bg-volt text-ink",
                     )}
-                  />
+                  >
+                    <tab.Icon
+                      className={cn(
+                        "size-5.5",
+                        tab.Icon === NotchGlyph && "size-4.5",
+                      )}
+                    />
+                  </span>
                   {tab.label}
                 </Link>
               </li>

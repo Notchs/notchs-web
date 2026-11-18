@@ -34,14 +34,14 @@ function Totals() {
   return (
     <section
       aria-label={copy.totals.label}
-      className="flex flex-col gap-6 rounded-[28px] bg-panel px-6 pt-9 pb-6 text-paper notch notch-lg md:px-8"
+      className="flex flex-col gap-6 rounded-[28px] bg-panel px-6 pt-9 pb-6 text-paper notch notch-lg sm:px-8"
     >
       <TotalsGrid totals={me.totals} />
       <div className="h-px bg-paper/15" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         {month && city ? (
-          <p className="flex items-center gap-3 text-[.9375rem] md:text-[1.0625rem]">
-            <span className="rounded-2xl bg-volt px-3.5 py-2 font-display text-xl font-extrabold text-ink md:text-[1.75rem]">
+          <p className="flex items-center gap-3 text-[.9375rem] sm:text-[1.0625rem]">
+            <span className="rounded-2xl bg-volt px-3.5 py-2 font-display text-xl font-extrabold text-ink sm:text-[1.75rem]">
               #{month.rank}
             </span>
             {copy.rank(city)}
@@ -76,7 +76,7 @@ function RewardCard({ reward }: { reward: Reward }) {
         </span>
         <h2
           id="reward-title"
-          className="font-display text-[1.375rem] font-extrabold tracking-[-.02em] md:text-[1.75rem]"
+          className="font-display text-[1.375rem] font-extrabold tracking-[-.02em] sm:text-[1.75rem]"
         >
           {copy.reward.title(reward.value_rupees)}
         </h2>
@@ -195,10 +195,10 @@ export function HomeScreen() {
           <p className="flex items-center gap-3.5 text-xs font-semibold tracking-[.18em] text-muted uppercase before:h-px before:w-8 before:bg-current">
             {copy.kicker}
           </p>
-          <h1 className="font-display text-[2.5rem] leading-[1.02] font-extrabold tracking-[-.03em] md:text-[4.5rem]">
+          <h1 className="font-display text-[2.5rem] leading-[1.02] font-extrabold tracking-[-.03em] sm:text-[4.5rem]">
             {copy.hello(firstName(me.name))}
           </h1>
-          <p className="text-[.9375rem] text-muted md:text-[1.0625rem]">
+          <p className="text-[.9375rem] text-muted sm:text-[1.0625rem]">
             {details.join(" · ")}
           </p>
         </section>

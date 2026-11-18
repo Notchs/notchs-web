@@ -25,7 +25,7 @@ export function Section({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 md:p-6",
+        "flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 sm:p-6",
         className,
       )}
     >

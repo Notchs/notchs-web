@@ -102,7 +102,7 @@ export function PhotoEditor({ onExpired }: { onExpired: () => void }) {
     }
   }
 
-  const avatarClass = "size-24 text-[1.75rem] md:size-28 md:text-[2rem]";
+  const avatarClass = "size-24 text-[1.75rem] sm:size-28 sm:text-[2rem]";
 
   return (
     <div className="flex flex-col gap-3">

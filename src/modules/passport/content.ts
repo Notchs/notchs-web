@@ -10,6 +10,7 @@ export const passportMetadata = privatePage("Your passport");
 export const notchsMetadata = privatePage("My Notchs");
 export const leaderboardMetadata = privatePage("Leaderboard");
 export const profileMetadata = privatePage("Profile");
+export const claimMetadata = privatePage("Claim a Notch");
 
 export const shellContent = {
   nav: {
@@ -25,6 +26,8 @@ export const shellContent = {
   loading: "Loading your passport…",
   loadError: "We couldn’t load this.",
   retry: "Try again",
+  /** Shown only in mock mode (lib/config.ts). */
+  mockData: "Example data",
 };
 
 export const homeContent = {
@@ -101,6 +104,8 @@ export const notchsContent = {
 };
 
 export const claimsContent = {
+  add: "Add Notch",
+  back: "My Notchs",
   title: "Missed a Notch?",
   body: "If the counter phone wasn’t working, send us your bill instead. We check it and add the Notch. It works on the day of your visit only.",
   search: "Find the place",
@@ -151,6 +156,25 @@ export const leaderboardContent = {
   decaying: (percent: number, day: string | null) =>
     `${percent === 0 ? "Your points don’t count for rank right now" : `Only ${percent}% of your points count for rank right now`}. Your next Notch brings them all back${day ? `; it drops again on ${day}` : ""}.`,
   pointsLabel: "points",
+  kicker: "Leaderboard",
+  standingLabel: "Your rank",
+  standingPeriod: (period: "month" | "all", city: string) =>
+    `${period === "month" ? "This month" : "All time"} in ${city}`,
+  belowTop: (seenAs: string) => `Below the top 50 for now. ${seenAs}`,
+  nobodyYet: "Nobody has a Notch this month yet.",
+  toNext: (points: number, rank: number) => `${points} points to #${rank}`,
+  nextPoints: (points: number) => `${points} pts`,
+  seeMe: "See me in the list",
+  podium: "Top 3",
+  podiumPoints: (points: number) => `${points} points`,
+  youShort: "You",
+  nameHidden: "Name hidden",
+  columns: { rank: "Rank", name: "Name", points: "Points" },
+  firstOfMonth: "The first Notch of the month puts you at #1.",
+  goProfile: "Go to Profile",
+  count: (total: string, city: string, period: "month" | "all") =>
+    `${total} ${total === "1" ? "person" : "people"} ranked in ${city} ${period === "month" ? "this month" : "of all time"} · top 50 shown`,
+  howTitle: "How ranking works",
 };
 
 export const inactivityContent = {

@@ -24,7 +24,7 @@ const messageOf = (error: unknown, fallback: string) =>
   error instanceof ApiError && error.status < 500 ? error.message : fallback;
 
 /**
- * When the counter phone was down: pick the place, send the claim code and then
+ * The claim form, on its own page (claim-screen). When the counter phone was down: pick the place, send the claim code and then
  * the bill photo on WhatsApp, and see how earlier claims went.
  */
 export function ClaimCard() {
@@ -78,10 +78,10 @@ export function ClaimCard() {
   }
 
   return (
-    <section className="flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 md:p-6">
-      <h2 className="font-display text-lg font-extrabold">{copy.title}</h2>
-      <p className="text-[.9375rem] text-muted">{copy.body}</p>
-
+    <section
+      aria-label={copy.title}
+      className="flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 sm:p-6"
+    >
       {started ? (
         <div className="flex flex-col gap-3" role="status">
           <p className="font-semibold">{copy.step1(started.message)}</p>

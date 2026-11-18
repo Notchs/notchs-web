@@ -52,14 +52,14 @@ export function AccountMenu({
         aria-label={shellContent.accountMenu}
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-foreground pr-1.5 pl-1.5 text-sm font-semibold text-background md:pr-4"
+        className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-foreground pr-1.5 pl-1.5 text-sm font-semibold text-background lg:pr-4"
       >
         <Avatar
           name={name}
           photoUrl={photoUrl}
           className="size-8 text-[.8125rem]"
         />
-        <span className="hidden md:inline">{firstName(name)}</span>
+        <span className="hidden lg:inline">{firstName(name)}</span>
       </button>
       {open && (
         <div className="absolute top-[calc(100%+8px)] right-0 z-50 flex w-56 animate-pop flex-col rounded-2xl border border-line bg-card p-2 shadow-[0_12px_32px_rgb(15_15_20/.18)]">
