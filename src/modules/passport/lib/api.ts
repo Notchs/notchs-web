@@ -2,6 +2,8 @@ import { ApiError, type ApiRequestOptions } from "@/shared/lib/api-client";
 import { endSession, sessionRequest } from "@/shared/lib/session";
 import type { ApiSuccess, Paginated } from "@/shared/types/api";
 
+import { USES_MOCK } from "./config";
+
 export type PlaceRef = { id: string; name: string };
 
 export type Theme = "light" | "dark";
@@ -150,6 +152,11 @@ const request = sessionRequest("user");
 
 /** Calls the API and returns `data`, renewing the short-lived login when needed. */
 async function call<T>(path: string, options?: ApiRequestOptions) {
+  if (USES_MOCK) {
+    // Loaded only in mock mode, so example data never ships otherwise.
+    const { mockCall } = await import("../mock/passport.dummydata");
+    return (await mockCall(path, options)) as T;
+  }
   return (await request<ApiSuccess<T>>(path, options)).data as T;
 }
 
@@ -263,6 +270,7 @@ export const deleteAccount = () =>
 
 /** Ends the session; the backend clears its cookies. */
 export function logOut() {
+  if (USES_MOCK) return Promise.resolve();
   return endSession("user");
 }
 

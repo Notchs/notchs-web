@@ -47,7 +47,7 @@ export function InviteCard() {
   }
 
   return (
-    <section className="flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 md:p-6">
+    <section className="flex flex-col gap-3 rounded-[20px] border border-line bg-card p-4 sm:p-6">
       <h2 className="font-display text-lg font-extrabold">
         {copy.inviteTitle}
       </h2>

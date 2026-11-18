@@ -35,6 +35,8 @@ export const routes = {
   /** The customer's passport, after logging in. Private: never link it from public pages. */
   passport: "/passport",
   passportNotchs: "/passport/notchs",
+  /** Claim a missed Notch with a bill photo. */
+  passportClaim: "/passport/notchs/claim",
   passportLeaderboard: "/passport/leaderboard",
   passportProfile: "/passport/profile",
   venueLogin: `${venueBase}/login`,

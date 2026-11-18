@@ -22,15 +22,15 @@ export function TotalsGrid({
     <dl className="grid grid-cols-3 gap-4">
       {items.map((item) => (
         <div key={item.label} className="flex flex-col-reverse gap-1.5">
-          <dt className="text-sm text-paper/75 md:text-[.9375rem]">
+          <dt className="text-sm text-paper/75 sm:text-[.9375rem]">
             {item.label}
           </dt>
           <dd
             className={cn(
               "font-display leading-none font-extrabold",
               compact
-                ? "text-[1.75rem] md:text-[2.25rem]"
-                : "text-[2.125rem] md:text-[3.5rem]",
+                ? "text-[1.75rem] sm:text-[2.25rem]"
+                : "text-[2.125rem] sm:text-[3.5rem]",
               item.accent && "text-volt",
             )}
           >

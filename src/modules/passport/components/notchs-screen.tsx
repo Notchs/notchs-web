@@ -1,8 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
-import { notchsContent as copy } from "../content";
+import { routes } from "@/config/routes";
+import { PlusIcon } from "@/shared/components/icons";
+
+import { claimsContent, notchsContent as copy } from "../content";
 import { getNotches, type Notch } from "../lib/api";
 import {
   fullDate,
@@ -12,7 +16,6 @@ import {
   safeColour,
 } from "../lib/format";
 import { useLoad } from "../lib/use-load";
-import { ClaimCard } from "./claim-card";
 import { useMe } from "./me-context";
 import { NotchTile } from "./notch-tile";
 import { LoadError, Loading } from "./states";
@@ -141,9 +144,18 @@ export function NotchsScreen() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <h1 className="font-display text-[2rem] font-extrabold tracking-[-.03em] md:text-5xl">
-          {copy.title}
-        </h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-[2rem] font-extrabold tracking-[-.03em] sm:text-5xl">
+            {copy.title}
+          </h1>
+          <Link
+            href={routes.passportClaim}
+            className="inline-flex min-h-11 flex-none items-center gap-1.5 rounded-full bg-btn pr-4.5 pl-3.5 text-sm font-bold text-btn-fg hover:bg-btn-hover"
+          >
+            <PlusIcon className="size-4.5" strokeWidth={2.25} />
+            {claimsContent.add}
+          </Link>
+        </div>
         <p className="text-sm text-muted">
           {copy.summary(me.totals.notches, me.totals.places)}
         </p>
@@ -159,8 +171,6 @@ export function NotchsScreen() {
       {view === "all" && <AllNotchs />}
       {view === "places" && <PlacesByKind />}
       {view === "locations" && <NotchsByLocation />}
-
-      <ClaimCard />
     </div>
   );
 }

@@ -45,7 +45,7 @@ export function DeleteAccountCard() {
   return (
     <form
       onSubmit={submit}
-      className="flex flex-col gap-3 rounded-[20px] border border-[#ff5b35] bg-card p-4 md:p-6"
+      className="flex flex-col gap-3 rounded-[20px] border border-[#ff5b35] bg-card p-4 sm:p-6"
     >
       <h2 className="font-display text-lg font-extrabold">{copy.title}</h2>
       <ul className="list-disc space-y-1 pl-5 text-[.9375rem] text-muted">
