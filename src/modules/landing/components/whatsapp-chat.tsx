@@ -79,7 +79,7 @@ function Bubble({
     <div
       style={style}
       className={cn(
-        "relative rounded-lg px-2.5 pt-1.5 pb-1 text-sm leading-snug",
+        "relative rounded-lg px-2 pt-1 pb-1 text-[.8125rem] leading-snug lg:px-2.5 lg:pt-1.5 lg:text-sm",
         side === "right" ? "rounded-tr-none" : "rounded-tl-none",
       )}
     >
@@ -103,16 +103,21 @@ export function WhatsAppChat({
       style={{ background: whatsapp.chat, color: whatsapp.text }}
     >
       <div
-        className="flex items-center gap-2.5 border-b px-3 pt-5 pb-2.5"
+        className="flex items-center gap-2 border-b px-2.5 pt-4 pb-2 lg:gap-2.5 lg:px-3 lg:pt-5 lg:pb-2.5"
         style={{ background: whatsapp.bar, borderColor: whatsapp.divider }}
       >
         <ArrowLeftIcon className="size-5 flex-none" />
-        <span className="grid size-9 flex-none place-items-center rounded-full bg-ink text-volt">
+        <span className="grid size-8 flex-none place-items-center rounded-full bg-ink text-volt lg:size-9">
           <NotchGlyph className="size-4.5" />
         </span>
         <span className="min-w-0 flex-1 leading-tight">
-          <span className="block text-[.9375rem] font-semibold">Notchs</span>
-          <span className="block text-xs" style={{ color: whatsapp.meta }}>
+          <span className="block text-sm font-semibold lg:text-[.9375rem]">
+            Notchs
+          </span>
+          <span
+            className="block text-[.6875rem] lg:text-xs"
+            style={{ color: whatsapp.meta }}
+          >
             {chatContent.status}
           </span>
         </span>
@@ -150,7 +155,7 @@ export function WhatsAppChat({
               {chatContent.replyButtons.map((label) => (
                 <span
                   key={label}
-                  className="rounded-lg py-2 text-center text-[.8125rem] font-medium"
+                  className="rounded-lg py-1.5 text-center text-xs font-medium lg:py-2 lg:text-[.8125rem]"
                   style={{
                     background: whatsapp.bubbleIn,
                     color: whatsapp.link,
@@ -168,7 +173,7 @@ export function WhatsAppChat({
       {/* Input bar: the typed message waits for you to press send. */}
       <div className="flex items-end gap-1.5 px-1.5 pb-2">
         <p
-          className="min-h-10 flex-1 rounded-3xl px-4 py-2.5 text-sm leading-snug"
+          className="min-h-9 flex-1 rounded-3xl px-3.5 py-2 text-[.8125rem] leading-snug lg:min-h-10 lg:px-4 lg:py-2.5 lg:text-sm"
           style={{
             background: whatsapp.bar,
             color: stage === 1 ? whatsapp.text : whatsapp.meta,
@@ -178,7 +183,7 @@ export function WhatsAppChat({
         </p>
         <span
           className={cn(
-            "grid size-10 flex-none place-items-center rounded-full text-white",
+            "grid size-9 flex-none place-items-center rounded-full text-white lg:size-10",
             stage === 1 && "animate-blink",
           )}
           style={{ background: whatsapp.accent }}

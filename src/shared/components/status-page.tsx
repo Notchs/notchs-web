@@ -17,6 +17,8 @@ type StatusPageProps = {
   markClassName?: string;
   /** Replaces the default "back home" action. */
   action?: ReactNode;
+  /** "alert" shows the description in the Unnotched coral, for errors. */
+  tone?: "default" | "alert";
 };
 
 function BackHomeLink() {
@@ -36,6 +38,7 @@ export function StatusPage({
   mark,
   markClassName,
   action = <BackHomeLink />,
+  tone = "default",
 }: StatusPageProps) {
   return (
     <PageShell>
@@ -43,6 +46,7 @@ export function StatusPage({
         kicker={kicker}
         title={title}
         description={description}
+        descriptionClassName={tone === "alert" ? "text-unnotched" : undefined}
         mark={mark}
         markClassName={markClassName}
       >

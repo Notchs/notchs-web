@@ -10,7 +10,7 @@ import { cn } from "@/shared/lib/cn";
 
 import { flowContent } from "../content";
 import { getVenueMe, type VenueMember } from "../lib/api";
-import { ApplicationPath } from "./application-path";
+import { ApplicationPath, ApplicationPathLink } from "./application-path";
 import { LoggedInPanel } from "./logged-in-panel";
 import { ForgotForm, LoginForm } from "./login-screens";
 import { ApplyEmailForm, CodeForm, VenueForm } from "./signup-screens";
@@ -231,18 +231,26 @@ export function VenueAuthFlow({ dashboardHref }: { dashboardHref?: string }) {
           </ol>
         )}
         {body()}
-        {showSwap && (
-          <p className="text-center text-muted">
-            {swap.question}{" "}
-            <button
-              type="button"
-              onClick={() => setScreen(applying ? "login" : "apply")}
-              className="cursor-pointer py-3 font-semibold text-foreground underline underline-offset-[3px] hover:text-muted"
-            >
-              {swap.cta}
-            </button>
-          </p>
-        )}
+        {/* The swap and joining links sit together as one tight group. */}
+        <div className="-my-3 flex flex-col items-center text-center empty:hidden">
+          {showSwap && (
+            <p className="text-muted">
+              {swap.question}{" "}
+              <button
+                type="button"
+                onClick={() => setScreen(applying ? "login" : "apply")}
+                className="cursor-pointer py-3 font-semibold text-foreground underline underline-offset-[3px] hover:text-muted"
+              >
+                {swap.cta}
+              </button>
+            </p>
+          )}
+          {applying && screen !== "applied" && (
+            <p className="-mt-3">
+              <ApplicationPathLink current={0} />
+            </p>
+          )}
+        </div>
       </AuthFormPanel>
     </>
   );

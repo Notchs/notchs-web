@@ -33,7 +33,6 @@ import {
 } from "../lib/validation";
 import { CodeInput } from "./code-input";
 import { VerifyHint } from "./login-screens";
-import { ApplicationPath } from "./application-path";
 
 const { apply: applyCopy, code: codeCopy, venue: venueCopy } = flowContent;
 
@@ -109,7 +108,6 @@ export function ApplyEmailForm({
           {applyCopy.cta}
         </AuthButton>
       </form>
-      <ApplicationPath current={0} />
     </>
   );
 }

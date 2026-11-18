@@ -1,25 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
+import { routes } from "@/config/routes";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
-import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
-import {
-  GlassLensTrack,
-  LENS_ITEM,
-} from "@/shared/components/glass/glass-lens-track";
-import { ReplayIcon } from "@/shared/components/icons";
+import { VerifiedIcon } from "@/shared/components/brand/verified-icon";
+import { ArrowRightIcon, ChatIcon, ScanIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/cn";
 import { INK_GROUND } from "@/shared/lib/glass/ink-ground";
 
 import { howItWorksContent, steps, venues } from "../content";
 import { buildQrPattern } from "../lib/qr-pattern";
 import { useLanding } from "./landing-provider";
+import { SectionHeading } from "./section-heading";
 import { WhatsAppChat } from "./whatsapp-chat";
 
 const STAGE_MS = 2600;
 const MINI_QR = 25;
+
+const stepIcons = [ScanIcon, ChatIcon, VerifiedIcon];
 
 /** Viewfinder brackets around the code in the camera view. */
 const cameraCorners = [
@@ -41,23 +42,11 @@ function useMiniQrPath() {
   }, []);
 }
 
-function ReplayButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-lg px-1 font-semibold underline decoration-line decoration-2 underline-offset-[6px] hover:decoration-current"
-    >
-      <ReplayIcon className="size-4.5" />
-      {howItWorksContent.replay}
-    </button>
-  );
-}
-
 /**
- * Plays the three stages once the phone scrolls into view. Desktop lists the
- * steps beside the phone; smaller screens show them as tabs right above it, so
- * picking a step and seeing the phone change happen in one view.
+ * "How it works" as one Ink panel: the pitch, the three steps as icons and
+ * the call to action on the left, a tilted phone playing the demo on the
+ * right. The demo starts once the phone scrolls into view; tapping a step
+ * jumps to it.
  */
 export function NotchDemo() {
   const { venue } = useLanding();
@@ -65,8 +54,6 @@ export function NotchDemo() {
   const phoneRef = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState(0);
   const [inView, setInView] = useState(false);
-  const [manual, setManual] = useState(false);
-  const [replays, setReplays] = useState(0);
   const qrPath = useMiniQrPath();
 
   useEffect(() => {
@@ -85,24 +72,26 @@ export function NotchDemo() {
     return () => observer.disconnect();
   }, []);
 
-  // Restarts when the phone first shows, the place changes or "Play again".
+  // Loops Scan → Send → Notched → Scan… once the phone shows. Tapping a step
+  // jumps there and the loop carries on from it. Reduced motion: no autoplay.
   useEffect(() => {
-    if (!inView || manual) return;
-    const timers = steps.map((_, index) =>
-      setTimeout(() => setStage(index), index * STAGE_MS),
+    if (!inView) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setTimeout(
+      () => setStage((current) => (current + 1) % steps.length),
+      STAGE_MS,
     );
-    return () => timers.forEach(clearTimeout);
-  }, [inView, manual, venue, replays]);
+    return () => clearTimeout(timer);
+  }, [inView, stage]);
 
-  const jumpTo = (index: number) => {
-    setManual(true);
-    setStage(index);
-  };
+  // A new place starts the demo again from the scan.
+  const [shownVenue, setShownVenue] = useState(venue);
+  if (venue !== shownVenue) {
+    setShownVenue(venue);
+    setStage(0);
+  }
 
-  const replay = () => {
-    setManual(false);
-    setReplays((count) => count + 1);
-  };
+  const jumpTo = (index: number) => setStage(index);
 
   const layer = (index: number) =>
     cn(
@@ -113,114 +102,109 @@ export function NotchDemo() {
     );
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-16">
-      {/* Desktop: the steps are glass pieces; a soft highlight marks the current step and slides to the
-          next as the demo plays, or to the one under the pointer. */}
-      <GlassGroup self={false} className="hidden lg:block">
-        <GlassLensTrack restingIndex={stage} lensRadius={14} inset={6}>
-          <ol className="grid gap-3">
-            {steps.map((step, index) => {
-              const current = stage === index;
-              return (
-                <li key={step.title}>
-                  <GlassShape radius={16}>
-                    <button
-                      type="button"
-                      aria-pressed={current}
-                      onClick={() => jumpTo(index)}
-                      className="relative w-full cursor-pointer rounded-2xl p-5 pt-6 text-left sm:p-6 sm:pt-7"
-                      {...LENS_ITEM}
+    <div
+      {...INK_GROUND}
+      className="relative grid reveal gap-12 overflow-hidden rounded-3xl bg-ink p-6 py-10 text-paper sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16 lg:p-14 lg:pr-20"
+    >
+      <div className="relative">
+        <SectionHeading
+          kicker={howItWorksContent.kicker}
+          title={howItWorksContent.titleLines.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+          description={howItWorksContent.description}
+          onInk
+        />
+
+        {/* The steps: icons joined by arrows. The current one lights up. */}
+        <ol className="mt-10 flex items-start gap-2 sm:gap-4">
+          {steps.map((step, index) => {
+            const Icon = stepIcons[index];
+            const current = stage === index;
+            const done = index < stage;
+            return (
+              <Fragment key={step.label.join(" ")}>
+                {index > 0 && (
+                  <li aria-hidden="true" className="pt-5 sm:pt-6">
+                    <ArrowRightIcon
+                      className={cn(
+                        "size-4 transition-colors duration-300",
+                        done || current ? "text-paper" : "text-paper/35",
+                      )}
+                    />
+                  </li>
+                )}
+                <li className="flex-1 sm:flex-none">
+                  <button
+                    type="button"
+                    aria-pressed={current}
+                    onClick={() => jumpTo(index)}
+                    className="group flex w-full cursor-pointer flex-col items-center gap-2.5 text-center sm:w-24"
+                  >
+                    <span
+                      className={cn(
+                        "grid size-14 place-items-center rounded-full border-2 transition-colors duration-300 sm:size-16",
+                        current
+                          ? "border-volt bg-volt/10 text-volt"
+                          : done
+                            ? "border-paper/60 text-paper"
+                            : "border-paper/20 text-paper/70 group-hover:border-paper/50",
+                      )}
                     >
-                      <span className="flex items-baseline gap-4">
-                        <span
-                          className={cn(
-                            "font-display text-2xl font-extrabold tabular-nums transition-colors duration-200",
-                            current ? "text-foreground" : "text-muted",
-                          )}
-                        >
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span>
-                          <span className="block font-display text-xl font-extrabold tracking-[-.02em]">
-                            {step.title}
-                          </span>
-                          <span className="mt-1.5 block text-base leading-relaxed text-muted">
-                            {step.body}
-                          </span>
-                        </span>
-                      </span>
-                    </button>
-                  </GlassShape>
+                      <Icon className="size-6 sm:size-7" />
+                    </span>
+                    <span className="text-sm leading-tight font-semibold sm:text-[.9375rem]">
+                      {step.label[0]}
+                      <br />
+                      {step.label[1]}
+                    </span>
+                    <span className="sr-only">{step.body}</span>
+                  </button>
                 </li>
-              );
-            })}
-          </ol>
-        </GlassLensTrack>
-        <div className="mt-3">
-          <ReplayButton onClick={replay} />
-        </div>
-      </GlassGroup>
+              </Fragment>
+            );
+          })}
+        </ol>
 
-      <div className="mx-auto w-full max-w-[18rem] sm:max-w-[20rem]">
-        {/* Phones and tablets: the steps as a glass segmented control, with the
-            current one explained. A soft highlight slides between them. */}
-        <div className="mb-5 lg:hidden">
-          <GlassGroup radius={20} className="rounded-[20px] p-1.5">
-            <GlassLensTrack restingIndex={stage} lensRadius={14} inset={0}>
-              <ol className="grid grid-cols-3 gap-1">
-                {steps.map((step, index) => {
-                  const current = stage === index;
-                  return (
-                    <li key={step.title} className="relative">
-                      <button
-                        type="button"
-                        aria-pressed={current}
-                        onClick={() => jumpTo(index)}
-                        className="relative flex min-h-12 w-full cursor-pointer flex-col items-center justify-center rounded-[14px] px-1.5 py-2 text-center"
-                        {...LENS_ITEM}
-                      >
-                        <span
-                          className={cn(
-                            "font-display text-xs font-extrabold tabular-nums",
-                            !current && "text-muted",
-                          )}
-                        >
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="font-display text-sm font-extrabold tracking-[-.02em]">
-                          {step.title}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </GlassLensTrack>
-          </GlassGroup>
-          <p
-            aria-live="polite"
-            className="mt-3 min-h-[3lh] text-[.9375rem] leading-snug text-muted"
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <Link
+            href={routes.login}
+            className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-volt px-6 font-semibold text-ink transition-transform duration-150 hover:-translate-y-0.5 motion-reduce:transition-none"
           >
-            {steps[stage].body}
-          </p>
+            {howItWorksContent.cta}
+            <ArrowRightIcon className="size-4.5 transition-transform duration-150 group-hover:translate-x-0.5" />
+          </Link>
         </div>
+      </div>
 
-        {/* The phone. Always Ink, like the real WhatsApp screens in the demo. */}
+      {/* The phone, tilted on desktop, with a few Volt sparks by its corner. */}
+      <div className="relative mx-auto w-full max-w-60 lg:w-68 lg:max-w-none">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 40 40"
+          className="absolute -top-8 -right-8 size-12 text-volt"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={3.5}
+          strokeLinecap="round"
+        >
+          <path d="M8 16 6 5M20 14l6-10M24 24l11-3" />
+        </svg>
         <div
           ref={phoneRef}
-          {...INK_GROUND}
-          className="rounded-[2.5rem] border-[10px] border-graphite bg-ink text-paper surface-ink"
+          className="rounded-[2.25rem] border-[8px] border-graphite bg-ink text-paper shadow-[0_40px_80px_-30px_rgb(0_0_0/.9)] ring-1 surface-ink ring-white/15 lg:rotate-6"
         >
-          {/* Below lg the screen height follows the viewport (minus header,
-              tabs and caption), so tabs and the whole phone fit in one view. */}
-          <div className="relative h-[clamp(20rem,calc(100svh-17rem),32rem)] overflow-hidden rounded-[1.9rem] lg:aspect-9/17 lg:h-auto">
+          {/* A 9:16 screen, like a real phone. */}
+          <div className="relative aspect-9/16 overflow-hidden rounded-[1.75rem]">
             {/* 1. Scan: camera over the counter phone. */}
             <div className={layer(0)} aria-hidden={stage !== 0}>
               <Image
                 src={active.image.src}
                 alt=""
                 fill
-                sizes="300px"
+                sizes="280px"
                 placeholder="blur"
                 className="object-cover opacity-45"
               />
@@ -228,7 +212,7 @@ export function NotchDemo() {
                 <div className="relative rounded-xl bg-paper p-3">
                   <svg
                     viewBox={`0 0 ${MINI_QR} ${MINI_QR}`}
-                    className="size-32 text-ink"
+                    className="size-28 text-ink"
                     shapeRendering="crispEdges"
                     aria-hidden="true"
                   >
@@ -269,11 +253,11 @@ export function NotchDemo() {
             </div>
           </div>
         </div>
-
-        <div className="mt-3 flex justify-center lg:hidden">
-          <ReplayButton onClick={replay} />
-        </div>
       </div>
+
+      <p aria-live="polite" className="sr-only">
+        {steps[stage].body}
+      </p>
     </div>
   );
 }

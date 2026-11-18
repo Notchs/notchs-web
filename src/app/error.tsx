@@ -21,6 +21,7 @@ export default function ErrorPage({ error, retry }: ErrorPageProps) {
       kicker="Error"
       title="Something went wrong."
       description="An unexpected error occurred. Please try again."
+      tone="alert"
       mark={<GhostMark />}
       action={<Button onClick={retry}>Try again</Button>}
     />

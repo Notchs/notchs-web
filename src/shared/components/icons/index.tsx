@@ -259,3 +259,54 @@ export function UserIcon(props: IconProps) {
     </OutlineIcon>
   );
 }
+
+export function ChartIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M4 20h16M7 16v-4M12 16V8M17 16V5" />
+    </OutlineIcon>
+  );
+}
+
+export function BadgeIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <circle cx="12" cy="9" r="5" />
+      <path d="m8.5 12.5-1.5 7.5 5-2.5 5 2.5-1.5-7.5" />
+    </OutlineIcon>
+  );
+}
+
+export function CardIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <rect x="6" y="3" width="12" height="18" rx="2.5" />
+      <path d="M9 15h6M9 18h3" />
+    </OutlineIcon>
+  );
+}
+
+export function ScanIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M4 8.5V6a2 2 0 0 1 2-2h2.5M15.5 4H18a2 2 0 0 1 2 2v2.5M20 15.5V18a2 2 0 0 1-2 2h-2.5M8.5 20H6a2 2 0 0 1-2-2v-2.5M7.5 12h9" />
+    </OutlineIcon>
+  );
+}
+
+export function ChatIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M12 4a8 8 0 0 0-6.9 12.05L4 20l4.05-1.07A8 8 0 1 0 12 4z" />
+      <path d="M9 11h6M9 14h3.5" />
+    </OutlineIcon>
+  );
+}
+
+export function StarIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="m12 3.5 2.6 5.3 5.9.85-4.25 4.15 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.5 9.65l5.9-.85z" />
+    </OutlineIcon>
+  );
+}

@@ -25,7 +25,7 @@ export function Faq() {
               <GlassShape
                 key={item.q}
                 role="listitem"
-                radius={18}
+                radius={16}
                 className="px-5"
               >
                 <details name="faq" className="group details-smooth">

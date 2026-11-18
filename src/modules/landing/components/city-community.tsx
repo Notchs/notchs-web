@@ -7,7 +7,7 @@ import { communityContent } from "../content";
 import { SectionHeading } from "./section-heading";
 
 /**
- * "One platform. Countless local stories.": where Notchs is live, the cities
+ * "Starting in Ahmedabad. Your city next.": where Notchs is live, the cities
  * people can ask for, and the picker to ask. Shows only real launch status.
  */
 export function CityCommunity() {
