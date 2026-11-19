@@ -12,7 +12,7 @@ export function LandingFooter() {
       <section className="mx-auto max-w-[1440px] px-gutter pb-16 sm:pb-24">
         <div className="flex reveal flex-col items-start gap-8 border-t border-line pt-14 sm:pt-20 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="max-w-[16ch] font-display text-[clamp(2rem,1.2rem+3.4vw,3.75rem)] leading-[1] font-extrabold tracking-[-.035em] text-balance">
+            <h2 className="max-w-[16ch] font-display text-[clamp(2rem,1.2rem+3.4vw,3.75rem)] leading-[1.14] font-extrabold tracking-[-.02em] text-balance">
               {closingContent.title}
             </h2>
             <p className="mt-4 text-lg text-muted">

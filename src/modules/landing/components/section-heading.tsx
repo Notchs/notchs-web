@@ -29,7 +29,7 @@ export function SectionHeading({
       >
         {kicker}
       </p>
-      <h2 className="font-display text-[clamp(1.875rem,1.1rem+3vw,3.25rem)] leading-[1.02] font-extrabold tracking-[-.03em] text-balance">
+      <h2 className="font-display text-[clamp(1.875rem,1.1rem+3vw,3.25rem)] leading-[1.2] font-extrabold tracking-[-.01em] text-balance">
         {title}
       </h2>
       {description && (

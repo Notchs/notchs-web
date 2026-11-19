@@ -61,7 +61,7 @@ export function AuthBrandPanel({
         <span className="rounded-full glass px-3.5 py-1.5 text-sm font-semibold">
           {kicker}
         </span>
-        <h1 className="font-display text-[3.5rem] leading-[1.02] tracking-[-.02em] text-balance">
+        <h1 className="font-display text-[3.5rem] leading-[1.06] tracking-[-.02em] text-balance">
           {title}
         </h1>
         <p className="max-w-100 text-lg leading-relaxed text-stone-light">

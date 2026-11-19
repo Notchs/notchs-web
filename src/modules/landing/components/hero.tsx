@@ -12,7 +12,7 @@ export function Hero() {
         <p className="mb-6 flex animate-fade-in items-center gap-3.5 text-xs font-semibold tracking-[.14em] text-muted uppercase [animation-delay:50ms] before:h-px before:w-8 before:bg-current">
           {heroContent.kicker}
         </p>
-        <h1 className="font-display text-[clamp(2.5rem,1.2rem+5.2vw,5.25rem)] leading-[.96] font-extrabold tracking-[-.035em]">
+        <h1 className="font-display text-[clamp(2.5rem,1.2rem+5.2vw,5.25rem)] leading-[1.06] font-extrabold tracking-[-.02em]">
           {heroContent.titleLines.map((line) => (
             <span key={line} className="block">
               {line}
