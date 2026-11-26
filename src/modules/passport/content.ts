@@ -21,6 +21,11 @@ export const shellContent = {
     profile: "Profile",
   },
   accountMenu: "Account menu",
+  notifications: {
+    label: "Notifications",
+    empty: "You’re all caught up.",
+    emptyBody: "News about your Notchs and rewards will show up here.",
+  },
   logOut: "Log out",
   loggingOut: "Logging out…",
   loading: "Loading your passport…",
