@@ -251,6 +251,14 @@ export function TrophyIcon(props: IconProps) {
   );
 }
 
+export function BellIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeLinecap="round" {...props}>
+      <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 21h4" />
+    </OutlineIcon>
+  );
+}
+
 export function UserIcon(props: IconProps) {
   return (
     <OutlineIcon strokeLinecap="round" {...props}>

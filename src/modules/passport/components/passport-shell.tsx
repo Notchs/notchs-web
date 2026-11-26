@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -8,13 +8,14 @@ import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { HomeIcon, TrophyIcon, UserIcon } from "@/shared/components/icons";
-import { GlassGroup } from "@/shared/components/glass/glass-group";
+import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
 import {
   GlassLensTrack,
   LENS_ITEM,
 } from "@/shared/components/glass/glass-lens-track";
 import { ThemeToggle } from "@/shared/components/layout/theme-toggle";
 import { cn } from "@/shared/lib/cn";
+import { useInkGround } from "@/shared/lib/glass/use-ink-ground";
 
 import { shellContent } from "../content";
 import { getMe, isLoggedOut } from "../lib/api";
@@ -22,9 +23,13 @@ import { USES_MOCK } from "../lib/config";
 import { useLoad } from "../lib/use-load";
 import { AccountMenu } from "./account-menu";
 import { MeContext } from "./me-context";
+import { NotificationsMenu } from "./notifications-menu";
 import { LoadError, Loading } from "./states";
 
 const { nav } = shellContent;
+
+/** Height and corner radius of the bar's glass capsules, px. */
+const CAPSULE_RADIUS = 32;
 
 const tabs = [
   { href: routes.passport, label: nav.home, Icon: HomeIcon },
@@ -43,9 +48,9 @@ const isCurrent = (pathname: string, href: string) =>
   (href !== routes.passport && pathname.startsWith(`${href}/`));
 
 /**
- * Frame for every passport page: on phones (under 640px) an app-style tab bar
- * along the bottom and no header; from 640px a glass header with the nav and
- * the account menu. Loads the customer once; someone who
+ * Frame for every passport page: the landing page's glass header (logo, nav,
+ * account menu) and, on phones, an app-style tab bar along the bottom in
+ * place of the header's nav. Loads the customer once; someone who
  * isn't logged in goes to the login page.
  */
 export function PassportShell({ children }: { children: ReactNode }) {
@@ -54,6 +59,8 @@ export function PassportShell({ children }: { children: ReactNode }) {
   const me = useLoad(getMe);
   const { data, setData } = me;
   const loggedOut = isLoggedOut(me.error);
+  const headerRef = useRef<HTMLElement>(null);
+  const onInk = useInkGround(headerRef);
 
   useEffect(() => {
     if (loggedOut) router.replace(routes.login);
@@ -66,50 +73,83 @@ export function PassportShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 hidden px-gutter pt-3 sm:block">
+      <header
+        ref={headerRef}
+        className={cn("sticky top-0 z-40 px-gutter pt-3", onInk && "tone-ink")}
+      >
+        {/* Same bar as the landing page: three glass capsules. */}
         <GlassGroup
-          radius={32}
-          className="flex h-16 items-center justify-between gap-4 rounded-[32px] pr-2.5 pl-5"
+          self={false}
+          className="mx-auto flex h-16 max-w-[calc(1440px_-_2_*_var(--gutter))] items-center justify-between gap-2"
         >
-          <Link
-            href={routes.passport}
-            aria-label={`${siteConfig.name} passport home`}
-            className="inline-flex min-h-11 items-center gap-2.5"
+          <GlassShape
+            radius={CAPSULE_RADIUS}
+            className="flex h-16 items-center px-5"
           >
-            <NotchGlyph className="size-5.5" />
-            <span className="font-display text-base leading-none font-extrabold tracking-[-.01em]">
-              {siteConfig.name}
-            </span>
-          </Link>
-          <nav aria-label={nav.label} className="hidden sm:block">
-            <ul className="flex items-center gap-1">
-              {tabs.slice(0, 3).map((tab) => (
-                <li key={tab.href}>
-                  <Link
-                    href={tab.href}
-                    aria-current={
-                      isCurrent(pathname, tab.href) ? "page" : undefined
-                    }
-                    className={cn(
-                      "flex min-h-11 items-center rounded-full px-3 text-[.9375rem] font-medium whitespace-nowrap text-muted hover:text-foreground lg:px-4",
-                      isCurrent(pathname, tab.href) &&
-                        "bg-glass-tint font-bold text-foreground",
-                    )}
-                  >
-                    {tab.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="flex items-center gap-2">
-            <GlassLensTrack lensRadius={22} inset={1}>
+            <Link
+              href={routes.passport}
+              aria-label={`${siteConfig.name} passport home`}
+              className="inline-flex min-h-11 items-center gap-2.5"
+            >
+              <span className="grid size-9 flex-none place-items-center rounded-[10px] bg-btn text-btn-fg">
+                <NotchGlyph className="size-5" />
+              </span>
+              <span className="font-display text-lg leading-none font-extrabold tracking-[-.01em]">
+                {siteConfig.name}
+              </span>
+            </Link>
+          </GlassShape>
+
+          {/* Phones use the tab bar along the bottom instead. */}
+          <GlassShape
+            radius={CAPSULE_RADIUS}
+            className="hidden h-16 items-center px-2 sm:flex"
+          >
+            <nav aria-label={nav.label}>
+              <GlassLensTrack lensRadius={20} inset={2}>
+                <ul className="flex items-center gap-0.5">
+                  {tabs.slice(0, 3).map((tab) => (
+                    <li key={tab.href}>
+                      <Link
+                        href={tab.href}
+                        aria-current={
+                          isCurrent(pathname, tab.href) ? "page" : undefined
+                        }
+                        className="relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[.9375rem] font-medium whitespace-nowrap text-muted transition-colors duration-150 after:absolute after:bottom-1.5 after:left-1/2 after:h-0.5 after:w-5 after:-translate-x-1/2 after:rounded-full after:bg-btn after:opacity-0 after:transition-opacity after:duration-200 hover:text-foreground focus-visible:text-foreground aria-[current=page]:text-foreground aria-[current=page]:after:opacity-100"
+                        {...LENS_ITEM}
+                      >
+                        {tab.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </GlassLensTrack>
+            </nav>
+          </GlassShape>
+
+          <GlassShape
+            radius={CAPSULE_RADIUS}
+            className="flex h-16 items-center gap-1 px-2 sm:gap-2 sm:pr-3"
+          >
+            <GlassLensTrack
+              lensRadius={22}
+              inset={1}
+              className="flex items-center gap-1"
+            >
               <span {...LENS_ITEM}>
                 <ThemeToggle />
               </span>
+              <span {...LENS_ITEM}>
+                <NotificationsMenu />
+              </span>
             </GlassLensTrack>
-            {data && <AccountMenu name={data.name} photoUrl={data.photo_url} />}
-          </div>
+            {/* Phones reach the profile from the bottom tab bar. */}
+            {data && (
+              <span className="max-sm:hidden">
+                <AccountMenu name={data.name} photoUrl={data.photo_url} />
+              </span>
+            )}
+          </GlassShape>
         </GlassGroup>
       </header>
 

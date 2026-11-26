@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/shared/lib/cn";
-import { CityProvider } from "@/modules/city";
 
 import { placesContent, sectionIds } from "../content";
 import { jetbrainsMono } from "../fonts";
-import { CityCommunity } from "./city-community";
+import { AudienceSplit } from "./audience-split";
 import { CityPulse } from "./city-pulse";
 import { Collect } from "./collect";
 import { Faq } from "./faq";
@@ -32,7 +31,7 @@ function Section({ id, className, children }: SectionProps) {
     <section
       id={id}
       className={cn(
-        "mx-auto max-w-[1440px] scroll-mt-24 px-gutter py-16 sm:py-24",
+        "mx-auto max-w-[1440px] scroll-mt-24 px-gutter py-12 sm:py-24",
         className,
       )}
     >
@@ -44,53 +43,50 @@ function Section({ id, className, children }: SectionProps) {
 export function LandingPage() {
   return (
     <LandingProvider>
-      <CityProvider>
-        <StructuredData />
-        <LandingHeader />
-        <main data-smooth-scroll className={jetbrainsMono.variable}>
-          <Hero />
+      <StructuredData />
+      <LandingHeader />
+      <main data-smooth-scroll className={jetbrainsMono.variable}>
+        <Hero />
 
-          <Section id={sectionIds.howItWorks}>
-            <NotchDemo />
-          </Section>
+        <Section className="pt-0 sm:pt-0">
+          <AudienceSplit />
+        </Section>
 
-          <Section id={sectionIds.rewards}>
-            <Collect />
-          </Section>
+        <Section id={sectionIds.howItWorks}>
+          <NotchDemo />
+        </Section>
 
-          <Section id={sectionIds.places}>
-            <SectionHeading
-              kicker={placesContent.kicker}
-              title={placesContent.title}
-              description={placesContent.description}
-              className="mb-12 reveal"
-            />
-            <PlaceCards />
-          </Section>
+        <Section id={sectionIds.rewards}>
+          <Collect />
+        </Section>
 
-          <Section id={sectionIds.map}>
-            <CityPulse />
-          </Section>
+        <Section id={sectionIds.places}>
+          <SectionHeading
+            kicker={placesContent.kicker}
+            title={placesContent.title}
+            description={placesContent.description}
+            className="mb-12 reveal"
+          />
+          <PlaceCards />
+        </Section>
 
-          <Section id={sectionIds.moments}>
-            <Moments />
-          </Section>
+        <Section id={sectionIds.map}>
+          <CityPulse />
+        </Section>
 
-          <Section id={sectionIds.venues}>
-            <ForVenues />
-          </Section>
+        <Section id={sectionIds.moments}>
+          <Moments />
+        </Section>
 
-          <Section id={sectionIds.faq}>
-            <Faq />
-          </Section>
+        <Section id={sectionIds.venues}>
+          <ForVenues />
+        </Section>
 
-          {/* "Not in your city? Ask": sits right before the closing CTA. */}
-          <Section id={sectionIds.cities}>
-            <CityCommunity />
-          </Section>
-        </main>
-        <LandingFooter />
-      </CityProvider>
+        <Section id={sectionIds.faq}>
+          <Faq />
+        </Section>
+      </main>
+      <LandingFooter />
     </LandingProvider>
   );
 }

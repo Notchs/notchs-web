@@ -36,27 +36,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    {
-      media: "(prefers-color-scheme: dark)",
-      color: siteConfig.themeColors.dark,
-    },
-    {
-      media: "(prefers-color-scheme: light)",
-      color: siteConfig.themeColors.light,
-    },
-  ],
+  // Dark is the default; the theme toggle updates this for a saved choice.
+  themeColor: siteConfig.themeColors.dark,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // The theme script sets data-theme on <html> before React hydrates.
+    // Dark is the default. The theme script swaps in a saved choice before
+    // first paint, so there is no flash.
     <html
       lang="en-IN"
+      data-theme="dark"
       className={`${inter.variable} ${unbounded.variable}`}
       suppressHydrationWarning
     >
-      <body className="grid min-h-svh grid-rows-[auto_1fr_auto] bg-background font-sans text-foreground antialiased">
+      <body className="grid min-h-svh grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr_auto] bg-background font-sans text-foreground antialiased">
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {children}
         {/* Team builds only: a corner link to the All pages hub. */}

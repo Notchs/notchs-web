@@ -14,17 +14,17 @@ export const sectionIds = {
   places: "explore",
   moments: "moments",
   rewards: "rewards",
-  cities: "cities",
   venues: "venues",
   faq: "faq",
 } as const;
 
+/** Navbar: one link per page (agreed by the team before launch). */
 export const navLinks = [
-  { label: "How it works", href: `#${sectionIds.howItWorks}` },
-  { label: "Explore", href: `#${sectionIds.places}` },
-  { label: "City Pulse", href: `#${sectionIds.map}` },
-  { label: "For venues", href: `#${sectionIds.venues}` },
-  { label: "FAQ", href: `#${sectionIds.faq}` },
+  { label: "About", href: routes.about },
+  { label: "For customers", href: routes.customers },
+  { label: "For venues", href: routes.venues },
+  { label: "Mission", href: routes.mission },
+  { label: "Contact", href: routes.contact },
 ] as const;
 
 export const accessLabel = "Get your passport";
@@ -226,10 +226,9 @@ export const heroSlides: readonly HeroSlide[] = [
 ];
 
 export const heroContent = {
-  kicker: "Ahmedabad · Now live",
   titleLines: ["Every real visit", "counts."],
   description:
-    "Discover places, collect visit memories, earn recognition and see your city's local stories come alive.",
+    "A free passport for your city. Visit, scan on WhatsApp, get your monthly Notch Card. No app.",
   secondary: "See how it works",
   sampleNote: "Example",
 } as const;
@@ -254,7 +253,7 @@ export const howItWorksContent = {
   titleLines: ["Your visit,", " Just a message away."],
   description:
     "Scan the QR at the venue and send a quick message on WhatsApp to get your Notch.",
-  cta: "Try it now",
+  cta: accessLabel,
   pickPlace: "Try it at",
   tryIt: "Try it",
 } as const;
@@ -281,18 +280,6 @@ export const placesContent = {
   title: "Find your kind of place.",
   description:
     "Cafés, turfs, courts and game nights. The spots you already go to, where every visit you prove adds to your Notch count.",
-} as const;
-
-export const communityContent = {
-  kicker: "Every city",
-  title: "Starting in Ahmedabad. Your city next.",
-  description:
-    "Notchs connects people with the places they love and the people they meet there. We're growing one city at a time.",
-  live: "Live now",
-  next: "Not here yet",
-  ask: "Want Notchs in your city?",
-  askBody:
-    "Pick it from the list and ask. Every request tells us where to go next.",
 } as const;
 
 export const collectContent = {
@@ -337,9 +324,6 @@ export const saturdayContent = {
   title: "What's happening around your city?",
   description:
     "One Saturday in Ahmedabad: tap a stop to fly there. Every pin is a place where a real visit becomes a Notch.",
-  noMapDescription:
-    "Pick your city to see what's happening there. More cities fill in as Notchs goes live.",
-  cityLabel: "Your city",
   credit: "© OpenStreetMap contributors",
   cta: "Notch it here",
   mapAlt:
@@ -443,8 +427,8 @@ export const venuesContent = {
   points: [
     "First-timers and regulars, every week",
     "A Notch Card that rewards your regulars",
-    "Totals only. Never names or phone numbers",
-    "Free for your first 3 months",
+    "Totals only. Never phone numbers",
+    "Free for your first months",
   ],
   cta: "Apply for your venue",
   image: photo(
@@ -467,7 +451,7 @@ export const faqContent = {
     },
     {
       q: "Who can see my Notchs?",
-      a: "Your profile is private by default. You choose what to share. Venues only see totals, never your name or number.",
+      a: "Your profile is private by default. You choose what to share. Venues only see totals, never your phone number.",
     },
     {
       q: "Why can't I just Notch from home?",
@@ -483,7 +467,7 @@ export const faqContent = {
     },
     {
       q: "How can a venue join?",
-      a: "Apply from the venue page. The Notchs team checks every venue, then emails a link to set your password. Your first 3 months are free.",
+      a: "Apply from the venue page. The Notchs team checks every venue, then emails a link to set your password. Your first months are free.",
     },
   ],
 } as const;
@@ -518,25 +502,25 @@ export const footerContent = {
   signOff: "Built for every city",
   columns: [
     {
-      title: "Product",
+      title: "Notchs",
       links: [
-        { label: "How it works", href: `#${sectionIds.howItWorks}` },
-        { label: "Rewards", href: `#${sectionIds.rewards}` },
-        { label: "Explore", href: `#${sectionIds.places}` },
-        { label: "City Pulse", href: `#${sectionIds.map}` },
+        { label: "About", href: routes.about },
+        { label: "Mission", href: routes.mission },
+        { label: "Contact", href: routes.contact },
       ],
     },
     {
-      title: "Community",
+      title: "Use Notchs",
       links: [
-        { label: "Real moments", href: `#${sectionIds.moments}` },
-        { label: "Every city", href: `#${sectionIds.cities}` },
+        { label: "For customers", href: routes.customers },
+        { label: "For venues", href: routes.venues },
+        { label: "How it works", href: `#${sectionIds.howItWorks}` },
+        { label: "FAQ", href: `#${sectionIds.faq}` },
       ],
     },
     {
       title: "Business",
       links: [
-        { label: "For venues", href: `#${sectionIds.venues}` },
         { label: "Venue log in", href: routes.venueLogin },
         {
           label: "Apply for your venue",
@@ -544,20 +528,28 @@ export const footerContent = {
         },
       ],
     },
+  ],
+} as const;
+
+/** Right under the hero: sends each visitor to their own page. */
+export const audienceContent = {
+  heading: "Who is Notchs for?",
+  cards: [
     {
-      title: "Cities",
-      links: [
-        { label: "Ahmedabad", href: `?city=ahmedabad#${sectionIds.map}` },
-        { label: "Ask for your city", href: `#${sectionIds.cities}` },
-      ],
+      kicker: "For customers",
+      title: "Prove where you go. Get ranked.",
+      body: "Scan at the counter, send one WhatsApp message, and every real visit counts.",
+      cta: "How it works for you",
+      href: routes.customers,
+      ink: true,
     },
     {
-      title: "Support",
-      links: [
-        { label: "FAQ", href: `#${sectionIds.faq}` },
-        { label: "Help", href: `mailto:${siteConfig.supportEmail}` },
-        { label: "Contact", href: `mailto:${siteConfig.contactEmail}` },
-      ],
+      kicker: "For venues",
+      title: "Know who comes back.",
+      body: "Pay for customers, not clicks. See first-timers and regulars, with zero work for your staff.",
+      cta: "How it works for venues",
+      href: routes.venues,
+      ink: false,
     },
   ],
 } as const;

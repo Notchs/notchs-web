@@ -104,7 +104,7 @@ export function NotchDemo() {
   return (
     <div
       {...INK_GROUND}
-      className="relative grid reveal gap-12 overflow-hidden rounded-3xl bg-ink p-6 py-10 text-paper sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16 lg:p-14 lg:pr-20"
+      className="relative grid reveal gap-10 overflow-hidden rounded-3xl bg-ink p-5 py-9 text-paper sm:gap-12 sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16 lg:p-14 lg:pr-20"
     >
       <div className="relative">
         <SectionHeading
@@ -119,7 +119,7 @@ export function NotchDemo() {
         />
 
         {/* The steps: icons joined by arrows. The current one lights up. */}
-        <ol className="mt-10 flex items-start gap-2 sm:gap-4">
+        <ol className="mt-8 flex items-start justify-center gap-2 sm:mt-10 sm:justify-start sm:gap-4">
           {steps.map((step, index) => {
             const Icon = stepIcons[index];
             const current = stage === index;
@@ -136,12 +136,12 @@ export function NotchDemo() {
                     />
                   </li>
                 )}
-                <li className="flex-1 sm:flex-none">
+                <li>
                   <button
                     type="button"
                     aria-pressed={current}
                     onClick={() => jumpTo(index)}
-                    className="group flex w-full cursor-pointer flex-col items-center gap-2.5 text-center sm:w-24"
+                    className="group flex w-[4.25rem] cursor-pointer flex-col items-center gap-2.5 text-center sm:w-24"
                   >
                     <span
                       className={cn(
@@ -168,7 +168,7 @@ export function NotchDemo() {
           })}
         </ol>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+        <div className="mt-8 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-6">
           <Link
             href={routes.login}
             className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-volt px-6 font-semibold text-ink transition-transform duration-150 hover:-translate-y-0.5 motion-reduce:transition-none"

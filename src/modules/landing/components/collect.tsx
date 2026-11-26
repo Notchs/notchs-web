@@ -44,7 +44,7 @@ function Visual({ item }: { item: Item }) {
       return (
         <>
           <ExampleTag />
-          <div className="flex h-full items-end gap-1.5 px-4 pt-8 pb-3">
+          <div className="mx-auto flex h-full max-w-64 items-end gap-1.5 px-4 pt-8 pb-3">
             {bars.map((height, i) => (
               <span
                 key={height}
@@ -147,7 +147,10 @@ export function Collect() {
                   key={item.title}
                   role="listitem"
                   radius={16}
-                  className={cn("flex flex-col p-4", staggerItem)}
+                  className={cn(
+                    "flex flex-col p-4 max-sm:text-center",
+                    staggerItem,
+                  )}
                   style={staggerDelay(index)}
                 >
                   <div
@@ -156,7 +159,7 @@ export function Collect() {
                   >
                     <Visual item={item} />
                   </div>
-                  <div className="mt-4 flex items-center gap-2.5 px-1">
+                  <div className="mt-4 flex items-center gap-2.5 px-1 max-sm:justify-center">
                     <span className="grid size-8 flex-none place-items-center rounded-lg bg-foreground text-background">
                       <Icon className="size-4.5" />
                     </span>
@@ -167,7 +170,7 @@ export function Collect() {
                   <p className="mt-2 px-1 text-base leading-relaxed text-muted">
                     {item.body}
                   </p>
-                  <p className="mt-auto flex items-center gap-2 px-1 pt-3 text-[.9375rem] font-semibold">
+                  <p className="mt-auto flex items-center gap-2 px-1 pt-3 text-[.9375rem] font-semibold max-sm:justify-center">
                     <VerifiedIcon className="size-3.5 flex-none" />
                     {item.why}
                   </p>

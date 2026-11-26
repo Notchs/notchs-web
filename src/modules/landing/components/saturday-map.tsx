@@ -163,7 +163,7 @@ export function SaturdayMap() {
                 className={cn(
                   "absolute grid -translate-1/2 cursor-pointer place-items-center rounded-full font-mono text-xs transition-[width,height,background-color,color] duration-500 ease-notch",
                   current
-                    ? "z-10 size-14 border-2 border-ink bg-volt font-semibold text-ink shadow-lg"
+                    ? "z-10 size-14 border-2 border-ink bg-btn font-semibold text-btn-fg shadow-lg"
                     : "size-11 border-2 border-paper bg-ink text-paper hover:bg-graphite",
                 )}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}

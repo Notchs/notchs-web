@@ -18,7 +18,7 @@ export function ForVenues() {
   return (
     <div
       {...INK_GROUND}
-      className="grid reveal overflow-hidden rounded-3xl bg-ink text-paper lg:grid-cols-2"
+      className="relative grid reveal overflow-hidden rounded-3xl bg-ink text-paper lg:grid-cols-2"
     >
       <div className="absolute inset-0 sm:relative sm:inset-auto sm:aspect-16/10 lg:order-last lg:aspect-auto">
         <Image
@@ -42,7 +42,7 @@ export function ForVenues() {
           description={venuesContent.description}
           onInk
         />
-        <ul className="mt-6 grid gap-2.5 sm:mt-8 sm:gap-3.5">
+        <ul className="mt-6 grid gap-2.5 max-sm:mx-auto max-sm:w-fit sm:mt-8 sm:gap-3.5">
           {venuesContent.points.map((point) => (
             <li
               key={point}
@@ -53,7 +53,7 @@ export function ForVenues() {
             </li>
           ))}
         </ul>
-        <div className="mt-8 inline-flex w-full rounded-xl bg-graphite sm:mt-10 sm:w-auto">
+        <div className="mt-8 flex w-fit rounded-xl bg-graphite max-sm:mx-auto sm:mt-10">
           <Link
             href={`${routes.venueLogin}?view=apply`}
             className="group inline-flex min-h-12 w-full items-center justify-center gap-2 px-6 py-3 text-center font-semibold"

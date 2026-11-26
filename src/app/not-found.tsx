@@ -15,6 +15,7 @@ export default function NotFound() {
         kicker="404 · Unnotched"
         title="This place isn't on the map."
         mark={<GhostMark />}
+        frame="logo"
       />
     </div>
   );

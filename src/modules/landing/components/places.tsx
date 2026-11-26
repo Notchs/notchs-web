@@ -85,7 +85,7 @@ export function PlaceCards() {
   );
 
   return (
-    <div className="reveal overflow-hidden mask-x-from-92% mask-x-to-100% motion-reduce:overflow-x-auto">
+    <div className="reveal overflow-hidden mask-x-from-92% mask-x-to-100% motion-reduce:overflow-x-auto motion-reduce:mask-none">
       <div className="flex w-max animate-rail focus-within:[animation-play-state:paused] hover:[animation-play-state:paused] motion-reduce:animate-none">
         {set(false)}
         <div className="motion-reduce:hidden">{set(true)}</div>

@@ -1,4 +1,4 @@
-import { PageShell } from "@/shared/components/layout/page-shell";
+import { LandingShell } from "@/modules/landing";
 import { PlusIcon } from "@/shared/components/icons";
 
 import type { LegalContent } from "../content";
@@ -6,7 +6,7 @@ import type { LegalContent } from "../content";
 /** A short summary card, then each topic in plain words (A10, A11). */
 export function LegalPage({ content }: { content: LegalContent }) {
   return (
-    <PageShell>
+    <LandingShell>
       <main className="mx-auto w-full max-w-2xl px-gutter py-12 lg:py-20">
         <h1 className="font-display text-4xl leading-tight font-extrabold tracking-[-.02em]">
           {content.title}
@@ -42,6 +42,6 @@ export function LegalPage({ content }: { content: LegalContent }) {
 
         <p className="mt-6 text-muted">{content.updated}</p>
       </main>
-    </PageShell>
+    </LandingShell>
   );
 }
