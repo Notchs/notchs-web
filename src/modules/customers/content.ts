@@ -24,7 +24,7 @@ export const customersMetadata: Metadata = {
 
 export const heroContent = {
   kicker: "For people who go out",
-  title: "Real life, ranked.",
+  title: "Prove where you go.",
   description:
     "You already go out. Notchs turns every real visit into proof, points and a place on your city's leaderboard. Free, no app, works on WhatsApp.",
 } as const;

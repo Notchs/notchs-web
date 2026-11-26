@@ -530,3 +530,26 @@ export const footerContent = {
     },
   ],
 } as const;
+
+/** Right under the hero: sends each visitor to their own page. */
+export const audienceContent = {
+  heading: "Who is Notchs for?",
+  cards: [
+    {
+      kicker: "For customers",
+      title: "Prove where you go. Get ranked.",
+      body: "Scan at the counter, send one WhatsApp message, and every real visit counts.",
+      cta: "How it works for you",
+      href: routes.customers,
+      ink: true,
+    },
+    {
+      kicker: "For venues",
+      title: "Know who comes back.",
+      body: "Pay for customers, not clicks. See first-timers and regulars, with zero work for your staff.",
+      cta: "How it works for venues",
+      href: routes.venues,
+      ink: false,
+    },
+  ],
+} as const;

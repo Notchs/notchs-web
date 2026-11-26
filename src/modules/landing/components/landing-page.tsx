@@ -4,6 +4,7 @@ import { cn } from "@/shared/lib/cn";
 
 import { placesContent, sectionIds } from "../content";
 import { jetbrainsMono } from "../fonts";
+import { AudienceSplit } from "./audience-split";
 import { CityPulse } from "./city-pulse";
 import { Collect } from "./collect";
 import { Faq } from "./faq";
@@ -46,6 +47,10 @@ export function LandingPage() {
       <LandingHeader />
       <main data-smooth-scroll className={jetbrainsMono.variable}>
         <Hero />
+
+        <Section className="pt-0 sm:pt-0">
+          <AudienceSplit />
+        </Section>
 
         <Section id={sectionIds.howItWorks}>
           <NotchDemo />
