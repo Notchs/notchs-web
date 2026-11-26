@@ -7,7 +7,7 @@ export type VenueDataMode = "mock" | "api";
  * Visits and Guests show real numbers, other screens say "Opens soon".
  * "mock" shows the example data, for design work only.
  */
-export const VENUE_DATA_MODE = "api" as VenueDataMode;
+export const VENUE_DATA_MODE = "mock" as VenueDataMode;
 
 /**
  * Whether the live site serves the dashboard to logged-in venues. On since
