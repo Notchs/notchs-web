@@ -28,6 +28,16 @@ export const routes = {
   /** The main site's homepage, for links from the venue host. */
   mainSite: env.siteAccess === "team" ? "/" : env.appUrl,
   forbidden: "/403",
+  /**
+   * Marketing pages. Not built yet: don't link them from public pages until
+   * they exist and the team agrees they go live.
+   */
+  about: "/about",
+  customers: "/customers",
+  /** For venue owners; not the venue login or dashboard (venueLogin, venueHome). */
+  venues: "/venues",
+  mission: "/mission",
+  contact: "/contact",
   privacy: "/privacy",
   terms: "/terms",
   login: "/login",
