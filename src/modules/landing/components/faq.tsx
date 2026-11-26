@@ -8,20 +8,27 @@ import { PlusIcon } from "@/shared/components/icons";
 import { faqContent } from "../content";
 import { SectionHeading } from "./section-heading";
 
-export function Faq() {
+type FaqProps = {
+  kicker?: string;
+  title?: string;
+  items?: readonly { q: string; a: string }[];
+};
+
+/** The homepage questions, or another page's own (e.g. /venues). */
+export function Faq({
+  kicker = faqContent.kicker,
+  title = faqContent.title,
+  items = faqContent.items,
+}: FaqProps) {
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
-      <SectionHeading
-        kicker={faqContent.kicker}
-        title={faqContent.title}
-        className="reveal"
-      />
+      <SectionHeading kicker={kicker} title={title} className="reveal" />
       {/* Each question is a piece of glass; a highlight follows the pointer
           from question to question. */}
       <GlassGroup self={false} className="reveal">
         <GlassLensTrack lensRadius={14} inset={4}>
           <div role="list" className="grid gap-2">
-            {faqContent.items.map((item) => (
+            {items.map((item) => (
               <GlassShape
                 key={item.q}
                 role="listitem"

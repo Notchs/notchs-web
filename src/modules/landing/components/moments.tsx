@@ -36,14 +36,15 @@ export function Moments() {
     setActive((current) => (current + step + stories.length) % stories.length);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-center lg:gap-20">
+    <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,42%)] md:items-center md:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-20">
       {/* min-w-0 lets the story strip scroll instead of widening the page. */}
       <div className="min-w-0">
         <SectionHeading
           kicker={momentsContent.kicker}
           title={momentsContent.title}
           description={momentsContent.description}
-          className="reveal"
+          // Side by side from 440px, so undo the phone centring there.
+          className="reveal md:mx-0! md:text-left! md:[&>p:first-child]:justify-start!"
         />
         {/* A soft highlight sits on the story playing. */}
         <GlassGroup self={false}>
@@ -53,7 +54,7 @@ export function Moments() {
             restingIndex={active}
             lensRadius={12}
             inset={4}
-            className="mt-5 flex snap-x gap-2 overflow-x-auto py-3 lg:mt-7 lg:grid lg:grid-cols-2 lg:overflow-visible lg:py-3"
+            className="mt-5 flex snap-x gap-2 overflow-x-auto py-3 md:grid md:grid-cols-1 md:overflow-visible lg:mt-7 lg:grid-cols-2 lg:py-3"
           >
             {stories.map((item, index) => (
               <GlassShape
@@ -78,7 +79,7 @@ export function Moments() {
                       className="object-cover"
                     />
                   </span>
-                  <span className="leading-snug font-semibold whitespace-nowrap lg:whitespace-normal">
+                  <span className="leading-snug font-semibold whitespace-nowrap md:whitespace-normal">
                     {item.caption}
                   </span>
                 </button>
@@ -91,7 +92,7 @@ export function Moments() {
       <div className="mx-auto w-full max-w-[22rem] reveal">
         <div
           {...INK_GROUND}
-          className="relative h-[clamp(24rem,calc(100svh-13rem),36rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper shadow-[0_24px_60px_-24px_rgb(15_15_20/.45)] select-none lg:aspect-9/16 lg:h-auto"
+          className="relative h-[clamp(24rem,calc(100svh-13rem),36rem)] overflow-hidden rounded-[2rem] border border-white/10 bg-ink text-paper shadow-[0_24px_60px_-24px_rgb(15_15_20/.45)] select-none md:aspect-9/16 md:h-auto"
           onPointerDown={() => setHeld(true)}
           onPointerUp={() => setHeld(false)}
           onPointerLeave={() => setHeld(false)}

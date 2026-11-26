@@ -70,6 +70,9 @@
 }
 
 @theme {
+  /* Phones are up to and including 640px wide; sm starts at 641px. */
+  --breakpoint-sm: 40.0625rem;
+
   /* Hover and selected wash for items on glass, in either theme. */
   --color-glass-tint: rgb(127 127 127 / 0.14);
 

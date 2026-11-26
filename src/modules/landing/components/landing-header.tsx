@@ -8,8 +8,8 @@ import {
   type RefObject,
 } from "react";
 
-import { routes } from "@/config/routes";
-import { CitySelector } from "@/modules/city";
+import Link from "next/link";
+
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
 import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
@@ -23,6 +23,7 @@ import { cn } from "@/shared/lib/cn";
 import { useInkGround } from "@/shared/lib/glass/use-ink-ground";
 
 import { navLinks } from "../content";
+import { withBase } from "../lib/link-base";
 import { useActiveSection } from "../lib/use-active-section";
 import { AccessButton } from "./access-button";
 
@@ -64,7 +65,12 @@ function useDismiss(
  * and actions. Over Ink panels the glass turns dark so it stays readable. On
  * phones and tablets the links open in a glass panel below the Menu button.
  */
-export function LandingHeader() {
+export function LandingHeader({
+  linkBase = "",
+}: {
+  /** Path put in front of section links when used off the landing page. */
+  linkBase?: string;
+}) {
   const headerRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -87,17 +93,19 @@ export function LandingHeader() {
             radius={CAPSULE_RADIUS}
             className="flex h-16 items-center pr-5 pl-5"
           >
-            <a
-              href="#top"
+            <Link
+              href={linkBase || "#top"}
               aria-label={`${siteConfig.name} home`}
               className="inline-flex min-h-11 items-center gap-2.5"
               onClick={closeMenu}
             >
-              <NotchGlyph className="size-6" />
-              <span className="font-display text-[1.0625rem] leading-none font-extrabold tracking-[-.01em]">
+              <span className="grid size-9 flex-none place-items-center rounded-[10px] bg-btn text-btn-fg">
+                <NotchGlyph className="size-5" />
+              </span>
+              <span className="font-display text-lg leading-none font-extrabold tracking-[-.01em]">
                 {siteConfig.name}
               </span>
-            </a>
+            </Link>
           </GlassShape>
 
           <GlassShape
@@ -109,19 +117,19 @@ export function LandingHeader() {
                 <ul className="flex items-center gap-0.5">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a
-                        href={link.href}
+                      <Link
+                        href={withBase(link.href, linkBase)}
                         aria-current={
                           isActive(link.href) ? "location" : undefined
                         }
                         className={cn(
                           linkStyles,
-                          "after:absolute after:bottom-1.5 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-current after:opacity-0 after:transition-opacity after:duration-200 aria-[current=location]:text-foreground aria-[current=location]:after:opacity-100",
+                          "after:absolute after:bottom-1.5 after:left-1/2 after:h-0.5 after:w-5 after:-translate-x-1/2 after:rounded-full after:bg-btn after:opacity-0 after:transition-opacity after:duration-200 aria-[current=location]:text-foreground aria-[current=location]:after:opacity-100",
                         )}
                         {...LENS_ITEM}
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -131,7 +139,7 @@ export function LandingHeader() {
 
           <GlassShape
             radius={CAPSULE_RADIUS}
-            className="flex h-16 items-center gap-1 pr-3 pl-2 sm:gap-2"
+            className="flex h-16 items-center gap-1 px-2 sm:gap-2 sm:pr-3"
           >
             <GlassLensTrack
               lensRadius={22}
@@ -139,18 +147,8 @@ export function LandingHeader() {
               className="flex items-center gap-1"
             >
               <span className="max-sm:hidden" {...LENS_ITEM}>
-                <CitySelector />
-              </span>
-              <span className="max-sm:hidden" {...LENS_ITEM}>
                 <ThemeToggle />
               </span>
-              <a
-                href={routes.login}
-                className={cn(linkStyles, "max-sm:hidden")}
-                {...LENS_ITEM}
-              >
-                Login
-              </a>
               <button
                 type="button"
                 aria-expanded={menuOpen}
@@ -167,7 +165,8 @@ export function LandingHeader() {
                 <span className="sr-only sm:not-sr-only">Menu</span>
               </button>
             </GlassLensTrack>
-            <AccessButton size="sm" />
+            {/* Phones: inside the menu instead, so the bar is logo + Menu. */}
+            <AccessButton size="md" className="max-sm:hidden" />
           </GlassShape>
         </GlassGroup>
 
@@ -184,14 +183,17 @@ export function LandingHeader() {
           )}
         >
           {/* Heavier frost than the bar: the items must read over anything. */}
-          <GlassGroup radius={20} className="rounded-[20px] p-1.5">
+          <GlassGroup
+            radius={20}
+            className="rounded-[20px] p-1.5 [--glass-fill:color-mix(in_srgb,var(--glass-solid)_94%,transparent)]"
+          >
             <nav aria-label="Menu">
               <GlassLensTrack lensRadius={14} inset={1}>
                 <ul className="grid gap-0.5">
                   {navLinks.map((link) => (
                     <li key={link.href}>
-                      <a
-                        href={link.href}
+                      <Link
+                        href={withBase(link.href, linkBase)}
                         onClick={closeMenu}
                         aria-current={
                           isActive(link.href) ? "location" : undefined
@@ -200,26 +202,15 @@ export function LandingHeader() {
                         {...LENS_ITEM}
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
-                  <li className="sm:hidden">
-                    <a
-                      href={routes.login}
-                      onClick={closeMenu}
-                      className="relative flex min-h-12 w-full items-center rounded-[14px] px-3 text-base font-medium"
-                      {...LENS_ITEM}
-                    >
-                      Login
-                    </a>
-                  </li>
                   <li className="mt-1 flex items-center justify-between border-t border-line pt-1 pl-3 sm:hidden">
-                    <span className="text-base text-muted">City</span>
-                    <CitySelector />
-                  </li>
-                  <li className="flex items-center justify-between pl-3 sm:hidden">
                     <span className="text-base text-muted">Theme</span>
                     <ThemeToggle />
+                  </li>
+                  <li className="p-1.5 pt-2 sm:hidden">
+                    <AccessButton className="w-full" />
                   </li>
                 </ul>
               </GlassLensTrack>

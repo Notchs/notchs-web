@@ -20,10 +20,15 @@ export function SectionHeading({
   className,
 }: SectionHeadingProps) {
   return (
-    <div className={cn("max-w-[40rem]", className)}>
+    <div
+      className={cn(
+        "max-w-[40rem] max-sm:mx-auto max-sm:text-center",
+        className,
+      )}
+    >
       <p
         className={cn(
-          "mb-5 flex items-center gap-3.5 text-xs font-semibold tracking-[.14em] uppercase before:h-px before:w-8 before:bg-current",
+          "mb-5 flex items-center gap-3.5 text-xs font-semibold tracking-[.14em] uppercase before:h-px before:w-8 before:bg-current max-sm:justify-center",
           onInk ? "text-stone" : "text-muted",
         )}
       >
