@@ -15,6 +15,7 @@ export default function ForbiddenPage() {
       title={"No proof, no entry."}
       description="You don’t have access to this page."
       mark={<LockedMark />}
+      frame="logo"
     />
   );
 }

@@ -23,6 +23,7 @@ export default function ErrorPage({ error, retry }: ErrorPageProps) {
       description="An unexpected error occurred. Please try again."
       tone="alert"
       mark={<GhostMark />}
+      frame="logo"
       action={<Button onClick={retry}>Try again</Button>}
     />
   );

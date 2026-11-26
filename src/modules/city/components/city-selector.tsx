@@ -127,7 +127,7 @@ export function CitySelector({ className, align = "end" }: CitySelectorProps) {
           role="dialog"
           aria-label={cityContent.trigger}
           className={cn(
-            "absolute top-full z-50 mt-2 w-72 animate-pop rounded-[20px] glass p-2 text-foreground",
+            "absolute top-full z-50 mt-2 w-72 animate-pop rounded-[20px] glass p-2 text-foreground [--glass-fill:color-mix(in_srgb,var(--glass-solid)_94%,transparent)]",
             align === "end" ? "right-0" : "left-0",
           )}
         >

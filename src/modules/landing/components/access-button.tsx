@@ -5,7 +5,8 @@ import { ButtonLink } from "@/shared/components/ui/button";
 import { accessLabel, accessLabelShort } from "../content";
 
 type AccessButtonProps = {
-  size?: "default" | "sm";
+  /** "sm" and "md" use the short label on phones. */
+  size?: "default" | "sm" | "md";
   className?: string;
 };
 
@@ -13,7 +14,7 @@ type AccessButtonProps = {
 export function AccessButton({ size, className }: AccessButtonProps) {
   return (
     <ButtonLink href={routes.login} size={size} className={className}>
-      {size === "sm" ? (
+      {size === "sm" || size === "md" ? (
         <>
           <span className="sm:hidden">{accessLabelShort}</span>
           <span className="max-sm:hidden">{accessLabel}</span>

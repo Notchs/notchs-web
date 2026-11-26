@@ -4,6 +4,7 @@ import { routes } from "@/config/routes";
 import { siteConfig } from "@/config/site";
 import { ArrowLeftIcon } from "@/shared/components/icons";
 import { HeroSection } from "@/shared/components/layout/hero-section";
+import { LogoOnlyHeader } from "@/shared/components/layout/logo-only-header";
 import { PageShell } from "@/shared/components/layout/page-shell";
 import { ButtonLink } from "@/shared/components/ui/button";
 
@@ -19,6 +20,8 @@ type StatusPageProps = {
   action?: ReactNode;
   /** "alert" shows the description in the Unnotched coral, for errors. */
   tone?: "default" | "alert";
+  /** "logo" drops the nav bar and footer, keeping only the logo (error pages). */
+  frame?: "full" | "logo";
 };
 
 function BackHomeLink() {
@@ -39,21 +42,31 @@ export function StatusPage({
   markClassName,
   action = <BackHomeLink />,
   tone = "default",
+  frame = "full",
 }: StatusPageProps) {
-  return (
-    <PageShell>
-      <HeroSection
-        kicker={kicker}
-        title={title}
-        description={description}
-        descriptionClassName={tone === "alert" ? "text-unnotched" : undefined}
-        mark={mark}
-        markClassName={markClassName}
-      >
-        <div className="mt-10 animate-fade-in [animation-delay:450ms]">
-          {action}
-        </div>
-      </HeroSection>
-    </PageShell>
+  const hero = (
+    <HeroSection
+      kicker={kicker}
+      title={title}
+      description={description}
+      descriptionClassName={tone === "alert" ? "text-unnotched" : undefined}
+      mark={mark}
+      markClassName={markClassName}
+    >
+      <div className="mt-10 animate-fade-in [animation-delay:450ms]">
+        {action}
+      </div>
+    </HeroSection>
   );
+
+  if (frame === "logo") {
+    return (
+      <>
+        <LogoOnlyHeader />
+        {hero}
+      </>
+    );
+  }
+
+  return <PageShell>{hero}</PageShell>;
 }
