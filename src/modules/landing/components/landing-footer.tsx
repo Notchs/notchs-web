@@ -50,7 +50,7 @@ export function LandingFooter({
           </div>
           <nav
             aria-label="Footer"
-            className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5"
+            className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3"
           >
             {footerContent.columns.map((column) => (
               <div

@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/config/site";
 import { NotchGlyph } from "@/shared/components/brand/notch-glyph";
@@ -24,11 +25,7 @@ import { useInkGround } from "@/shared/lib/glass/use-ink-ground";
 
 import { navLinks } from "../content";
 import { withBase } from "../lib/link-base";
-import { useActiveSection } from "../lib/use-active-section";
 import { AccessButton } from "./access-button";
-
-/** Section ids the menu links point to, in page order. */
-const navSectionIds = navLinks.map((link) => link.href.slice(1));
 
 const linkStyles =
   "relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[.9375rem] font-medium text-muted transition-colors duration-150 hover:text-foreground focus-visible:text-foreground";
@@ -76,8 +73,8 @@ export function LandingHeader({
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   useDismiss(headerRef, menuOpen, closeMenu);
   const onInk = useInkGround(headerRef);
-  const activeSection = useActiveSection(navSectionIds);
-  const isActive = (href: string) => href.slice(1) === activeSection;
+  const pathname = usePathname();
+  const isActive = (href: string) => href === pathname;
 
   return (
     <header
@@ -119,12 +116,10 @@ export function LandingHeader({
                     <li key={link.href}>
                       <Link
                         href={withBase(link.href, linkBase)}
-                        aria-current={
-                          isActive(link.href) ? "location" : undefined
-                        }
+                        aria-current={isActive(link.href) ? "page" : undefined}
                         className={cn(
                           linkStyles,
-                          "after:absolute after:bottom-1.5 after:left-1/2 after:h-0.5 after:w-5 after:-translate-x-1/2 after:rounded-full after:bg-btn after:opacity-0 after:transition-opacity after:duration-200 aria-[current=location]:text-foreground aria-[current=location]:after:opacity-100",
+                          "after:absolute after:bottom-1.5 after:left-1/2 after:h-0.5 after:w-5 after:-translate-x-1/2 after:rounded-full after:bg-btn after:opacity-0 after:transition-opacity after:duration-200 aria-[current=page]:text-foreground aria-[current=page]:after:opacity-100",
                         )}
                         {...LENS_ITEM}
                       >
@@ -195,10 +190,8 @@ export function LandingHeader({
                       <Link
                         href={withBase(link.href, linkBase)}
                         onClick={closeMenu}
-                        aria-current={
-                          isActive(link.href) ? "location" : undefined
-                        }
-                        className="relative flex min-h-12 w-full items-center justify-between rounded-[14px] px-3 text-base font-medium after:size-1.5 after:rounded-full after:bg-current after:opacity-0 aria-[current=location]:after:opacity-100"
+                        aria-current={isActive(link.href) ? "page" : undefined}
+                        className="relative flex min-h-12 w-full items-center justify-between rounded-[14px] px-3 text-base font-medium after:size-1.5 after:rounded-full after:bg-current after:opacity-0 aria-[current=page]:after:opacity-100"
                         {...LENS_ITEM}
                       >
                         {link.label}

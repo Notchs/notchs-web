@@ -18,12 +18,13 @@ export const sectionIds = {
   faq: "faq",
 } as const;
 
+/** Navbar: one link per page (agreed by the team before launch). */
 export const navLinks = [
-  { label: "How it works", href: `#${sectionIds.howItWorks}` },
-  { label: "Explore", href: `#${sectionIds.places}` },
-  { label: "City Pulse", href: `#${sectionIds.map}` },
-  { label: "For venues", href: `#${sectionIds.venues}` },
-  { label: "FAQ", href: `#${sectionIds.faq}` },
+  { label: "About", href: routes.about },
+  { label: "For customers", href: routes.customers },
+  { label: "For venues", href: routes.venues },
+  { label: "Mission", href: routes.mission },
+  { label: "Contact", href: routes.contact },
 ] as const;
 
 export const accessLabel = "Get your passport";
@@ -501,42 +502,30 @@ export const footerContent = {
   signOff: "Built for every city",
   columns: [
     {
-      title: "Product",
+      title: "Notchs",
       links: [
-        { label: "How it works", href: `#${sectionIds.howItWorks}` },
-        { label: "Rewards", href: `#${sectionIds.rewards}` },
-        { label: "Explore", href: `#${sectionIds.places}` },
-        { label: "City Pulse", href: `#${sectionIds.map}` },
+        { label: "About", href: routes.about },
+        { label: "Mission", href: routes.mission },
+        { label: "Contact", href: routes.contact },
       ],
     },
     {
-      title: "Community",
-      links: [{ label: "Real moments", href: `#${sectionIds.moments}` }],
+      title: "Use Notchs",
+      links: [
+        { label: "For customers", href: routes.customers },
+        { label: "For venues", href: routes.venues },
+        { label: "How it works", href: `#${sectionIds.howItWorks}` },
+        { label: "FAQ", href: `#${sectionIds.faq}` },
+      ],
     },
     {
       title: "Business",
       links: [
-        { label: "For venues", href: `#${sectionIds.venues}` },
         { label: "Venue log in", href: routes.venueLogin },
         {
           label: "Apply for your venue",
           href: `${routes.venueLogin}?view=apply`,
         },
-      ],
-    },
-    {
-      title: "Cities",
-      links: [
-        { label: "Ahmedabad", href: `?city=ahmedabad#${sectionIds.map}` },
-        { label: "Ask for your city", href: `#${sectionIds.map}` },
-      ],
-    },
-    {
-      title: "Support",
-      links: [
-        { label: "FAQ", href: `#${sectionIds.faq}` },
-        { label: "Help", href: `mailto:${siteConfig.supportEmail}` },
-        { label: "Contact", href: `mailto:${siteConfig.contactEmail}` },
       ],
     },
   ],
