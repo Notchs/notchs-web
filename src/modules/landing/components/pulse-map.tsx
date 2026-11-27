@@ -94,7 +94,7 @@ function PinFace({ stop }: { stop: MapStop }) {
  * middle, with its card above it. Tours the stops on its own while on screen,
  * until someone picks one. A still map image shows first; the live map takes
  * over once it has loaded. The stops are the example Saturday tour or, once
- * they are live, the real cafés (`example` false).
+ * they are live, the real places with cafés highlighted (`example` false).
  */
 export function PulseMap({
   stops,
@@ -255,25 +255,26 @@ export function PulseMap({
                 style={{ left: `${x}%`, top: `${y}%` }}
               />
             ))}
+          {/* On the still map the pins are only a picture: real places can
+              sit too close to tap apart, so the list above is how to pick
+              one here. The live map's pins can be tapped (and cluster). */}
           {stops.map((item, index) => {
             // Places off the still image show on the live map only.
             if (!onImage(item)) return null;
             const current = index === active;
             return (
-              <button
+              <span
                 key={item.key}
-                type="button"
-                aria-label={item.label}
-                onClick={() => choose(index)}
+                aria-hidden="true"
                 className={cn(
-                  "absolute -translate-1/2",
+                  "pointer-events-none absolute -translate-1/2",
                   current && "z-10",
                   stopPinClass(item.isCafe, current),
                 )}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}
               >
                 <PinFace stop={item} />
-              </button>
+              </span>
             );
           })}
         </div>

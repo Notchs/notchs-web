@@ -5,21 +5,30 @@ import { cacheLife } from "next/cache";
 import { mapConfig } from "@/config/map";
 import { apiRequest } from "@/shared/lib/api-client";
 
-/** A live café on Notchs, as the homepage map shows it. */
-export type Cafe = {
+/** A live place on Notchs, as the homepage map shows it. */
+export type Place = {
   code: string;
   name: string;
   area: string | null;
+  /** The API's kind of place, e.g. "cafe", "turf_gym". */
+  category: string;
+  isCafe: boolean;
   /** [longitude, latitude] */
   lngLat: [number, number];
-  /** From the API; null when it has none, or while ranks are hidden. */
+  /**
+   * Cafés only, from the API; null when it has none or while ranks are
+   * hidden. Other kinds are ranked among themselves, so their rank isn't shown.
+   */
   rank: number | null;
 };
 
-export type CafeMap = {
+export type PlaceMap = {
   cityName: string;
-  /** In rank order when ranks show, otherwise A to Z (never by hidden rank). */
-  cafes: Cafe[];
+  /**
+   * Cafés first (in rank order when ranks show, otherwise A to Z, never by a
+   * hidden rank), then every other place A to Z.
+   */
+  places: Place[];
   /** At least `mapConfig.minRankedCafes` cafés have a rank. */
   showRanks: boolean;
 };
@@ -34,7 +43,7 @@ const isText = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
 
 /** One GeoJSON feature from the API, or null if anything about it is off. */
-function toCafe(feature: unknown): Cafe | null {
+function toPlace(feature: unknown): Place | null {
   if (!isRecord(feature)) return null;
   const { geometry, properties } = feature;
   if (!isRecord(geometry) || !isRecord(properties)) return null;
@@ -52,24 +61,27 @@ function toCafe(feature: unknown): Cafe | null {
     return null;
   }
   const { venue_code, name, area, category, rank } = properties;
-  if (!isText(venue_code) || !isText(name) || category !== "cafe") {
-    return null;
-  }
+  if (!isText(venue_code) || !isText(name) || !isText(category)) return null;
+  const isCafe = category === "cafe";
   return {
     code: venue_code,
     name: name.trim(),
     area: isText(area) ? area.trim() : null,
+    category,
+    isCafe,
     lngLat: [lng, lat],
     rank:
-      Number.isInteger(rank) && (rank as number) >= 1 ? (rank as number) : null,
+      isCafe && Number.isInteger(rank) && (rank as number) >= 1
+        ? (rank as number)
+        : null,
   };
 }
 
 /**
- * Checks the API's answer (it is untrusted) and keeps only well-formed cafés.
+ * Checks the API's answer (it is untrusted) and keeps only well-formed places.
  * The ranks are the API's; nothing here works one out.
  */
-export function toCafeMap(payload: unknown): CafeMap | null {
+export function toPlaceMap(payload: unknown): PlaceMap | null {
   const data = isRecord(payload) ? payload.data : null;
   if (!isRecord(data) || !isRecord(data.city) || !isRecord(data.venues)) {
     return null;
@@ -77,37 +89,45 @@ export function toCafeMap(payload: unknown): CafeMap | null {
   const features = data.venues.features;
   if (!Array.isArray(features)) return null;
 
-  const cafes = features.map(toCafe).filter((cafe) => cafe !== null);
-  if (cafes.length === 0) return null;
+  const places = features.map(toPlace).filter((place) => place !== null);
+  if (places.length === 0) return null;
 
-  const ranked = cafes.filter((cafe) => cafe.rank !== null).length;
-  const showRanks = ranked >= mapConfig.minRankedCafes;
-  const byName = (a: Cafe, b: Cafe) => a.name.localeCompare(b.name);
+  const cafes = places.filter((place) => place.isCafe);
+  const others = places.filter((place) => !place.isCafe);
+  const showRanks =
+    cafes.filter((cafe) => cafe.rank !== null).length >=
+    mapConfig.minRankedCafes;
+  const byName = (a: Place, b: Place) => a.name.localeCompare(b.name);
+  const byRank = (a: Place, b: Place) =>
+    (a.rank ?? Infinity) - (b.rank ?? Infinity) || byName(a, b);
+
   return {
     cityName: isText(data.city.name) ? data.city.name.trim() : "Ahmedabad",
-    cafes: showRanks
-      ? cafes.sort(
-          (a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity) || byName(a, b),
-        )
-      : cafes.map((cafe) => ({ ...cafe, rank: null })).sort(byName),
+    places: [
+      ...(showRanks
+        ? cafes.sort(byRank)
+        : cafes.map((cafe) => ({ ...cafe, rank: null })).sort(byName)),
+      ...others.sort(byName),
+    ],
     showRanks,
   };
 }
 
 /**
- * The city's live cafés for the homepage map, or null when there are none or
- * the API can't be reached (the page then shows its example map). Cached for
- * 5 minutes, like the API itself.
+ * The city's live places for the homepage map (every kind; cafés are
+ * highlighted and ranked), or null when there are none or the API can't be
+ * reached (the page then shows its example map). Cached for 5 minutes, like
+ * the API itself.
  */
-export async function getCafeMap(): Promise<CafeMap | null> {
+export async function getPlaceMap(): Promise<PlaceMap | null> {
   "use cache";
   cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
   try {
     const payload = await apiRequest<unknown>("/venues/map", {
-      query: { city: mapConfig.city.slug, category: "cafe" },
+      query: { city: mapConfig.city.slug },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    return toCafeMap(payload);
+    return toPlaceMap(payload);
   } catch {
     // Not deployed yet, down, slow or a 404 for a city not live yet.
     return null;

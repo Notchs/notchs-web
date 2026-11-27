@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { mapConfig } from "@/config/map";
 import { GlassGroup } from "@/shared/components/glass/glass-group";
 import { MinusIcon, PlusIcon } from "@/shared/components/icons";
 import { MapMarker } from "@/shared/components/map/map-marker";
+import { useMapView } from "@/shared/components/map/use-map-view";
 import { cn } from "@/shared/lib/cn";
-import { Map as MapLibreMap } from "@/shared/lib/maplibre";
+import { LngLatBounds, Map as MapLibreMap } from "@/shared/lib/maplibre";
 
 import { mapDots, saturdayContent } from "../content";
 import { MAP_IMAGE, imageToLngLat } from "../lib/map-image";
@@ -21,7 +22,57 @@ const CARD_LIFT = 36;
 /** Room to pan past the outermost place or the still map's edge, degrees. */
 const PAN_MARGIN = { lng: 0.08, lat: 0.06 };
 
+/** Pins closer than this on screen (px) join a cluster: about a pin's width. */
+const CLUSTER_GAP = 40;
+/** From this zoom on every pin stands alone, so tapping a cluster splits it. */
+const CLUSTER_UNTIL_ZOOM = 16;
+
 type LngLat = [number, number];
+type Member = { stop: MapStop; index: number };
+type Group = { key: string; members: Member[]; at: LngLat };
+
+/**
+ * Pins that would overlap on screen at the current view join one cluster,
+ * so every pin stays big enough to tap. The open stop always stands alone.
+ * Stops come in list order, so a cluster is named after its best-ranked café.
+ */
+function groupStops(map: MapLibreMap, stops: MapStop[], open: number) {
+  const clustering = map.getZoom() < CLUSTER_UNTIL_ZOOM;
+  const groups: { members: Member[]; x: number; y: number }[] = [];
+  stops.forEach((stop, index) => {
+    const { x, y } = map.project(stop.lngLat);
+    const group =
+      !clustering || index === open
+        ? undefined
+        : groups.find(
+            (g) =>
+              g.members[0].index !== open &&
+              Math.hypot(g.x - x, g.y - y) < CLUSTER_GAP,
+          );
+    if (group) group.members.push({ stop, index });
+    else groups.push({ members: [{ stop, index }], x, y });
+  });
+  return groups.map(({ members }): Group => {
+    const average = (axis: 0 | 1) =>
+      members.reduce((sum, m) => sum + m.stop.lngLat[axis], 0) / members.length;
+    return {
+      key:
+        members.length > 1
+          ? `cluster-${members[0].stop.key}`
+          : members[0].stop.key,
+      members,
+      at: [average(0), average(1)],
+    };
+  });
+}
+
+function boundsOf(members: Member[]) {
+  const [first] = members;
+  return members.reduce(
+    (bounds, { stop }) => bounds.extend(stop.lngLat),
+    new LngLatBounds(first.stop.lngLat, first.stop.lngLat),
+  );
+}
 
 /**
  * How far people can pan: the still map's area and every stop, with a margin,
@@ -94,7 +145,7 @@ export function PulseLiveMap({
   open: boolean;
   /** The card for the active stop, shown above its pin. */
   card: ReactNode;
-  /** What a pin shows: its time, its rank or a cup. */
+  /** What a pin shows: its time, rank or initial, or a cup. */
   pinFace: (stop: MapStop) => ReactNode;
   onChoose: (index: number) => void;
   /** A tap on the map itself, away from the pins and the card. */
@@ -185,6 +236,12 @@ export function PulseLiveMap({
     });
   }, [map, lng, lat]);
 
+  const view = useMapView(map);
+  const groups = useMemo(
+    () => (map && view ? groupStops(map, stops, open ? active : -1) : []),
+    [map, view, stops, active, open],
+  );
+
   const zoomButton =
     "grid size-11 cursor-pointer place-items-center rounded-full text-ink hover:bg-ink/8";
 
@@ -215,7 +272,41 @@ export function PulseLiveMap({
           </MapMarker>
         ))}
       {map &&
-        stops.map((item, index) => {
+        groups.map((group) => {
+          if (group.members.length > 1) {
+            const hasCafe = group.members.some((m) => m.stop.isCafe);
+            return (
+              <MapMarker
+                key={group.key}
+                map={map}
+                at={group.at}
+                anchor="center"
+              >
+                <button
+                  type="button"
+                  aria-label={saturdayContent.cluster(group.members.length)}
+                  onClick={() => {
+                    onExplore();
+                    map.fitBounds(boundsOf(group.members), {
+                      padding: 80,
+                      maxZoom: CLUSTER_UNTIL_ZOOM,
+                    });
+                  }}
+                  className={cn(
+                    "grid size-11 cursor-pointer place-items-center rounded-full border-2 border-paper bg-graphite font-mono text-xs font-semibold text-paper hover:bg-ink",
+                    // Drawn as a little stack of pins, so a count never
+                    // reads as a rank; Volt behind when a café is inside.
+                    hasCafe
+                      ? "shadow-[5px_-5px_0_-2px_var(--volt),5px_-5px_0_0_var(--ink)]"
+                      : "shadow-[5px_-5px_0_-2px_var(--graphite),5px_-5px_0_0_var(--paper)]",
+                  )}
+                >
+                  {group.members.length}
+                </button>
+              </MapMarker>
+            );
+          }
+          const [{ stop: item, index }] = group.members;
           const current = open && index === active;
           return (
             <MapMarker

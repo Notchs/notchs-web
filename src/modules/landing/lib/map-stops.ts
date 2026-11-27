@@ -1,7 +1,7 @@
 import type { StaticImageData } from "next/image";
 
-import { cafeMapContent, saturdayStops, venueByKind } from "../content";
-import type { CafeMap } from "./cafe-map";
+import { placeMapContent, saturdayStops, venueByKind } from "../content";
+import type { PlaceMap } from "./place-map";
 import { imageToLngLat, lngLatToImage } from "./map-image";
 
 /** One place on the City Pulse map: an example stop or a real café. */
@@ -30,7 +30,7 @@ export type MapStop = {
   };
 };
 
-/** The example Saturday tour, shown until real cafés are live. */
+/** The example Saturday tour, shown until real places are live. */
 export const saturdayMapStops: MapStop[] = saturdayStops.map((stop) => {
   const venue = venueByKind(stop.kind);
   return {
@@ -53,27 +53,39 @@ export const saturdayMapStops: MapStop[] = saturdayStops.map((stop) => {
   };
 });
 
-/** Real cafés from the API, with their rank only while ranks show. */
-export function cafeMapStops({ cafes, cityName, showRanks }: CafeMap) {
-  const copy = cafeMapContent;
-  return cafes.map((cafe): MapStop => {
-    const area = cafe.area ?? cityName;
-    const rank = showRanks ? cafe.rank : null;
+/**
+ * Real places from the API. Cafés are highlighted and carry their rank while
+ * ranks show; other places get their initial on the pin and no rank.
+ */
+export function placeMapStops({ places, cityName, showRanks }: PlaceMap) {
+  const copy = placeMapContent;
+  return places.map((place): MapStop => {
+    const area = place.area ?? cityName;
+    const kind = copy.kind(place.category);
+    const rank = showRanks ? place.rank : null;
     return {
-      key: cafe.code,
-      lngLat: cafe.lngLat,
-      ...lngLatToImage(cafe.lngLat),
-      isCafe: true,
-      tag: rank ? String(rank) : "",
-      title: cafe.name,
+      key: place.code,
+      lngLat: place.lngLat,
+      ...lngLatToImage(place.lngLat),
+      isCafe: place.isCafe,
+      // A café without a rank shows a cup instead (see PinFace).
+      tag: rank
+        ? String(rank)
+        : place.isCafe
+          ? ""
+          : place.name.charAt(0).toUpperCase(),
+      title: place.name,
       area,
-      label: rank
-        ? copy.pinLabel(cafe.name, area, rank)
-        : `${cafe.name}, ${area}`,
+      label: copy.pinLabel(place.name, kind, area, rank),
       card: {
-        title: cafe.name,
-        subtitle: `${copy.cafe} · ${area}`,
-        badge: !showRanks ? null : rank ? `#${rank}` : copy.newPlace,
+        title: place.name,
+        subtitle: `${kind} · ${area}`,
+        badge:
+          !showRanks || !place.isCafe
+            ? null
+            : rank
+              ? `#${rank}`
+              : copy.newPlace,
         image: null,
         note: rank ? copy.rankNote(rank, cityName) : null,
       },

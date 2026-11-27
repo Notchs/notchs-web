@@ -329,25 +329,37 @@ export const saturdayContent = {
   liveCredit: "OpenFreeMap © OpenMapTiles © OpenStreetMap",
   zoomIn: "Zoom in",
   zoomOut: "Zoom out",
+  cluster: (count: number) => `${count} places here, zoom in`,
   cta: "Notch it here",
   mapAlt:
     "Map of Ahmedabad with Notchs stops in Thaltej, Navrangpura, Satellite, Prahladnagar and Bodakdev",
 } as const;
 
-/**
- * The City Pulse map once real cafés are live (from the API). Ranks are the
- * API's, from real verified visits; visit counts are never shown.
- */
-export const cafeMapContent = {
-  description: (city: string) =>
-    `The cafés on Notchs in ${city}, ranked by real verified visits. Tap a pin to see one.`,
-  descriptionUnranked: (city: string) =>
-    `The cafés on Notchs in ${city}. Tap a pin to see one.`,
-  mapAlt: (city: string) => `Map of ${city} with the cafés on Notchs`,
+/** The API's kinds of place, as people say them. */
+const placeKinds: Record<string, string> = {
   cafe: "Café",
+  restaurant: "Restaurant",
+  bar: "Bar",
+  hotel: "Hotel",
+  turf_gym: "Turf or gym",
+  theatre: "Theatre",
+};
+
+/**
+ * The City Pulse map once real places are live (from the API). Cafés are
+ * highlighted and ranked; ranks are the API's, from real verified visits.
+ * Visit counts are never shown.
+ */
+export const placeMapContent = {
+  description: (city: string) =>
+    `The places on Notchs in ${city}, with cafés ranked by real verified visits. Tap a pin to see one.`,
+  descriptionUnranked: (city: string) =>
+    `The places on Notchs in ${city}. Tap a pin to see one.`,
+  mapAlt: (city: string) => `Map of ${city} with the places on Notchs`,
+  kind: (category: string) => placeKinds[category] ?? "Place",
   newPlace: "New on Notchs",
-  pinLabel: (name: string, area: string, rank: number) =>
-    `${name}, ${area}, ranked #${rank}`,
+  pinLabel: (name: string, kind: string, area: string, rank: number | null) =>
+    `${name}, ${kind}, ${area}${rank ? `, ranked #${rank}` : ""}`,
   rankNote: (rank: number, city: string) =>
     `#${rank} café in ${city} by real visits in the last 30 days.`,
 } as const;

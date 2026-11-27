@@ -1,16 +1,10 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { mapConfig } from "@/config/map";
 import { MapMarker } from "@/shared/components/map/map-marker";
+import { useMapView } from "@/shared/components/map/use-map-view";
 import { cn } from "@/shared/lib/cn";
 import {
   AttributionControl,
@@ -95,26 +89,6 @@ function boundsOf(venues: CityVenue[]) {
   return venues.reduce(
     (bounds, venue) => bounds.extend(lngLat(venue)),
     new LngLatBounds(lngLat(venues[0]), lngLat(venues[0])),
-  );
-}
-
-/** Re-renders when the map stops moving, so clusters follow the view. */
-function useMapView(map: MapLibreMap | null) {
-  const subscribe = useCallback(
-    (onChange: () => void) => {
-      map?.on("moveend", onChange);
-      map?.on("resize", onChange);
-      return () => {
-        map?.off("moveend", onChange);
-        map?.off("resize", onChange);
-      };
-    },
-    [map],
-  );
-  return useSyncExternalStore(
-    subscribe,
-    () => (map ? `${map.getZoom()}:${map.getCenter().toArray()}` : ""),
-    () => "",
   );
 }
 
