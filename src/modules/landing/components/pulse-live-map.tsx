@@ -9,82 +9,93 @@ import { MapMarker } from "@/shared/components/map/map-marker";
 import { cn } from "@/shared/lib/cn";
 import { Map as MapLibreMap } from "@/shared/lib/maplibre";
 
-import {
-  mapDots,
-  saturdayContent,
-  saturdayStops,
-  venueByKind,
-} from "../content";
+import { mapDots, saturdayContent } from "../content";
+import { MAP_IMAGE, imageToLngLat } from "../lib/map-image";
+import type { MapStop } from "../lib/map-stops";
 import { stopPinClass } from "./stop-pin";
 
-/**
- * The area the still map image (assets/ahmedabad-map.webp, 1280 px wide)
- * covers. Stops and dots keep their % positions on that image, so the live
- * map puts them in exactly the same places.
- */
-const IMAGE = {
-  width: 1280,
-  west: 72.419,
-  east: 72.6433,
-  north: 23.1196,
-  south: 22.9592,
-};
-/** How far people can pan: Ahmedabad with a margin, not the whole world. */
-const PAN_LIMIT: [[number, number], [number, number]] = [
-  [IMAGE.west - 0.08, IMAGE.south - 0.06],
-  [IMAGE.east + 0.08, IMAGE.north + 0.06],
-];
 /** How long the map takes to fly to a stop; the same as the still map. */
 const FLY_MS = 1400;
 /** The card sits this far above its pin's centre: half the big pin + a gap. */
 const CARD_LIFT = 36;
+/** Room to pan past the outermost place or the still map's edge, degrees. */
+const PAN_MARGIN = { lng: 0.08, lat: 0.06 };
 
-const toLngLat = (x: number, y: number): [number, number] => [
-  IMAGE.west + ((IMAGE.east - IMAGE.west) * x) / 100,
-  IMAGE.north - ((IMAGE.north - IMAGE.south) * y) / 100,
-];
+type LngLat = [number, number];
+
+/**
+ * How far people can pan: the still map's area and every stop, with a margin,
+ * so the city stays in view and a café on the outskirts is still reachable.
+ */
+function panLimit(stops: MapStop[]): [LngLat, LngLat] {
+  const lngs = [
+    MAP_IMAGE.west,
+    MAP_IMAGE.east,
+    ...stops.map((s) => s.lngLat[0]),
+  ];
+  const lats = [
+    MAP_IMAGE.south,
+    MAP_IMAGE.north,
+    ...stops.map((s) => s.lngLat[1]),
+  ];
+  return [
+    [Math.min(...lngs) - PAN_MARGIN.lng, Math.min(...lats) - PAN_MARGIN.lat],
+    [Math.max(...lngs) + PAN_MARGIN.lng, Math.max(...lats) + PAN_MARGIN.lat],
+  ];
+}
 
 /**
  * The view for a stop, from the frame's own CSS: --cy is where the focused
- * pin sits (in cqh), --zoom how far the still image is scaled.
+ * pin sits (in cqh), --zoom how far the still image is scaled, so the live
+ * map frames each stop like the still one.
  */
-function viewFor(element: HTMLElement, index: number) {
+function viewFor(element: HTMLElement, at: LngLat) {
   const style = getComputedStyle(element);
   const height = element.clientHeight;
   const focusY = (parseFloat(style.getPropertyValue("--cy")) / 100) * height;
   const scale = parseFloat(style.getPropertyValue("--zoom")) || 1;
-  const stop = saturdayStops[index];
   return {
-    center: toLngLat(stop.x, stop.y),
+    center: at,
     // MapLibre draws 512 px per tile, i.e. 512 * 2^zoom px around the world.
     zoom: Math.log2(
-      (IMAGE.width * scale * 360) / ((IMAGE.east - IMAGE.west) * 512),
+      (MAP_IMAGE.width * scale * 360) /
+        ((MAP_IMAGE.east - MAP_IMAGE.west) * 512),
     ),
-    offset: [0, (focusY || height / 2) - height / 2] as [number, number],
+    offset: [0, (focusY || height / 2) - height / 2] as LngLat,
   };
 }
 
 /**
- * The live MapLibre version of the Saturday map. It sits over the still map
- * and only shows once it has loaded; until then, or if it never loads, the
- * still map does the job. People can drag and zoom it. Tapping a stop grows
- * its venue card out of the pin; tapping anywhere else on the map shrinks it
- * back into the pin.
+ * The live MapLibre version of the City Pulse map. It sits over the still
+ * map and only shows once it has loaded; until then, or if it never loads,
+ * the still map does the job. People can drag and zoom it. Tapping a stop
+ * grows its card out of the pin; tapping the pin again, or anywhere else on
+ * the map, shrinks it back into the pin.
  */
-export function SaturdayLiveMap({
+export function PulseLiveMap({
+  stops,
+  dots,
+  mapAlt,
   active,
   open,
   card,
+  pinFace,
   onChoose,
   onClose,
   onExplore,
   onReady,
 }: {
+  stops: MapStop[];
+  /** Show the decorative dots (example map only). */
+  dots: boolean;
+  mapAlt: string;
   active: number;
   /** Whether the active stop's card is showing. */
   open: boolean;
-  /** The venue card for the active stop, shown above its pin. */
+  /** The card for the active stop, shown above its pin. */
   card: ReactNode;
+  /** What a pin shows: its time, its rank or a cup. */
+  pinFace: (stop: MapStop) => ReactNode;
   onChoose: (index: number) => void;
   /** A tap on the map itself, away from the pins and the card. */
   onClose: () => void;
@@ -94,7 +105,8 @@ export function SaturdayLiveMap({
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
-  const activeRef = useRef(active);
+  const activeAt = useRef(stops[active].lngLat);
+  const setup = useRef({ stops, mapAlt });
   const callbacks = useRef({ onClose, onExplore, onReady });
   useEffect(() => {
     callbacks.current = { onClose, onExplore, onReady };
@@ -105,7 +117,7 @@ export function SaturdayLiveMap({
     if (!element) return;
     let instance: MapLibreMap;
     try {
-      const { center, zoom } = viewFor(element, activeRef.current);
+      const { center, zoom } = viewFor(element, activeAt.current);
       instance = new MapLibreMap({
         container: element,
         style: mapConfig.style,
@@ -113,7 +125,7 @@ export function SaturdayLiveMap({
         zoom,
         minZoom: 10,
         maxZoom: 17,
-        maxBounds: PAN_LIMIT,
+        maxBounds: panLimit(setup.current.stops),
         // The page keeps scrolling: Ctrl/⌘ + scroll zooms, and on phones
         // two fingers move the map while one finger scrolls the page.
         cooperativeGestures: true,
@@ -121,7 +133,7 @@ export function SaturdayLiveMap({
         pitchWithRotate: false,
         touchPitch: false,
         attributionControl: false,
-        locale: { "Map.Title": saturdayContent.mapAlt },
+        locale: { "Map.Title": setup.current.mapAlt },
       });
     } catch {
       // No WebGL: the still map stays.
@@ -149,10 +161,7 @@ export function SaturdayLiveMap({
     });
 
     const place = () =>
-      instance.easeTo({
-        ...viewFor(element, activeRef.current),
-        duration: 0,
-      });
+      instance.easeTo({ ...viewFor(element, activeAt.current), duration: 0 });
     // Keep the stop framed when the page resizes, unless someone moved away.
     instance.on("resize", () => {
       if (!explored) place();
@@ -165,13 +174,17 @@ export function SaturdayLiveMap({
     return () => instance.remove();
   }, []);
 
+  const stop = stops[active];
+  const [lng, lat] = stop.lngLat;
   useEffect(() => {
-    activeRef.current = active;
+    activeAt.current = [lng, lat];
     if (!map) return;
-    map.easeTo({ ...viewFor(map.getContainer(), active), duration: FLY_MS });
-  }, [map, active]);
+    map.easeTo({
+      ...viewFor(map.getContainer(), [lng, lat]),
+      duration: FLY_MS,
+    });
+  }, [map, lng, lat]);
 
-  const stop = saturdayStops[active];
   const zoomButton =
     "grid size-11 cursor-pointer place-items-center rounded-full text-ink hover:bg-ink/8";
 
@@ -187,11 +200,12 @@ export function SaturdayLiveMap({
           keep the page's type. */}
       <div ref={container} className="size-full" style={{ font: "inherit" }} />
       {map &&
+        dots &&
         mapDots.map(([x, y]) => (
           <MapMarker
             key={`${x}-${y}`}
             map={map}
-            at={toLngLat(x, y)}
+            at={imageToLngLat(x, y)}
             anchor="center"
           >
             <span
@@ -201,25 +215,25 @@ export function SaturdayLiveMap({
           </MapMarker>
         ))}
       {map &&
-        saturdayStops.map((item, index) => {
+        stops.map((item, index) => {
           const current = open && index === active;
           return (
             <MapMarker
-              key={item.time}
+              key={item.key}
               map={map}
-              at={toLngLat(item.x, item.y)}
+              at={item.lngLat}
               anchor="center"
               raised={current}
             >
               <button
                 type="button"
-                aria-label={`${venueByKind(item.kind).label}, ${item.area}, ${item.time}`}
+                aria-label={item.label}
                 aria-expanded={current}
                 // Tapping the open stop's pin again closes its card.
                 onClick={() => (current ? onClose() : onChoose(index))}
-                className={stopPinClass(item.kind, current)}
+                className={stopPinClass(item.isCafe, current)}
               >
-                {item.time}
+                {pinFace(item)}
               </button>
             </MapMarker>
           );
@@ -228,9 +242,9 @@ export function SaturdayLiveMap({
         // Last, so it sits above every pin. Each stop gets its own card
         // (new key), which grows out of the pin as it appears.
         <MapMarker
-          key={`card-${active}`}
+          key={`card-${stop.key}`}
           map={map}
-          at={toLngLat(stop.x, stop.y)}
+          at={stop.lngLat}
           anchor="bottom"
           offset={[0, -CARD_LIFT]}
           raised

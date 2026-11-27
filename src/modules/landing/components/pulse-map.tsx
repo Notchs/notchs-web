@@ -9,32 +9,26 @@ import {
   GlassLensTrack,
   LENS_ITEM,
 } from "@/shared/components/glass/glass-lens-track";
-import { ArrowRightIcon } from "@/shared/components/icons";
+import { ArrowRightIcon, CupIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/cn";
 
-import {
-  mapDots,
-  saturdayContent,
-  saturdayStops,
-  venueByKind,
-} from "../content";
+import { mapDots, saturdayContent } from "../content";
+import { MAP_IMAGE, onImage } from "../lib/map-image";
+import type { MapStop } from "../lib/map-stops";
 import { useStripScroll } from "../lib/use-strip-scroll";
 import ahmedabadMap from "../assets/ahmedabad-map.webp";
 import { useLanding } from "./landing-provider";
 import { stopPinClass } from "./stop-pin";
 
-/** Size of the stitched map image, in pixels. */
-const MAP_W = 1280;
-const MAP_H = 1024;
 const TOUR_MS = 3500;
 
 /**
  * The live map (MapLibre) is big, so it loads only as this section comes
  * near; the still map shows first and stays if the live one can't load.
  */
-const SaturdayLiveMap = dynamic(
-  () => import("./saturday-live-map").then((m) => m.SaturdayLiveMap),
+const PulseLiveMap = dynamic(
+  () => import("./pulse-live-map").then((m) => m.PulseLiveMap),
   { ssr: false },
 );
 
@@ -46,14 +40,72 @@ function savesData() {
   return connection?.saveData === true;
 }
 
+/** A stop's card: photo (example stops) or rank pill (cafés), then the CTA. */
+function StopCard({ stop }: { stop: MapStop }) {
+  const { openAccess } = useLanding();
+  const { card } = stop;
+  return (
+    // Solid: it is content, and the map must not show through its text.
+    <div className="rounded-2xl border border-line bg-background p-1.5 text-foreground shadow-xl">
+      {card.image && (
+        <div className="relative aspect-[2/1] overflow-hidden rounded-[12px] bg-block">
+          <Image
+            src={card.image}
+            alt=""
+            fill
+            sizes="272px"
+            placeholder="blur"
+            className="object-cover"
+          />
+          {card.badge && (
+            <div className="absolute top-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-xs text-paper">
+              {card.badge}
+            </div>
+          )}
+        </div>
+      )}
+      <div className="p-2.5 pt-3">
+        {!card.image && card.badge && (
+          <span className="mb-2 inline-block rounded-full bg-volt px-2.5 py-1 font-mono text-xs font-semibold text-ink">
+            {card.badge}
+          </span>
+        )}
+        <p className="font-display text-lg leading-tight font-extrabold tracking-[-.02em]">
+          {card.title}
+        </p>
+        <p className="mt-1 text-[.9375rem] text-muted">{card.subtitle}</p>
+        {card.note && <p className="mt-1 text-sm text-muted">{card.note}</p>}
+        <Button size="sm" className="mt-3 w-full" onClick={openAccess}>
+          {saturdayContent.cta}
+          <ArrowRightIcon className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/** A pin's text: its tag, or a cup for a café with no rank to show. */
+function PinFace({ stop }: { stop: MapStop }) {
+  return stop.tag ? stop.tag : <CupIcon className="size-4.5" />;
+}
+
 /**
  * A map of Ahmedabad that "flies" to the chosen stop: the pin lands in the
- * middle, with a venue card above it. Tours the stops on its own while on
- * screen, until someone picks one. A still map image shows first; the live
- * map takes over once it has loaded.
+ * middle, with its card above it. Tours the stops on its own while on screen,
+ * until someone picks one. A still map image shows first; the live map takes
+ * over once it has loaded. The stops are the example Saturday tour or, once
+ * they are live, the real cafés (`example` false).
  */
-export function SaturdayMap() {
-  const { openAccess } = useLanding();
+export function PulseMap({
+  stops,
+  mapAlt,
+  example,
+}: {
+  stops: MapStop[];
+  mapAlt: string;
+  /** Example stops: the decorative dots for other places show too. */
+  example: boolean;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -65,8 +117,7 @@ export function SaturdayMap() {
   const [nearby, setNearby] = useState(false);
   /** The live map has loaded and covers the still one. */
   const [live, setLive] = useState(false);
-  const stop = saturdayStops[active];
-  const venue = venueByKind(stop.kind);
+  const stop = stops[active];
   useStripScroll(listRef, active);
 
   useEffect(() => {
@@ -96,14 +147,14 @@ export function SaturdayMap() {
   }, []);
 
   useEffect(() => {
-    if (!inView || manual) return;
+    if (!inView || manual || stops.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = setInterval(
-      () => setActive((current) => (current + 1) % saturdayStops.length),
+      () => setActive((current) => (current + 1) % stops.length),
       TOUR_MS,
     );
     return () => clearInterval(timer);
-  }, [inView, manual]);
+  }, [inView, manual, stops.length]);
 
   const choose = (index: number) => {
     setManual(true);
@@ -116,42 +167,10 @@ export function SaturdayMap() {
     setOpen(false);
   };
 
-  /* The venue card for the active stop. Solid: it is content, and the map
-     must not show through its text. */
-  const card = (
-    <div className="rounded-2xl border border-line bg-background p-1.5 text-foreground shadow-xl">
-      <div className="relative aspect-[2/1] overflow-hidden rounded-[12px] bg-block">
-        <Image
-          src={venue.image.src}
-          alt=""
-          fill
-          sizes="272px"
-          placeholder="blur"
-          className="object-cover"
-        />
-        <div className="absolute top-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-xs text-paper">
-          {stop.time}
-        </div>
-      </div>
-      <div className="p-2.5 pt-3">
-        <p className="font-display text-lg leading-tight font-extrabold tracking-[-.02em]">
-          {venue.example}
-        </p>
-        <p className="mt-1 text-[.9375rem] text-muted">
-          {venue.label} · {stop.area}
-        </p>
-        <Button size="sm" className="mt-3 w-full" onClick={openAccess}>
-          {saturdayContent.cta}
-          <ArrowRightIcon className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
-        </Button>
-      </div>
-    </div>
-  );
-
   // Moves the pin to the focus point (--cx, --cy), then scales the map.
   const layerStyle: CSSProperties = {
-    width: MAP_W,
-    height: MAP_H,
+    width: MAP_IMAGE.width,
+    height: MAP_IMAGE.height,
     transform: `translate(var(--cx), var(--cy)) scale(var(--zoom)) translate(-${stop.x}%, -${stop.y}%)`,
   };
 
@@ -160,8 +179,9 @@ export function SaturdayMap() {
       ref={rootRef}
       className="grid gap-4 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-6"
     >
-      {/* The stops; a soft highlight sits on the one shown on the map and
-          slides to the next. */}
+      {/* The stops, in the map's order (cafés by rank); a soft highlight sits
+          on the one shown on the map and slides to the next. On wide screens
+          a long list scrolls inside the map's height. */}
       <GlassGroup self={false} className="min-w-0">
         <GlassLensTrack
           ref={listRef}
@@ -169,14 +189,13 @@ export function SaturdayMap() {
           restingIndex={active}
           lensRadius={12}
           inset={4}
-          className="-my-3 flex snap-x gap-2 overflow-x-auto py-3 lg:my-0 lg:grid lg:gap-2 lg:overflow-visible lg:py-0"
+          className="-my-3 flex snap-x gap-2 overflow-x-auto py-3 lg:my-0 lg:grid lg:max-h-160 lg:content-start lg:gap-2 lg:overflow-x-visible lg:overflow-y-auto lg:py-0"
         >
-          {saturdayStops.map((item, index) => {
-            const place = venueByKind(item.kind);
+          {stops.map((item, index) => {
             const current = index === active;
             return (
               <GlassShape
-                key={item.time}
+                key={item.key}
                 role="listitem"
                 radius={16}
                 className="flex-none snap-start"
@@ -188,12 +207,12 @@ export function SaturdayMap() {
                   className="relative flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 text-left"
                   {...LENS_ITEM}
                 >
-                  <span className="font-mono text-sm text-muted">
-                    {item.time}
+                  <span className="grid min-w-5 place-items-center font-mono text-sm text-muted">
+                    <PinFace stop={item} />
                   </span>
                   <span className="leading-tight">
                     <span className="block font-semibold whitespace-nowrap">
-                      {place.label}
+                      {item.title}
                     </span>
                     <span className="block text-sm whitespace-nowrap text-muted">
                       {item.area}
@@ -218,49 +237,56 @@ export function SaturdayMap() {
         >
           <Image
             src={ahmedabadMap}
-            alt={saturdayContent.mapAlt}
-            width={MAP_W}
-            height={MAP_H}
+            alt={mapAlt}
+            width={MAP_IMAGE.width}
+            height={MAP_IMAGE.height}
             // Phones show the map at about 768 CSS px; the full layer only on wider screens.
-            sizes={`(max-width: 767px) 768px, ${MAP_W}px`}
+            sizes={`(max-width: 767px) 768px, ${MAP_IMAGE.width}px`}
             placeholder="blur"
             className="block size-full select-none"
             draggable={false}
           />
-          {mapDots.map(([x, y]) => (
-            <span
-              key={`${x}-${y}`}
-              aria-hidden="true"
-              className="absolute size-3 -translate-1/2 rounded-full border-2 border-paper bg-ink/45"
-              style={{ left: `${x}%`, top: `${y}%` }}
-            />
-          ))}
-          {saturdayStops.map((item, index) => {
+          {example &&
+            mapDots.map(([x, y]) => (
+              <span
+                key={`${x}-${y}`}
+                aria-hidden="true"
+                className="absolute size-3 -translate-1/2 rounded-full border-2 border-paper bg-ink/45"
+                style={{ left: `${x}%`, top: `${y}%` }}
+              />
+            ))}
+          {stops.map((item, index) => {
+            // Places off the still image show on the live map only.
+            if (!onImage(item)) return null;
             const current = index === active;
             return (
               <button
-                key={item.time}
+                key={item.key}
                 type="button"
-                aria-label={`${venueByKind(item.kind).label}, ${item.area}, ${item.time}`}
+                aria-label={item.label}
                 onClick={() => choose(index)}
                 className={cn(
                   "absolute -translate-1/2",
                   current && "z-10",
-                  stopPinClass(item.kind, current),
+                  stopPinClass(item.isCafe, current),
                 )}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}
               >
-                {item.time}
+                <PinFace stop={item} />
               </button>
             );
           })}
         </div>
 
         {nearby && (
-          <SaturdayLiveMap
+          <PulseLiveMap
+            stops={stops}
+            dots={example}
+            mapAlt={mapAlt}
             active={active}
             open={open}
-            card={card}
+            card={<StopCard stop={stop} />}
+            pinFace={(item) => <PinFace stop={item} />}
             onChoose={choose}
             onClose={close}
             onExplore={() => setManual(true)}
@@ -279,7 +305,7 @@ export function SaturdayMap() {
               translate: "-50% calc(-100% - 2.25rem)",
             }}
           >
-            {card}
+            <StopCard stop={stop} />
           </div>
         )}
 

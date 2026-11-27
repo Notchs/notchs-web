@@ -334,6 +334,24 @@ export const saturdayContent = {
     "Map of Ahmedabad with Notchs stops in Thaltej, Navrangpura, Satellite, Prahladnagar and Bodakdev",
 } as const;
 
+/**
+ * The City Pulse map once real cafés are live (from the API). Ranks are the
+ * API's, from real verified visits; visit counts are never shown.
+ */
+export const cafeMapContent = {
+  description: (city: string) =>
+    `The cafés on Notchs in ${city}, ranked by real verified visits. Tap a pin to see one.`,
+  descriptionUnranked: (city: string) =>
+    `The cafés on Notchs in ${city}. Tap a pin to see one.`,
+  mapAlt: (city: string) => `Map of ${city} with the cafés on Notchs`,
+  cafe: "Café",
+  newPlace: "New on Notchs",
+  pinLabel: (name: string, area: string, rank: number) =>
+    `${name}, ${area}, ranked #${rank}`,
+  rankNote: (rank: number, city: string) =>
+    `#${rank} café in ${city} by real visits in the last 30 days.`,
+} as const;
+
 /** Stops on the map. x and y are percentages across the map image. */
 export const saturdayStops: readonly {
   time: string;
