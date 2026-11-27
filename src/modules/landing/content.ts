@@ -325,6 +325,8 @@ export const saturdayContent = {
   description:
     "One Saturday in Ahmedabad: tap a stop to fly there. Every pin is a place where a real visit becomes a Notch.",
   credit: "© OpenStreetMap contributors",
+  /** Credit for the live map's tiles (OpenFreeMap requires all three). */
+  liveCredit: "OpenFreeMap © OpenMapTiles © OpenStreetMap",
   cta: "Notch it here",
   mapAlt:
     "Map of Ahmedabad with Notchs stops in Thaltej, Navrangpura, Satellite, Prahladnagar and Bodakdev",

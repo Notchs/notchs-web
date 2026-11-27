@@ -1,14 +1,5 @@
 "use client";
 
-import "maplibre-gl/dist/maplibre-gl.css";
-
-import {
-  AttributionControl,
-  LngLatBounds,
-  Map as MapLibreMap,
-  Marker,
-  setWorkerUrl,
-} from "maplibre-gl";
 import {
   useCallback,
   useEffect,
@@ -16,12 +7,16 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
-import { createPortal } from "react-dom";
 
 import { mapConfig } from "@/config/map";
+import { MapMarker } from "@/shared/components/map/map-marker";
 import { cn } from "@/shared/lib/cn";
+import {
+  AttributionControl,
+  LngLatBounds,
+  Map as MapLibreMap,
+} from "@/shared/lib/maplibre";
 
 import { content } from "../../content";
 import type { CityVenue } from "../../types";
@@ -31,15 +26,6 @@ import { Card } from "../ui/card";
 import { Icon } from "../ui/icon";
 
 const copy = content.discover;
-
-/*
- * MapLibre finds its web worker next to its own file, but the bundler hides
- * that address (it becomes a file:// URL). This literal `new URL` makes the
- * bundler serve the worker from /_next/static and hands MapLibre that address.
- */
-setWorkerUrl(
-  new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href,
-);
 
 /** Pins closer than this on screen (px) join a cluster. */
 const CLUSTER_GAP = { x: 96, y: 34 };
@@ -130,45 +116,6 @@ function useMapView(map: MapLibreMap | null) {
     () => (map ? `${map.getZoom()}:${map.getCenter().toArray()}` : ""),
     () => "",
   );
-}
-
-/** A React-rendered pin, placed by MapLibre so it moves with the map. */
-function MapMarker({
-  map,
-  at,
-  raised,
-  children,
-}: {
-  map: MapLibreMap;
-  at: LngLat;
-  raised: boolean;
-  children: ReactNode;
-}) {
-  const [element] = useState(() => document.createElement("div"));
-  // MapLibre needs a position before the marker joins the map.
-  const [marker] = useState(() =>
-    new Marker({ element, anchor: "bottom" }).setLngLat(at),
-  );
-  const [lng, lat] = at;
-
-  useEffect(() => {
-    marker.addTo(map);
-    return () => {
-      marker.remove();
-    };
-  }, [map, marker]);
-
-  useEffect(() => {
-    marker.setLngLat([lng, lat]);
-  }, [marker, lng, lat]);
-
-  // Your venue and the selected or hovered pin sit above the others.
-  useEffect(() => {
-    if (raised) marker.addClassName("z-2");
-    else marker.removeClassName("z-2");
-  }, [marker, raised]);
-
-  return createPortal(children, element);
 }
 
 export function CityMap({

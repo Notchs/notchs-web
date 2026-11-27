@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 
 import { GlassGroup, GlassShape } from "@/shared/components/glass/glass-group";
@@ -21,6 +22,7 @@ import {
 import { useStripScroll } from "../lib/use-strip-scroll";
 import ahmedabadMap from "../assets/ahmedabad-map.webp";
 import { useLanding } from "./landing-provider";
+import { stopPinClass } from "./stop-pin";
 
 /** Size of the stitched map image, in pixels. */
 const MAP_W = 1280;
@@ -28,9 +30,27 @@ const MAP_H = 1024;
 const TOUR_MS = 3500;
 
 /**
- * A still map of Ahmedabad that "flies" to the chosen stop: the whole layer
- * moves so the pin lands in the middle, with a venue card above it. Tours the
- * stops on its own while on screen, until someone picks one.
+ * The live map (MapLibre) is big, so it loads only as this section comes
+ * near; the still map shows first and stays if the live one can't load.
+ */
+const SaturdayLiveMap = dynamic(
+  () => import("./saturday-live-map").then((m) => m.SaturdayLiveMap),
+  { ssr: false },
+);
+
+/** Data Saver on: keep the still map and skip the download. */
+function savesData() {
+  const connection = (
+    navigator as Navigator & { connection?: { saveData?: boolean } }
+  ).connection;
+  return connection?.saveData === true;
+}
+
+/**
+ * A map of Ahmedabad that "flies" to the chosen stop: the pin lands in the
+ * middle, with a venue card above it. Tours the stops on its own while on
+ * screen, until someone picks one. A still map image shows first; the live
+ * map takes over once it has loaded.
  */
 export function SaturdayMap() {
   const { openAccess } = useLanding();
@@ -39,6 +59,10 @@ export function SaturdayMap() {
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
   const [manual, setManual] = useState(false);
+  /** The section is near, so the live map may load. */
+  const [nearby, setNearby] = useState(false);
+  /** The live map has loaded and covers the still one. */
+  const [live, setLive] = useState(false);
   const stop = saturdayStops[active];
   const venue = venueByKind(stop.kind);
   useStripScroll(listRef, active);
@@ -49,6 +73,21 @@ export function SaturdayMap() {
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
       { threshold: 0.4 },
+    );
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || savesData()) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setNearby(true);
+        observer.disconnect();
+      },
+      { rootMargin: "600px 0px" },
     );
     observer.observe(root);
     return () => observer.disconnect();
@@ -129,7 +168,11 @@ export function SaturdayMap() {
 
       {/* The map is light in either theme, so the glass over it is too. */}
       <div className="[container-type:size] relative h-[30rem] overflow-hidden rounded-3xl bg-block surface-ink glass-light [--cx:50cqw] [--cy:68cqh] [--zoom:.85] sm:h-[34rem] lg:h-[40rem] lg:[--cy:60cqh] lg:[--zoom:1.05]">
+        {/* Once the live map covers it, the still map leaves the page's
+            tab order and reading order, so each stop is met once. */}
         <div
+          inert={live}
+          aria-hidden={live || undefined}
           className="absolute top-0 left-0 origin-top-left transition-transform duration-[1400ms] ease-notch motion-reduce:transition-none"
           style={layerStyle}
         >
@@ -161,10 +204,9 @@ export function SaturdayMap() {
                 aria-label={`${venueByKind(item.kind).label}, ${item.area}, ${item.time}`}
                 onClick={() => choose(index)}
                 className={cn(
-                  "absolute grid -translate-1/2 cursor-pointer place-items-center rounded-full font-mono text-xs transition-[width,height,background-color,color] duration-500 ease-notch",
-                  current
-                    ? "z-10 size-14 border-2 border-ink bg-btn font-semibold text-btn-fg shadow-lg"
-                    : "size-11 border-2 border-paper bg-ink text-paper hover:bg-graphite",
+                  "absolute -translate-1/2",
+                  current && "z-10",
+                  stopPinClass(item.kind, current),
                 )}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}
               >
@@ -173,6 +215,14 @@ export function SaturdayMap() {
             );
           })}
         </div>
+
+        {nearby && (
+          <SaturdayLiveMap
+            active={active}
+            onChoose={choose}
+            onReady={() => setLive(true)}
+          />
+        )}
 
         {/* Venue card above the focused pin, like a map popup. */}
         <div
@@ -214,7 +264,7 @@ export function SaturdayMap() {
           radius={999}
           className="absolute right-2 bottom-2 rounded-full px-2.5 py-0.5 text-xs text-ink/70 glass-light"
         >
-          {saturdayContent.credit}
+          {live ? saturdayContent.liveCredit : saturdayContent.credit}
         </GlassGroup>
       </div>
     </div>
