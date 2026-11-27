@@ -67,20 +67,27 @@ function viewFor(element: HTMLElement, index: number) {
 /**
  * The live MapLibre version of the Saturday map. It sits over the still map
  * and only shows once it has loaded; until then, or if it never loads, the
- * still map does the job. People can drag and zoom it; the venue card rides
- * on its pin, and picking a stop flies back to it.
+ * still map does the job. People can drag and zoom it. Tapping a stop grows
+ * its venue card out of the pin; tapping anywhere else on the map shrinks it
+ * back into the pin.
  */
 export function SaturdayLiveMap({
   active,
+  open,
   card,
   onChoose,
+  onClose,
   onExplore,
   onReady,
 }: {
   active: number;
+  /** Whether the active stop's card is showing. */
+  open: boolean;
   /** The venue card for the active stop, shown above its pin. */
   card: ReactNode;
   onChoose: (index: number) => void;
+  /** A tap on the map itself, away from the pins and the card. */
+  onClose: () => void;
   /** Someone moved the map themselves: stop the tour. */
   onExplore: () => void;
   onReady: () => void;
@@ -88,10 +95,10 @@ export function SaturdayLiveMap({
   const container = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const activeRef = useRef(active);
-  const callbacks = useRef({ onExplore, onReady });
+  const callbacks = useRef({ onClose, onExplore, onReady });
   useEffect(() => {
-    callbacks.current = { onExplore, onReady };
-  }, [onExplore, onReady]);
+    callbacks.current = { onClose, onExplore, onReady };
+  }, [onClose, onExplore, onReady]);
 
   useEffect(() => {
     const element = container.current;
@@ -132,6 +139,13 @@ export function SaturdayLiveMap({
     instance.on("zoomstart", (event) => {
       // Only a person's zoom, not the fly to a stop or the zoom buttons.
       if (event.originalEvent) explore();
+    });
+    // A tap on the map itself closes the card. Taps on a pin or the card
+    // land on their own elements, and a drag never counts as a click.
+    instance.on("click", (event) => {
+      if (event.originalEvent.target === instance.getCanvas()) {
+        callbacks.current.onClose();
+      }
     });
 
     const place = () =>
@@ -188,7 +202,7 @@ export function SaturdayLiveMap({
         ))}
       {map &&
         saturdayStops.map((item, index) => {
-          const current = index === active;
+          const current = open && index === active;
           return (
             <MapMarker
               key={item.time}
@@ -209,8 +223,8 @@ export function SaturdayLiveMap({
           );
         })}
       {map && (
-        // Last, so it sits above every pin. A new key per stop replays the
-        // card's rise, as on the still map.
+        // Last, so it sits above every pin. Each stop gets its own card
+        // (new key), which grows out of the pin as it appears.
         <MapMarker
           key={`card-${active}`}
           map={map}
@@ -218,8 +232,23 @@ export function SaturdayLiveMap({
           anchor="bottom"
           offset={[0, -CARD_LIFT]}
           raised
+          passThrough={!open}
         >
-          {card}
+          <div
+            inert={!open}
+            aria-hidden={!open || undefined}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") onClose();
+            }}
+            // Grows from and shrinks into the pin's centre, below the card.
+            style={{ transformOrigin: `50% calc(100% + ${CARD_LIFT}px)` }}
+            className={cn(
+              "w-[min(17rem,calc(100vw-4rem))] transition-[scale,opacity] duration-300 ease-notch motion-reduce:transition-opacity starting:scale-25 starting:opacity-0",
+              open ? "scale-100 opacity-100" : "scale-25 opacity-0",
+            )}
+          >
+            {card}
+          </div>
         </MapMarker>
       )}
 

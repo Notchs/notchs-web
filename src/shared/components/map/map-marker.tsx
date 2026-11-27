@@ -19,6 +19,7 @@ export function MapMarker({
   anchor = "bottom",
   offset,
   raised = false,
+  passThrough = false,
   children,
 }: {
   map: MapLibreMap;
@@ -29,6 +30,8 @@ export function MapMarker({
   offset?: [number, number];
   /** Draws this pin above the others. */
   raised?: boolean;
+  /** Clicks go through to the map, e.g. while its content is hidden. */
+  passThrough?: boolean;
   children: ReactNode;
 }) {
   const [element] = useState(() => document.createElement("div"));
@@ -53,6 +56,11 @@ export function MapMarker({
     if (raised) marker.addClassName("z-2");
     else marker.removeClassName("z-2");
   }, [marker, raised]);
+
+  useEffect(() => {
+    if (passThrough) marker.addClassName("pointer-events-none");
+    else marker.removeClassName("pointer-events-none");
+  }, [marker, passThrough]);
 
   return createPortal(children, element);
 }

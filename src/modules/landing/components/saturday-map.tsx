@@ -59,6 +59,8 @@ export function SaturdayMap() {
   const [active, setActive] = useState(0);
   const [inView, setInView] = useState(false);
   const [manual, setManual] = useState(false);
+  /** The active stop's card is showing (the live map can close it). */
+  const [open, setOpen] = useState(true);
   /** The section is near, so the live map may load. */
   const [nearby, setNearby] = useState(false);
   /** The live map has loaded and covers the still one. */
@@ -106,6 +108,12 @@ export function SaturdayMap() {
   const choose = (index: number) => {
     setManual(true);
     setActive(index);
+    setOpen(true);
+  };
+  // Closing the card also stops the tour, so it doesn't pop open again.
+  const close = () => {
+    setManual(true);
+    setOpen(false);
   };
 
   /* The venue card for the active stop. Solid: it is content, and the map
@@ -251,12 +259,10 @@ export function SaturdayMap() {
         {nearby && (
           <SaturdayLiveMap
             active={active}
-            card={
-              <div className="w-[min(17rem,calc(100vw-4rem))] animate-rise">
-                {card}
-              </div>
-            }
+            open={open}
+            card={card}
             onChoose={choose}
+            onClose={close}
             onExplore={() => setManual(true)}
             onReady={() => setLive(true)}
           />
