@@ -214,7 +214,9 @@ export function SaturdayLiveMap({
               <button
                 type="button"
                 aria-label={`${venueByKind(item.kind).label}, ${item.area}, ${item.time}`}
-                onClick={() => onChoose(index)}
+                aria-expanded={current}
+                // Tapping the open stop's pin again closes its card.
+                onClick={() => (current ? onClose() : onChoose(index))}
                 className={stopPinClass(item.kind, current)}
               >
                 {item.time}
