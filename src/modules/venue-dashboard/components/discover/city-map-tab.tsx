@@ -1,21 +1,29 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/shared/lib/cn";
 
 import { content } from "../../content";
 import type { CityVenue, DiscoverResponse } from "../../types";
-import { Badge, Stars } from "../ui/badges";
+import { Badge } from "../ui/badges";
 import { Button } from "../ui/button";
 import { Card, SideGrid } from "../ui/card";
 import { Chip, FilterSelect, SearchField, SegmentedTabs } from "../ui/controls";
 import { Icon } from "../ui/icon";
-import { CityMapArt } from "./city-map-art";
 
 const copy = content.discover;
-const ZOOM_SCALE = 2.2;
-const CLUSTER_DISTANCE = 9;
+
+/** MapLibre is large and browser-only: load it only when the map shows. */
+const CityMap = dynamic(() => import("./city-map").then((m) => m.CityMap), {
+  ssr: false,
+  loading: () => (
+    <div className="grid h-full min-h-105 place-items-center rounded-[14px] border border-line bg-block text-sm text-muted">
+      {copy.mapLoading}
+    </div>
+  ),
+});
 
 type ViewMode = (typeof copy.views)[number]["value"];
 type SortMode = "rank" | "rating" | "distance" | "name";
@@ -71,7 +79,9 @@ export function CityMapTab({
   const [sort, setSort] = useState<SortMode>("rank");
   const [view, setView] = useState<ViewMode>("split");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [zoom, setZoom] = useState({ zoomed: false, x: 50, y: 50 });
+  const [mapFailed, setMapFailed] = useState(false);
+  /** Changes on Retry, so a failed map starts again from scratch. */
+  const [mapAttempt, setMapAttempt] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -92,7 +102,11 @@ export function CityMapTab({
   const reset = () => {
     setFilters(initialFilters);
     setSelectedId(null);
-    setZoom({ zoomed: false, x: 50, y: 50 });
+  };
+  const retryMap = () => {
+    setMapFailed(false);
+    setMapAttempt((attempt) => attempt + 1);
+    onRetry();
   };
   const activeCount =
     filters.categories.length +
@@ -213,7 +227,7 @@ export function CityMapTab({
     </div>
   );
 
-  const showMapError = !data.mapAvailable && view !== "list";
+  const showMapError = (!data.mapAvailable || mapFailed) && view !== "list";
 
   const map = showMapError ? (
     <div className="relative grid min-h-90 place-items-center overflow-hidden rounded-[14px] border border-line bg-[#e9e6db] p-4">
@@ -222,7 +236,7 @@ export function CityMapTab({
         <b className="text-[17px]">{copy.mapErrorTitle}</b>
         <span className="text-sm text-muted">{copy.mapErrorBody}</span>
         <div className="flex gap-2">
-          <Button variant="dark" size="sm" icon="refresh" onClick={onRetry}>
+          <Button variant="dark" size="sm" icon="refresh" onClick={retryMap}>
             {content.common.retry}
           </Button>
           <Button size="sm" onClick={() => setView("list")}>
@@ -233,15 +247,15 @@ export function CityMapTab({
     </div>
   ) : (
     <CityMap
+      key={mapAttempt}
       venues={list}
       myVenueId={data.myVenueId}
       selected={selected}
       selectedId={selectedId}
       hoveredId={hoveredId}
-      zoom={zoom}
-      onZoom={setZoom}
       onSelect={setSelectedId}
       onReset={reset}
+      onFail={() => setMapFailed(true)}
     />
   );
 
@@ -327,215 +341,5 @@ export function CityMapTab({
         </>
       )}
     </>
-  );
-}
-
-type ZoomState = { zoomed: boolean; x: number; y: number };
-
-function CityMap({
-  venues,
-  myVenueId,
-  selected,
-  selectedId,
-  hoveredId,
-  zoom,
-  onZoom,
-  onSelect,
-  onReset,
-}: {
-  venues: CityVenue[];
-  myVenueId: string;
-  selected: CityVenue | undefined;
-  selectedId: string | null;
-  hoveredId: string | null;
-  zoom: ZoomState;
-  onZoom: (zoom: ZoomState) => void;
-  onSelect: (id: string | null) => void;
-  onReset: () => void;
-}) {
-  const position = (venue: CityVenue): [number, number] =>
-    zoom.zoomed
-      ? [
-          50 + (venue.x - zoom.x) * ZOOM_SCALE,
-          50 + (venue.y - zoom.y) * ZOOM_SCALE,
-        ]
-      : [venue.x, venue.y];
-
-  type Point = { venue: CityVenue; at: [number, number] };
-  const groups: Point[][] = [];
-  venues
-    .map((venue) => ({ venue, at: position(venue) }))
-    .filter(({ at }) => at[0] > 3 && at[0] < 97 && at[1] > 8 && at[1] < 98)
-    .forEach((point) => {
-      const standsAlone =
-        point.venue.isMine || point.venue.id === selectedId || zoom.zoomed;
-      const group = standsAlone
-        ? undefined
-        : groups.find(
-            ([first]) =>
-              !first.venue.isMine &&
-              first.venue.id !== selectedId &&
-              Math.hypot(
-                first.at[0] - point.at[0],
-                (first.at[1] - point.at[1]) * 0.7,
-              ) < CLUSTER_DISTANCE,
-          );
-      if (group) group.push(point);
-      else groups.push([point]);
-    });
-
-  const control =
-    "grid size-10 cursor-pointer place-items-center rounded-[10px] bg-card shadow-[0_2px_8px_-2px_rgb(15_15_20/0.25)] hover:bg-block disabled:cursor-not-allowed disabled:opacity-40";
-
-  return (
-    <div className="relative h-full min-h-105 overflow-hidden rounded-[14px] border border-line bg-[#e9e6db]">
-      <CityMapArt
-        transform={
-          zoom.zoomed
-            ? `translate(${50 - zoom.x * ZOOM_SCALE} ${50 - zoom.y * ZOOM_SCALE}) scale(${ZOOM_SCALE})`
-            : undefined
-        }
-      />
-      {groups.map((group) => {
-        if (group.length > 1) {
-          const average = (read: (point: Point) => number) =>
-            group.reduce((total, point) => total + read(point), 0) /
-            group.length;
-          return (
-            <button
-              key={group[0].venue.id}
-              type="button"
-              aria-label={copy.clusterLabel(group.length)}
-              onClick={() =>
-                onZoom({
-                  zoomed: true,
-                  x: average((point) => point.venue.x),
-                  y: average((point) => point.venue.y),
-                })
-              }
-              style={{
-                left: `${average((point) => point.at[0])}%`,
-                top: `${average((point) => point.at[1])}%`,
-              }}
-              className="absolute z-2 grid size-[34px] -translate-x-1/2 -translate-y-full cursor-pointer place-items-center rounded-full bg-graphite text-xs font-semibold text-paper"
-            >
-              {group.length}
-            </button>
-          );
-        }
-        const { venue, at } = group[0];
-        const isSelected = venue.id === selectedId;
-        return (
-          <button
-            key={venue.id}
-            type="button"
-            aria-label={venue.isMine ? copy.pinYours(venue.name) : venue.name}
-            aria-pressed={isSelected}
-            onClick={() => onSelect(venue.id)}
-            style={{ left: `${at[0]}%`, top: `${at[1]}%` }}
-            className="absolute z-2 flex -translate-x-1/2 -translate-y-full cursor-pointer flex-col items-center after:h-2 after:w-0.5 after:bg-ink"
-          >
-            <b
-              className={cn(
-                "flex items-center gap-1.5 rounded-lg bg-card px-2 py-[5px] text-xs font-semibold whitespace-nowrap shadow-[0_4px_12px_-4px_rgb(15_15_20/0.35)]",
-                venue.isMine && "bg-ink text-paper",
-                (isSelected || hoveredId === venue.id) &&
-                  "shadow-[0_0_0_2px_var(--ink)]",
-              )}
-            >
-              {venue.isMine && <Icon name="star" size={12} />}
-              {venue.name}
-            </b>
-          </button>
-        );
-      })}
-
-      <div className="absolute top-3 right-3 z-3 flex flex-col gap-1.5">
-        <button
-          type="button"
-          aria-label={copy.zoomIn}
-          disabled={zoom.zoomed}
-          onClick={() => onZoom({ ...zoom, zoomed: true })}
-          className={control}
-        >
-          <Icon name="plus" size={18} />
-        </button>
-        <button
-          type="button"
-          aria-label={copy.zoomOut}
-          onClick={() => onZoom({ zoomed: false, x: 50, y: 50 })}
-          className={control}
-        >
-          <Icon name="minus" size={18} />
-        </button>
-        <button
-          type="button"
-          aria-label={copy.centre}
-          onClick={() => {
-            const mine = venues.find((venue) => venue.id === myVenueId);
-            onZoom({ zoomed: true, x: mine?.x ?? 46, y: mine?.y ?? 46 });
-            onSelect(myVenueId);
-          }}
-          className={control}
-        >
-          <Icon name="target" size={18} />
-        </button>
-      </div>
-
-      {venues.length === 0 && (
-        <Card className="absolute top-1/2 left-1/2 z-4 w-[min(280px,90%)] -translate-x-1/2 -translate-y-1/2 gap-2 p-4">
-          <b>{copy.noVenuesTitle}</b>
-          <span className="text-[13px] text-muted">{copy.noVenuesBody}</span>
-          <Button variant="dark" size="sm" onClick={onReset}>
-            {copy.resetFilters}
-          </Button>
-        </Card>
-      )}
-
-      {selected && (
-        <Card className="absolute bottom-7 left-3 z-4 w-[min(300px,calc(100%-24px))] animate-pop gap-2 p-3.5 shadow-[0_12px_30px_-12px_rgb(15_15_20/0.35)]">
-          <div className="flex items-center gap-2">
-            <b className="flex-1">{selected.name}</b>
-            <button
-              type="button"
-              aria-label={copy.closePreview}
-              onClick={() => onSelect(null)}
-              className="grid size-7 cursor-pointer place-items-center rounded-lg hover:bg-ink/5"
-            >
-              <Icon name="x" size={14} />
-            </button>
-          </div>
-          <span className="text-[13px] text-muted">
-            {selected.category} · {selected.area} ·{" "}
-            {"₹".repeat(selected.priceLevel)} ·{" "}
-            {selected.isMine
-              ? copy.yourVenue
-              : copy.fromYou(selected.distanceKm)}
-          </span>
-          <span className="flex items-center gap-2 text-[13px]">
-            <Stars value={selected.rating} size={12} />
-            <b>{selected.rating}</b>
-            {selected.rank && (
-              <Badge className="font-mono text-[11px] font-medium">
-                {copy.rankBadge(selected.rank)}
-              </Badge>
-            )}
-          </span>
-          {selected.amenities.length > 0 && (
-            <span className="flex flex-wrap gap-1">
-              {selected.amenities.map((amenity) => (
-                <Badge key={amenity}>{amenity}</Badge>
-              ))}
-            </span>
-          )}
-          <span className="text-xs text-muted">
-            {selected.isMine ? copy.pinNoteMine : copy.pinNoteOther}
-          </span>
-        </Card>
-      )}
-      <span className="absolute bottom-2 left-2.5 z-3 rounded bg-white/75 px-1.5 py-0.5 font-mono text-[10px] text-muted uppercase">
-        {copy.mapAttribution}
-      </span>
-    </div>
   );
 }

@@ -130,6 +130,23 @@ export function PlusIcon(props: IconProps) {
   );
 }
 
+/** A coffee cup: a café on the map. */
+export function CupIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 11h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5v2M12 3.5v2" />
+    </OutlineIcon>
+  );
+}
+
+export function MinusIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M5 12h14" />
+    </OutlineIcon>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>

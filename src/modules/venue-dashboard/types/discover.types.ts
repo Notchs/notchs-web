@@ -6,9 +6,9 @@ export type CityVenue = {
   name: string;
   category: VenueCategory;
   area: string;
-  /** Position on the map canvas, 0 to 100. */
-  x: number;
-  y: number;
+  /** Where the venue is (WGS84 degrees), from the API. */
+  latitude: number;
+  longitude: number;
   rating: number;
   priceLevel: 1 | 2 | 3;
   amenities: string[];

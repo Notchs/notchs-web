@@ -325,9 +325,43 @@ export const saturdayContent = {
   description:
     "One Saturday in Ahmedabad: tap a stop to fly there. Every pin is a place where a real visit becomes a Notch.",
   credit: "© OpenStreetMap contributors",
+  /** Credit for the live map's tiles (OpenFreeMap requires all three). */
+  liveCredit: "OpenFreeMap © OpenMapTiles © OpenStreetMap",
+  zoomIn: "Zoom in",
+  zoomOut: "Zoom out",
+  cluster: (count: number) => `${count} places here, zoom in`,
   cta: "Notch it here",
   mapAlt:
     "Map of Ahmedabad with Notchs stops in Thaltej, Navrangpura, Satellite, Prahladnagar and Bodakdev",
+} as const;
+
+/** The API's kinds of place, as people say them. */
+const placeKinds: Record<string, string> = {
+  cafe: "Café",
+  restaurant: "Restaurant",
+  bar: "Bar",
+  hotel: "Hotel",
+  turf_gym: "Turf or gym",
+  theatre: "Theatre",
+};
+
+/**
+ * The City Pulse map once real places are live (from the API). Cafés are
+ * highlighted and ranked; ranks are the API's, from real verified visits.
+ * Visit counts are never shown.
+ */
+export const placeMapContent = {
+  description: (city: string) =>
+    `The places on Notchs in ${city}, with cafés ranked by real verified visits. Tap a pin to see one.`,
+  descriptionUnranked: (city: string) =>
+    `The places on Notchs in ${city}. Tap a pin to see one.`,
+  mapAlt: (city: string) => `Map of ${city} with the places on Notchs`,
+  kind: (category: string) => placeKinds[category] ?? "Place",
+  newPlace: "New on Notchs",
+  pinLabel: (name: string, kind: string, area: string, rank: number | null) =>
+    `${name}, ${kind}, ${area}${rank ? `, ranked #${rank}` : ""}`,
+  rankNote: (rank: number, city: string) =>
+    `#${rank} café in ${city} by real visits in the last 30 days.`,
 } as const;
 
 /** Stops on the map. x and y are percentages across the map image. */
