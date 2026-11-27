@@ -130,6 +130,14 @@ export function PlusIcon(props: IconProps) {
   );
 }
 
+export function MinusIcon(props: IconProps) {
+  return (
+    <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>
+      <path d="M5 12h14" />
+    </OutlineIcon>
+  );
+}
+
 export function MenuIcon(props: IconProps) {
   return (
     <OutlineIcon strokeWidth={2} strokeLinecap="round" {...props}>

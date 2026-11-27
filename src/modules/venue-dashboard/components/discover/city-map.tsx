@@ -224,7 +224,13 @@ export function CityMap({
   return (
     <div className="relative h-full min-h-105 overflow-hidden rounded-[14px] border border-line bg-block">
       <div className="absolute inset-0">
-        <div ref={container} className="size-full" />
+        {/* Inline, to beat MapLibre's own font rule, so pins keep the
+            dashboard's type. */}
+        <div
+          ref={container}
+          className="size-full"
+          style={{ font: "inherit" }}
+        />
       </div>
 
       {!map && (

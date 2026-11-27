@@ -108,6 +108,38 @@ export function SaturdayMap() {
     setActive(index);
   };
 
+  /* The venue card for the active stop. Solid: it is content, and the map
+     must not show through its text. */
+  const card = (
+    <div className="rounded-2xl border border-line bg-background p-1.5 text-foreground shadow-xl">
+      <div className="relative aspect-[2/1] overflow-hidden rounded-[12px] bg-block">
+        <Image
+          src={venue.image.src}
+          alt=""
+          fill
+          sizes="272px"
+          placeholder="blur"
+          className="object-cover"
+        />
+        <div className="absolute top-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-xs text-paper">
+          {stop.time}
+        </div>
+      </div>
+      <div className="p-2.5 pt-3">
+        <p className="font-display text-lg leading-tight font-extrabold tracking-[-.02em]">
+          {venue.example}
+        </p>
+        <p className="mt-1 text-[.9375rem] text-muted">
+          {venue.label} · {stop.area}
+        </p>
+        <Button size="sm" className="mt-3 w-full" onClick={openAccess}>
+          {saturdayContent.cta}
+          <ArrowRightIcon className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
+        </Button>
+      </div>
+    </div>
+  );
+
   // Moves the pin to the focus point (--cx, --cy), then scales the map.
   const layerStyle: CSSProperties = {
     width: MAP_W,
@@ -219,46 +251,31 @@ export function SaturdayMap() {
         {nearby && (
           <SaturdayLiveMap
             active={active}
+            card={
+              <div className="w-[min(17rem,calc(100vw-4rem))] animate-rise">
+                {card}
+              </div>
+            }
             onChoose={choose}
+            onExplore={() => setManual(true)}
             onReady={() => setLive(true)}
           />
         )}
 
-        {/* Venue card above the focused pin, like a map popup. */}
-        <div
-          key={active}
-          className="absolute left-1/2 w-[min(17rem,calc(100%_-_2rem))] animate-rise"
-          style={{ top: "var(--cy)", translate: "-50% calc(-100% - 2.25rem)" }}
-        >
-          {/* Solid: it is content, and the map must not show through its text. */}
-          <div className="rounded-2xl border border-line bg-background p-1.5 text-foreground shadow-xl">
-            <div className="relative aspect-[2/1] overflow-hidden rounded-[12px] bg-block">
-              <Image
-                src={venue.image.src}
-                alt=""
-                fill
-                sizes="272px"
-                placeholder="blur"
-                className="object-cover"
-              />
-              <div className="absolute top-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-xs text-paper">
-                {stop.time}
-              </div>
-            </div>
-            <div className="p-2.5 pt-3">
-              <p className="font-display text-lg leading-tight font-extrabold tracking-[-.02em]">
-                {venue.example}
-              </p>
-              <p className="mt-1 text-[.9375rem] text-muted">
-                {venue.label} · {stop.area}
-              </p>
-              <Button size="sm" className="mt-3 w-full" onClick={openAccess}>
-                {saturdayContent.cta}
-                <ArrowRightIcon className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
-              </Button>
-            </div>
+        {/* On the still map the card floats above the focused pin, like a
+            map popup; the live map carries it on the pin instead. */}
+        {!live && (
+          <div
+            key={active}
+            className="absolute left-1/2 w-[min(17rem,calc(100%_-_2rem))] animate-rise"
+            style={{
+              top: "var(--cy)",
+              translate: "-50% calc(-100% - 2.25rem)",
+            }}
+          >
+            {card}
           </div>
-        </div>
+        )}
 
         <GlassGroup
           radius={999}

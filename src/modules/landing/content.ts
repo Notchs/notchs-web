@@ -327,6 +327,8 @@ export const saturdayContent = {
   credit: "© OpenStreetMap contributors",
   /** Credit for the live map's tiles (OpenFreeMap requires all three). */
   liveCredit: "OpenFreeMap © OpenMapTiles © OpenStreetMap",
+  zoomIn: "Zoom in",
+  zoomOut: "Zoom out",
   cta: "Notch it here",
   mapAlt:
     "Map of Ahmedabad with Notchs stops in Thaltej, Navrangpura, Satellite, Prahladnagar and Bodakdev",

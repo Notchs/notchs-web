@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { mapConfig } from "@/config/map";
+import { GlassGroup } from "@/shared/components/glass/glass-group";
+import { MinusIcon, PlusIcon } from "@/shared/components/icons";
 import { MapMarker } from "@/shared/components/map/map-marker";
 import { cn } from "@/shared/lib/cn";
 import { Map as MapLibreMap } from "@/shared/lib/maplibre";
@@ -27,8 +29,15 @@ const IMAGE = {
   north: 23.1196,
   south: 22.9592,
 };
+/** How far people can pan: Ahmedabad with a margin, not the whole world. */
+const PAN_LIMIT: [[number, number], [number, number]] = [
+  [IMAGE.west - 0.08, IMAGE.south - 0.06],
+  [IMAGE.east + 0.08, IMAGE.north + 0.06],
+];
 /** How long the map takes to fly to a stop; the same as the still map. */
 const FLY_MS = 1400;
+/** The card sits this far above its pin's centre: half the big pin + a gap. */
+const CARD_LIFT = 36;
 
 const toLngLat = (x: number, y: number): [number, number] => [
   IMAGE.west + ((IMAGE.east - IMAGE.west) * x) / 100,
@@ -58,25 +67,31 @@ function viewFor(element: HTMLElement, index: number) {
 /**
  * The live MapLibre version of the Saturday map. It sits over the still map
  * and only shows once it has loaded; until then, or if it never loads, the
- * still map does the job. It moves only when a stop is picked, like the still
- * one, so the venue card always sits above its pin.
+ * still map does the job. People can drag and zoom it; the venue card rides
+ * on its pin, and picking a stop flies back to it.
  */
 export function SaturdayLiveMap({
   active,
+  card,
   onChoose,
+  onExplore,
   onReady,
 }: {
   active: number;
+  /** The venue card for the active stop, shown above its pin. */
+  card: ReactNode;
   onChoose: (index: number) => void;
+  /** Someone moved the map themselves: stop the tour. */
+  onExplore: () => void;
   onReady: () => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const activeRef = useRef(active);
-  const readyRef = useRef(onReady);
+  const callbacks = useRef({ onExplore, onReady });
   useEffect(() => {
-    readyRef.current = onReady;
-  }, [onReady]);
+    callbacks.current = { onExplore, onReady };
+  }, [onExplore, onReady]);
 
   useEffect(() => {
     const element = container.current;
@@ -89,7 +104,15 @@ export function SaturdayLiveMap({
         style: mapConfig.style,
         center,
         zoom,
-        interactive: false,
+        minZoom: 10,
+        maxZoom: 17,
+        maxBounds: PAN_LIMIT,
+        // The page keeps scrolling: Ctrl/⌘ + scroll zooms, and on phones
+        // two fingers move the map while one finger scrolls the page.
+        cooperativeGestures: true,
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
         attributionControl: false,
         locale: { "Map.Title": saturdayContent.mapAlt },
       });
@@ -97,16 +120,33 @@ export function SaturdayLiveMap({
       // No WebGL: the still map stays.
       return;
     }
+    instance.touchZoomRotate.disableRotation();
+    instance.keyboard.disableRotation();
+
+    let explored = false;
+    const explore = () => {
+      explored = true;
+      callbacks.current.onExplore();
+    };
+    instance.on("dragstart", explore);
+    instance.on("zoomstart", (event) => {
+      // Only a person's zoom, not the fly to a stop or the zoom buttons.
+      if (event.originalEvent) explore();
+    });
+
     const place = () =>
       instance.easeTo({
         ...viewFor(element, activeRef.current),
         duration: 0,
       });
-    instance.on("resize", place);
+    // Keep the stop framed when the page resizes, unless someone moved away.
+    instance.on("resize", () => {
+      if (!explored) place();
+    });
     instance.once("load", () => {
       place();
       setMap(instance);
-      readyRef.current();
+      callbacks.current.onReady();
     });
     return () => instance.remove();
   }, []);
@@ -117,6 +157,10 @@ export function SaturdayLiveMap({
     map.easeTo({ ...viewFor(map.getContainer(), active), duration: FLY_MS });
   }, [map, active]);
 
+  const stop = saturdayStops[active];
+  const zoomButton =
+    "grid size-11 cursor-pointer place-items-center rounded-full text-ink hover:bg-ink/8";
+
   return (
     <div
       aria-hidden={!map || undefined}
@@ -125,7 +169,9 @@ export function SaturdayLiveMap({
         map ? "opacity-100" : "opacity-0",
       )}
     >
-      <div ref={container} className="size-full" />
+      {/* Inline, to beat MapLibre's own font rule, so the card and pins
+          keep the page's type. */}
+      <div ref={container} className="size-full" style={{ font: "inherit" }} />
       {map &&
         mapDots.map(([x, y]) => (
           <MapMarker
@@ -162,6 +208,52 @@ export function SaturdayLiveMap({
             </MapMarker>
           );
         })}
+      {map && (
+        // Last, so it sits above every pin. A new key per stop replays the
+        // card's rise, as on the still map.
+        <MapMarker
+          key={`card-${active}`}
+          map={map}
+          at={toLngLat(stop.x, stop.y)}
+          anchor="bottom"
+          offset={[0, -CARD_LIFT]}
+          raised
+        >
+          {card}
+        </MapMarker>
+      )}
+
+      {map && (
+        <GlassGroup
+          radius={999}
+          // Bottom left, clear of the card (top) and the credit (bottom right;
+          // full width on phones, so the buttons sit above it there).
+          className="absolute bottom-10 left-3 z-10 flex flex-col rounded-full glass-light sm:bottom-3"
+        >
+          <button
+            type="button"
+            aria-label={saturdayContent.zoomIn}
+            onClick={() => {
+              onExplore();
+              map.zoomIn();
+            }}
+            className={zoomButton}
+          >
+            <PlusIcon className="size-5" />
+          </button>
+          <button
+            type="button"
+            aria-label={saturdayContent.zoomOut}
+            onClick={() => {
+              onExplore();
+              map.zoomOut();
+            }}
+            className={zoomButton}
+          >
+            <MinusIcon className="size-5" />
+          </button>
+        </GlassGroup>
+      )}
     </div>
   );
 }

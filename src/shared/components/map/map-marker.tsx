@@ -17,6 +17,7 @@ export function MapMarker({
   map,
   at,
   anchor = "bottom",
+  offset,
   raised = false,
   children,
 }: {
@@ -24,6 +25,8 @@ export function MapMarker({
   /** [longitude, latitude] */
   at: [number, number];
   anchor?: PositionAnchor;
+  /** Shift from the anchor in px, [x, y]; set once, when the pin appears. */
+  offset?: [number, number];
   /** Draws this pin above the others. */
   raised?: boolean;
   children: ReactNode;
@@ -31,7 +34,7 @@ export function MapMarker({
   const [element] = useState(() => document.createElement("div"));
   // MapLibre needs a position before the marker joins the map.
   const [marker] = useState(() =>
-    new Marker({ element, anchor }).setLngLat(at),
+    new Marker({ element, anchor, offset }).setLngLat(at),
   );
   const [lng, lat] = at;
 
