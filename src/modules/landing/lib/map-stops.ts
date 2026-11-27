@@ -1,7 +1,7 @@
 import type { StaticImageData } from "next/image";
 
 import { placeMapContent, saturdayStops, venueByKind } from "../content";
-import type { PlaceMap } from "./place-map";
+import type { PlaceMap } from "./place-data";
 import { imageToLngLat, lngLatToImage } from "./map-image";
 
 /** One place on the City Pulse map: an example stop or a real café. */

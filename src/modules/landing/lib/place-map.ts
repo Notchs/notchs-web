@@ -2,132 +2,24 @@ import "server-only";
 
 import { cacheLife } from "next/cache";
 
-import { mapConfig } from "@/config/map";
-import { apiRequest } from "@/shared/lib/api-client";
+import { fetchPlaceMap, type PlaceMap } from "./place-data";
 
-/** A live place on Notchs, as the homepage map shows it. */
-export type Place = {
-  code: string;
-  name: string;
-  area: string | null;
-  /** The API's kind of place, e.g. "cafe", "turf_gym". */
-  category: string;
-  isCafe: boolean;
-  /** [longitude, latitude] */
-  lngLat: [number, number];
-  /**
-   * Cafés only, from the API; null when it has none or while ranks are
-   * hidden. Other kinds are ranked among themselves, so their rank isn't shown.
-   */
-  rank: number | null;
-};
-
-export type PlaceMap = {
-  cityName: string;
-  /**
-   * Cafés first (in rank order when ranks show, otherwise A to Z, never by a
-   * hidden rank), then every other place A to Z.
-   */
-  places: Place[];
-  /** At least `mapConfig.minRankedCafes` cafés have a rank. */
-  showRanks: boolean;
-};
-
-/** The API waits this long at most, so a sleeping API never holds up a build. */
+/** The server waits this long at most, so a sleeping API never holds up a build. */
 const TIMEOUT_MS = 8000;
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isText = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0;
-
-/** One GeoJSON feature from the API, or null if anything about it is off. */
-function toPlace(feature: unknown): Place | null {
-  if (!isRecord(feature)) return null;
-  const { geometry, properties } = feature;
-  if (!isRecord(geometry) || !isRecord(properties)) return null;
-  const [lng, lat] = Array.isArray(geometry.coordinates)
-    ? geometry.coordinates
-    : [];
-  if (
-    typeof lng !== "number" ||
-    typeof lat !== "number" ||
-    !Number.isFinite(lng) ||
-    !Number.isFinite(lat) ||
-    Math.abs(lng) > 180 ||
-    Math.abs(lat) > 90
-  ) {
-    return null;
-  }
-  const { venue_code, name, area, category, rank } = properties;
-  if (!isText(venue_code) || !isText(name) || !isText(category)) return null;
-  const isCafe = category === "cafe";
-  return {
-    code: venue_code,
-    name: name.trim(),
-    area: isText(area) ? area.trim() : null,
-    category,
-    isCafe,
-    lngLat: [lng, lat],
-    rank:
-      isCafe && Number.isInteger(rank) && (rank as number) >= 1
-        ? (rank as number)
-        : null,
-  };
-}
-
 /**
- * Checks the API's answer (it is untrusted) and keeps only well-formed places.
- * The ranks are the API's; nothing here works one out.
- */
-export function toPlaceMap(payload: unknown): PlaceMap | null {
-  const data = isRecord(payload) ? payload.data : null;
-  if (!isRecord(data) || !isRecord(data.city) || !isRecord(data.venues)) {
-    return null;
-  }
-  const features = data.venues.features;
-  if (!Array.isArray(features)) return null;
-
-  const places = features.map(toPlace).filter((place) => place !== null);
-  if (places.length === 0) return null;
-
-  const cafes = places.filter((place) => place.isCafe);
-  const others = places.filter((place) => !place.isCafe);
-  const showRanks =
-    cafes.filter((cafe) => cafe.rank !== null).length >=
-    mapConfig.minRankedCafes;
-  const byName = (a: Place, b: Place) => a.name.localeCompare(b.name);
-  const byRank = (a: Place, b: Place) =>
-    (a.rank ?? Infinity) - (b.rank ?? Infinity) || byName(a, b);
-
-  return {
-    cityName: isText(data.city.name) ? data.city.name.trim() : "Ahmedabad",
-    places: [
-      ...(showRanks
-        ? cafes.sort(byRank)
-        : cafes.map((cafe) => ({ ...cafe, rank: null })).sort(byName)),
-      ...others.sort(byName),
-    ],
-    showRanks,
-  };
-}
-
-/**
- * The city's live places for the homepage map (every kind; cafés are
- * highlighted and ranked), or null when there are none or the API can't be
- * reached (the page then shows its example map). Cached for 5 minutes, like
- * the API itself.
+ * The places as the server last saw them, for the page's HTML (search
+ * engines, and the first thing visitors see). Refreshed in the background
+ * after 5 minutes and never served older than 15; when there are places, the
+ * browser also asks the API itself as the page loads (CityPulseView), so
+ * visitors end up with what the API says now. Null when there are no places
+ * or the API can't be reached.
  */
 export async function getPlaceMap(): Promise<PlaceMap | null> {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
+  cacheLife({ stale: 300, revalidate: 300, expire: 900 });
   try {
-    const payload = await apiRequest<unknown>("/venues/map", {
-      query: { city: mapConfig.city.slug },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-    return toPlaceMap(payload);
+    return await fetchPlaceMap(AbortSignal.timeout(TIMEOUT_MS));
   } catch {
     // Not deployed yet, down, slow or a 404 for a city not live yet.
     return null;
